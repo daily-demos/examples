@@ -44,7 +44,6 @@ export const App = () => {
             owner
           </MessageCard>
         );
-      case CALL_STATE_READY:
       case CALL_STATE_LOBBY:
         return <HairCheck />;
       case CALL_STATE_JOINED:
