@@ -1,0 +1,240 @@
+import React, { forwardRef } from 'react';
+import classnames from 'classnames';
+import Link from 'next/link';
+import PropTypes from 'prop-types';
+import theme from '../../styles/defaultTheme';
+import { hexa } from '../../styles/global';
+
+export const Button = forwardRef(
+  (
+    {
+      children,
+      className,
+      disabled = false,
+      fullWidth,
+      href,
+      IconAfter = null,
+      IconBefore = null,
+      loading = false,
+      size = 'medium',
+      type = 'button',
+      variant = 'primary',
+      shadow = false,
+      ...rest
+    },
+    ref
+  ) => {
+    const cx = classnames('button', className, size, variant, {
+      disabled,
+      fullWidth,
+      loading,
+      shadow,
+    });
+
+    const content = (
+      <>
+        {IconBefore && <IconBefore />}
+        {children}
+        {IconAfter && <IconAfter />}
+      </>
+    );
+
+    return (
+      <>
+        {href ? (
+          <Link href={href}>
+            <a className={cx} ref={ref} {...rest}>
+              {content}
+            </a>
+          </Link>
+        ) : (
+          <button
+            ref={ref}
+            className={cx}
+            // eslint-disable-next-line react/button-has-type
+            type={type || 'button'}
+            disabled={disabled}
+            {...rest}
+          >
+            {content}
+          </button>
+        )}
+        <style jsx>{`
+          .button {
+            font-family: var(--font-family);
+            font-weight: var(--weight-medium);
+            font-size: 1rem;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+            flex-shrink: 0;
+            user-select: none;
+            position: relative;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            margin: 0;
+            height: 48px;
+            padding: 0 var(--spacing-sm);
+            box-shadow: 0 0 0 0 transparent;
+            color: var(--text-darkest);
+            background-color: var(--primary-default);
+            transition: all 200ms ease;
+          }
+
+          .button.fullWidth {
+            flex: 1;
+          }
+
+          .button:visited {
+            color: var(--text-darkest);
+          }
+
+          .button:hover,
+          .button:focus,
+          .button:active,
+          .button[href]:hover,
+          .button[href]:focus,
+          .button[href]:active {
+            outline: none;
+            text-decoration: none;
+            border: 1px solid var(--primary-dark);
+          }
+
+          .button:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.primary.default, 0.35)};
+          }
+
+          .button::-moz-focus-inner {
+            border: 0;
+          }
+
+          .button:disabled {
+            border-color: var(--gray-default);
+            background-color: var(--gray-default);
+            color: var(--gray-dark);
+            cursor: not-allowed;
+          }
+
+          .button.shadow {
+            box-shadow: 0 0 4px 0 rgb(0 0 0 / 8%), 0 4px 4px 0 rgb(0 0 0 / 4%);
+          }
+
+          .button.shadow:hover {
+            box-shadow: 0 0 4px 0 rgb(0 0 0 / 8%), 0 4px 4px 0 rgb(0 0 0 / 12%);
+          }
+
+          .button.medium-square {
+            padding: 0px;
+            height: 48px;
+            width: 48px;
+          }
+
+          .button.large-square {
+            padding: 0px;
+            height: 52px;
+            width: 52px;
+          }
+
+          .button.large-circle {
+            padding: 0px;
+            height: 64px;
+            width: 64px;
+            border-radius: 32px;
+          }
+
+          .button.translucent {
+            background: ${hexa(theme.blue.light, 0.35)};
+            color: white;
+            border: 0px;
+          }
+
+          .button.translucent:hover,
+          .button.translucent:focus,
+          .button.translucent:active {
+            border: 0px;
+            box-shadow: none;
+            background: ${hexa(theme.blue.light, 1)};
+          }
+
+          .button.blur {
+            background: ${hexa(theme.blue.default, 0.35)};
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 0px;
+          }
+
+          .button.blur:hover,
+          .button.blur:focus,
+          .button.blur:active {
+            border: 0px;
+            box-shadow: none;
+            background: ${hexa(theme.blue.default, 1)};
+          }
+
+          .button.blur:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.blue.default, 0.35)};
+          }
+
+          .button.dark {
+            background: ${theme.blue.dark};
+            color: white;
+            border: 0px;
+          }
+
+          .button.dark:hover,
+          .button.dark:focus,
+          .button.dark:active {
+            background: ${theme.blue.default};
+            border: 0px;
+          }
+
+          .button.dark:focus {
+            box-shadow: 0 0 0px 3px rgba(255, 255, 255, 0.15);
+          }
+
+          .button.outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+          }
+          .button.outline:hover,
+          .button.outline:focus,
+          .button.outline:active {
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: none;
+          }
+          .button.outline:focus {
+            box-shadow: 0 0 0px 3px rgba(255, 255, 255, 0.15);
+          }
+
+          .button.muted {
+            color: var(--red-default);
+          }
+        `}</style>
+      </>
+    );
+  }
+);
+
+Button.propTypes = {
+  children: PropTypes.node,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  fullWidth: PropTypes.bool,
+  href: PropTypes.string,
+  IconAfter: PropTypes.node,
+  IconBefore: PropTypes.node,
+  loading: PropTypes.bool,
+  size: PropTypes.string,
+  type: PropTypes.oneOf(['button', 'reset', 'submit']),
+  variant: PropTypes.string,
+  shadow: PropTypes.bool,
+};
+
+export default Button;
