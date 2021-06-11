@@ -1,6 +1,6 @@
 # WKWebView prebuilt example
 
-![Basic Call](./image.png)
+![WebViewPrebuilt](./image.png)
 
 ## What does this demo do?
 
