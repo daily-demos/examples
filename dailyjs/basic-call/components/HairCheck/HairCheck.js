@@ -21,6 +21,13 @@ import IconSettings from '@dailyjs/shared/icons/settings-sm.svg';
 
 import { useDeepCompareMemo } from 'use-deep-compare';
 
+/**
+ * Hair check
+ * ---
+ * - Setup local media devices to see how you look / sound
+ * - Toggle mute state of camera and mic
+ * - Set user name and join call / request access
+ */
 export const HairCheck = () => {
   const { callObject } = useCallState();
   const { localParticipant } = useParticipants();
@@ -28,10 +35,11 @@ export const HairCheck = () => {
     useMediaDevices();
   const { showDeviceModal, setShowDeviceModal } = useUIState();
   const [waiting, setWaiting] = useState(false);
+  const [denied, setDenied] = useState();
   const [joining, setJoining] = useState(false);
   const [userName, setUserName] = useState('');
 
-  // Tell Daily to initialise devices (even through we're not yet in a call)
+  // Initialise devices (even through we're not yet in a call)
   useEffect(() => {
     if (!callObject) return;
     callObject.startCamera();
@@ -53,6 +61,8 @@ export const HairCheck = () => {
     // If we we're in the lobby, wait for the owner to let us in
     if (access?.level === ACCESS_STATE_LOBBY) {
       setWaiting(true);
+
+      // Async request access (this will block until the call owner responds to the knock)
       const { granted } = await callObject.requestAccess({
         name: localParticipant?.name,
         access: {
@@ -62,8 +72,10 @@ export const HairCheck = () => {
 
       if (granted) {
         console.log('👋 Access granted');
+        // Note: we don't have to do any thing here as the call state will mutate
       } else {
         console.log('❌ Access denied');
+        setDenied(true);
       }
     }
   }, [callObject, userName, localParticipant]);
@@ -163,7 +175,12 @@ export const HairCheck = () => {
           <footer>
             {waiting ? (
               <div className="waiting">
-                <Loader /> <span>Waiting for host to grant access</span>
+                <Loader />
+                {denied ? (
+                  <span>Call owner denied request</span>
+                ) : (
+                  <span>Waiting for host to grant access</span>
+                )}
               </div>
             ) : (
               <>
