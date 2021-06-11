@@ -24,7 +24,8 @@ class ViewController: UIViewController {
         webView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
         webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
 
-        let url = URL(string: "https://webrtc.github.io/samples/src/content/getusermedia/gum/");
+        let url = URL(string: "https://jpt.staging.daily.co/hello");
+        
         webView.load(URLRequest(url: url!));
     }
 
@@ -40,7 +41,7 @@ class ViewController: UIViewController {
         configuration.allowsInlineMediaPlayback = true
         // … and without user interaction:
         configuration.mediaTypesRequiringUserActionForPlayback = []
-
+        
         configuration.defaultWebpagePreferences = webpagePreferences
 
         // We don't intend to ever show the webview, so we give it a zero-size:
@@ -49,6 +50,7 @@ class ViewController: UIViewController {
             configuration: configuration
         )
 
+        
         // We pretend to be iOS Safari:
         webView.customUserAgent = """
             Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) \
