@@ -66,7 +66,7 @@ export const HairCheck = () => {
         console.log('❌ Access denied');
       }
     }
-  }, [callObject, userName, localParticipant]);
+  }, [callObject, userName]);
 
   // Memoize the to prevent unnecassary re-renders
   const tileMemo = useDeepCompareMemo(
