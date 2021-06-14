@@ -223,8 +223,8 @@ export const BooleanInput = ({
           position: absolute;
           height: 20px;
           width: 20px;
-          left: 3px;
-          bottom: 3px;
+          left: 2px;
+          bottom: 2px;
           transition: 0.4s;
           border-radius: 50%;
           box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.1),
