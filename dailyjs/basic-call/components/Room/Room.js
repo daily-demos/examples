@@ -1,8 +1,14 @@
 import React from 'react';
+import {
+  WaitingRoomModal,
+  WaitingRoomNotification,
+} from '@dailyjs/shared/components/WaitingRoom';
 import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useMediaDevices } from '@dailyjs/shared/contexts/MediaDeviceProvider';
+import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
-import { ReactComponent as IconAdd } from '@dailyjs/shared/icons/add-md.svg';
+import { useWaitingRoom } from '@dailyjs/shared/contexts/WaitingRoomProvider';
+
 import { ReactComponent as IconCameraOff } from '@dailyjs/shared/icons/camera-off-md.svg';
 import { ReactComponent as IconCameraOn } from '@dailyjs/shared/icons/camera-on-md.svg';
 import { ReactComponent as IconLeave } from '@dailyjs/shared/icons/leave-md.svg';
@@ -17,9 +23,11 @@ import { Header } from './Header';
 import { Tray, TrayButton } from './Tray';
 
 export const Room = ({ onLeave }) => {
-  const { callObject, addFakeParticipant } = useCallState();
+  const { callObject } = useCallState();
+  const { localParticipant } = useParticipants();
   const { setShowDeviceModal } = useUIState();
   const { isCamMuted, isMicMuted } = useMediaDevices();
+  const { setShowModal, showModal } = useWaitingRoom();
 
   const toggleCamera = (newState) => {
     if (!callObject) return false;
@@ -39,6 +47,16 @@ export const Room = ({ onLeave }) => {
         <VideoGrid />
       </main>
 
+      {/* Show waiting room notification & modal if call owner */}
+      {localParticipant?.isOwner && (
+        <>
+          <WaitingRoomNotification />
+          {showModal && (
+            <WaitingRoomModal onClose={() => setShowModal(false)} />
+          )}
+        </>
+      )}
+
       <Tray>
         <TrayButton
           label="Camera"
@@ -57,10 +75,9 @@ export const Room = ({ onLeave }) => {
         <TrayButton label="Settings" onClick={() => setShowDeviceModal(true)}>
           <IconSettings />
         </TrayButton>
-        <TrayButton label="Add fake" onClick={() => addFakeParticipant()}>
-          <IconAdd />
-        </TrayButton>
+
         <span className="divider" />
+
         <TrayButton label="Leave" onClick={onLeave} orange>
           <IconLeave />
         </TrayButton>
