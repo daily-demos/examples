@@ -4,7 +4,7 @@
 
 ## What does this demo do?
 
-- Loads a prebuilt UI room in a WKWebView
+Wraps a prebuilt UI call in a WKWebView
 
 Notes:
 
