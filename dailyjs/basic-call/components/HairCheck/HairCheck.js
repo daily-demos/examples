@@ -54,7 +54,7 @@ export const HairCheck = () => {
     if (access?.level === ACCESS_STATE_LOBBY) {
       setWaiting(true);
       const { granted } = await callObject.requestAccess({
-        name: localParticipant?.name,
+        name: userName,
         access: {
           level: 'full',
         },
