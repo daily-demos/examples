@@ -3,7 +3,7 @@ import Modal from '@dailyjs/shared/components/Modal';
 import { useWaitingRoom } from '@dailyjs/shared/contexts/WaitingRoomProvider';
 import PropTypes from 'prop-types';
 import { Button } from '../Button';
-import { WaitingParticipantRow } from '.';
+import { WaitingParticipantRow } from './WaitingParticipantRow';
 
 export const WaitingRoomModal = ({ onClose }) => {
   const { denyAccess, grantAccess, waitingParticipants } = useWaitingRoom();
