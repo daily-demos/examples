@@ -121,9 +121,9 @@ export const Modal = ({
 
         .backdrop .modal :global(.card-footer) {
           border-top: 0px;
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-          grid-column-gap: var(--spacing-sm);
+          display: flex;
+          column-gap: var(--spacing-xs);
+          margin-top: var(--spacing-sm);
         }
 
         .isVisible {
