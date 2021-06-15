@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Button from '@dailyjs/shared/components/Button';
 import { TextInput } from '@dailyjs/shared/components/Input';
 import Loader from '@dailyjs/shared/components/Loader';
@@ -37,7 +37,7 @@ export const HairCheck = () => {
     callObject.startCamera();
   }, [callObject]);
 
-  const joinCall = useCallback(async () => {
+  const joinCall = async () => {
     if (!callObject) return;
 
     // Disable join controls
@@ -54,7 +54,7 @@ export const HairCheck = () => {
     if (access?.level === ACCESS_STATE_LOBBY) {
       setWaiting(true);
       const { granted } = await callObject.requestAccess({
-        name: localParticipant?.name,
+        name: userName,
         access: {
           level: 'full',
         },
@@ -66,7 +66,7 @@ export const HairCheck = () => {
         console.log('❌ Access denied');
       }
     }
-  }, [callObject, userName, localParticipant]);
+  };
 
   // Memoize the to prevent unnecassary re-renders
   const tileMemo = useDeepCompareMemo(

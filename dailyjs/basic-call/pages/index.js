@@ -4,6 +4,7 @@ import { MediaDeviceProvider } from '@dailyjs/shared/contexts/MediaDeviceProvide
 import { ParticipantsProvider } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { TracksProvider } from '@dailyjs/shared/contexts/TracksProvider';
 import { UIStateProvider } from '@dailyjs/shared/contexts/UIStateProvider';
+import { WaitingRoomProvider } from '@dailyjs/shared/contexts/WaitingRoomProvider';
 import PropTypes from 'prop-types';
 import App from '../components/App';
 import { Intro, NotConfigured } from '../components/Intro';
@@ -95,7 +96,9 @@ export default function Index({ domain, isConfigured = false }) {
         <ParticipantsProvider>
           <TracksProvider>
             <MediaDeviceProvider>
-              <App />
+              <WaitingRoomProvider>
+                <App />
+              </WaitingRoomProvider>
             </MediaDeviceProvider>
           </TracksProvider>
         </ParticipantsProvider>

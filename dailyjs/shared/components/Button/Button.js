@@ -121,12 +121,38 @@ export const Button = forwardRef(
             cursor: not-allowed;
           }
 
+          .button.error {
+            background: var(--secondary-default);
+            border-color: var(--secondary-default);
+          }
+          .button.error:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.secondary.default, 0.35)};
+          }
+          .button.error:hover {
+            border-color: var(--secondary-dark);
+          }
+
+          .button.success {
+            background: var(--green-default);
+            border-color: var(--green-default);
+          }
+          .button.success:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.green.default, 0.35)};
+          }
+          .button.success:hover {
+            border-color: var(--green-dark);
+          }
+
           .button.shadow {
             box-shadow: 0 0 4px 0 rgb(0 0 0 / 8%), 0 4px 4px 0 rgb(0 0 0 / 4%);
           }
 
           .button.shadow:hover {
             box-shadow: 0 0 4px 0 rgb(0 0 0 / 8%), 0 4px 4px 0 rgb(0 0 0 / 12%);
+          }
+
+          .button.small {
+            height: 42px;
           }
 
           .button.medium-square {

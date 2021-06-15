@@ -2,8 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-export const Card = ({ children }) => (
-  <div className="card">
+export const Card = ({ children, className }) => (
+  <div className={classNames('card', className)}>
     {children}
     <style jsx>{`
       background: white;
@@ -16,6 +16,7 @@ export const Card = ({ children }) => (
 
 Card.propTypes = {
   children: PropTypes.node,
+  className: PropTypes.string,
 };
 
 export const CardHeader = ({ children }) => (
@@ -53,14 +54,19 @@ CardBody.propTypes = {
   children: PropTypes.node,
 };
 
-export const CardFooter = ({ children, divider = false }) => (
-  <footer className={classNames('card-footer', { divider })}>
+export const CardFooter = ({ children, divider = false, flex = false }) => (
+  <footer className={classNames('card-footer', { divider, flex })}>
     {children}
     <style jsx>{`
-      display: flex;
-      margin: 0;
+      .card-footer {
+        display: flex;
+      }
 
-      &.divider {
+      :global(.card-footer.flex > *) {
+        flex: 1;
+      }
+
+      .card-footer.divider {
         border-top: 1px solid var(--gray-light);
         padding-top: var(--spacing-md);
       }
@@ -70,6 +76,7 @@ export const CardFooter = ({ children, divider = false }) => (
 CardFooter.propTypes = {
   children: PropTypes.node,
   divider: PropTypes.bool,
+  flex: PropTypes.bool,
 };
 
 export default Card;
