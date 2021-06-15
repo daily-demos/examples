@@ -19,6 +19,7 @@ export const useCallUI = ({
   room,
   haircheck,
   redirectUrl,
+  callEnded,
   notFoundRedirect = 'not-found',
 }) => {
   const router = useRouter();
@@ -57,8 +58,9 @@ export const useCallUI = ({
           <MessageCard error header="No room component declared" />
         );
       case CALL_STATE_ENDED:
-        // Note: you could set a manual redirect here but we'll show just an exit screen
-        return (
+        return callEnded ? (
+          callEnded()
+        ) : (
           <MessageCard onBack={() => window.location.reload()}>
             You have left the call. We hope you had fun!
           </MessageCard>
@@ -72,7 +74,15 @@ export const useCallUI = ({
         An unknown error has occured in the call loop. This should not happen!
       </MessageCard>
     );
-  }, [state, notFoundRedirect, redirectUrl, haircheck, room, router]);
+  }, [
+    state,
+    notFoundRedirect,
+    redirectUrl,
+    haircheck,
+    room,
+    callEnded,
+    router,
+  ]);
 
   return renderByState;
 };
