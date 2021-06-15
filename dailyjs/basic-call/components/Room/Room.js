@@ -7,8 +7,11 @@ import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useMediaDevices } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
+<<<<<<< HEAD
 import { useWaitingRoom } from '@dailyjs/shared/contexts/WaitingRoomProvider';
 
+=======
+>>>>>>> e47ada8fa4389bbfbeb7c97a6d80731a33d24b01
 import { ReactComponent as IconCameraOff } from '@dailyjs/shared/icons/camera-off-md.svg';
 import { ReactComponent as IconCameraOn } from '@dailyjs/shared/icons/camera-on-md.svg';
 import { ReactComponent as IconLeave } from '@dailyjs/shared/icons/leave-md.svg';
@@ -24,7 +27,6 @@ import { Tray, TrayButton } from './Tray';
 
 export const Room = ({ onLeave }) => {
   const { callObject } = useCallState();
-  const { localParticipant } = useParticipants();
   const { setShowDeviceModal } = useUIState();
   const { isCamMuted, isMicMuted } = useMediaDevices();
   const { setShowModal, showModal } = useWaitingRoom();

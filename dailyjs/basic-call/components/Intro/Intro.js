@@ -47,9 +47,11 @@ export const Intro = ({ room, error, domain, onJoin, fetching = false }) => {
         <Field label="Fetch meeting token">
           <BooleanInput onChange={(e) => setFetchToken(e.target.checked)} />
         </Field>
-        <Field label="Join as owner">
-          <BooleanInput onChange={(e) => setOwner(e.target.checked)} />
-        </Field>
+        {fetchToken && (
+          <Field label="Join as owner">
+            <BooleanInput onChange={(e) => setOwner(e.target.checked)} />
+          </Field>
+        )}
       </CardBody>
       <CardFooter divider>
         <Button
