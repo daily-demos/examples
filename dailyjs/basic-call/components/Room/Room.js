@@ -2,7 +2,6 @@ import React from 'react';
 import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useMediaDevices } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
-import { ReactComponent as IconAdd } from '@dailyjs/shared/icons/add-md.svg';
 import { ReactComponent as IconCameraOff } from '@dailyjs/shared/icons/camera-off-md.svg';
 import { ReactComponent as IconCameraOn } from '@dailyjs/shared/icons/camera-on-md.svg';
 import { ReactComponent as IconLeave } from '@dailyjs/shared/icons/leave-md.svg';
@@ -17,7 +16,7 @@ import { Header } from './Header';
 import { Tray, TrayButton } from './Tray';
 
 export const Room = ({ onLeave }) => {
-  const { callObject, addFakeParticipant } = useCallState();
+  const { callObject } = useCallState();
   const { setShowDeviceModal } = useUIState();
   const { isCamMuted, isMicMuted } = useMediaDevices();
 
@@ -57,9 +56,7 @@ export const Room = ({ onLeave }) => {
         <TrayButton label="Settings" onClick={() => setShowDeviceModal(true)}>
           <IconSettings />
         </TrayButton>
-        <TrayButton label="Add fake" onClick={() => addFakeParticipant()}>
-          <IconAdd />
-        </TrayButton>
+
         <span className="divider" />
         <TrayButton label="Leave" onClick={onLeave} orange>
           <IconLeave />
