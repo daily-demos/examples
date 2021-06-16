@@ -32,7 +32,7 @@ export const WaitingRoomModal = ({ onClose }) => {
       ]}
     >
       {waitingParticipants.map((p) => (
-        <WaitingParticipantRow participant={p} />
+        <WaitingParticipantRow participant={p} key={p.id} />
       ))}
     </Modal>
   );
