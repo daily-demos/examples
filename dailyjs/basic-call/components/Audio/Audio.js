@@ -10,15 +10,15 @@ const AudioItem = React.memo(({ participant }) => {
   useEffect(() => {
     if (!audioTrack || !audioRef.current) return;
 
-    // sanity check to make sure this is an audio track
-    if (audioTrack && audioTrack !== 'audio') return;
+    // quick sanity to check to make sure this is an audio track...
+    if (audioTrack.kind !== 'audio') return;
 
     audioRef.current.srcObject = new MediaStream([audioTrack]);
   }, [audioTrack]);
 
   return (
     <>
-      <audio autoPlay playsInline ref={audioRef}>
+      <audio autoPlay playsInline ref={audioRef} id={participant.name}>
         <track kind="captions" />
       </audio>
     </>

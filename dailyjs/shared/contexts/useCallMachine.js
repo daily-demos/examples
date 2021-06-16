@@ -38,7 +38,7 @@ export const useCallMachine = ({
 }) => {
   const [daily, setDaily] = useState(null);
   const [state, setState] = useState(CALL_STATE_READY);
-  const [redirectOnLeave, setRedirectOnLeave] = useState(true);
+  const [redirectOnLeave, setRedirectOnLeave] = useState(false);
 
   const url = useMemo(
     () => (domain && room ? `https://${domain}.daily.co/${room}` : null),
@@ -245,8 +245,9 @@ export const useCallMachine = ({
           break;
         case 'left-meeting':
           daily.destroy();
-          if (!redirectOnLeave) return;
-          setState(CALL_STATE_REDIRECTING);
+          setState(
+            !redirectOnLeave ? CALL_STATE_ENDED : CALL_STATE_REDIRECTING
+          );
           break;
         case 'error':
           switch (ev?.error?.type) {
