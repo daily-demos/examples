@@ -48,15 +48,19 @@ export const useCallUI = ({
         );
       case CALL_STATE_LOBBY:
         return haircheck ? haircheck() : <HairCheck />;
-      case CALL_STATE_REDIRECTING:
-        window.location = redirectUrl;
-        break;
+
       case CALL_STATE_JOINED:
         return room ? (
           room()
         ) : (
           <MessageCard error header="No room component declared" />
         );
+      case CALL_STATE_REDIRECTING:
+        if (!redirectUrl) {
+          break;
+        }
+        window.location = redirectUrl;
+        break;
       case CALL_STATE_ENDED:
         return callEnded ? (
           callEnded()

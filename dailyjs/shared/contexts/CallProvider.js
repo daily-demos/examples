@@ -33,7 +33,7 @@ export const CallProvider = ({
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
 
   // Daily CallMachine hook (primarily handles status of the call)
-  const { daily, leave, join, state } = useCallMachine({
+  const { daily, leave, state, setRedirectOnLeave } = useCallMachine({
     domain,
     room,
     token,
@@ -71,10 +71,10 @@ export const CallProvider = ({
         addFakeParticipant,
         preJoinNonAuthorized,
         leave,
-        join,
         videoQuality,
         setVideoQuality,
         setBandwidth,
+        setRedirectOnLeave,
         subscribeToTracksAutomatically,
       }}
     >
