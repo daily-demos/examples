@@ -22,6 +22,7 @@ export const Tile = React.memo(
     const cx = classNames('tile', {
       mirrored,
       avatar: showAvatar && !videoTrack,
+      active: participant.isActiveSpeaker,
     });
 
     return (
@@ -60,6 +61,11 @@ export const Tile = React.memo(
             min-width: 1px;
             position: relative;
             width: 100%;
+            box-sizing: border-box;
+          }
+
+          .tile.active {
+            border: 2px solid var(--primary-default);
           }
 
           .tile.mirrored :global(video) {
