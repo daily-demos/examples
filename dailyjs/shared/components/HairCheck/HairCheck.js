@@ -21,6 +21,13 @@ import IconSettings from '@dailyjs/shared/icons/settings-sm.svg';
 
 import { useDeepCompareMemo } from 'use-deep-compare';
 
+/**
+ * Hair check
+ * ---
+ * - Setup local media devices to see how you look / sound
+ * - Toggle mute state of camera and mic
+ * - Set user name and join call / request access
+ */
 export const HairCheck = () => {
   const { callObject } = useCallState();
   const { localParticipant } = useParticipants();
@@ -29,9 +36,10 @@ export const HairCheck = () => {
   const { showDeviceModal, setShowDeviceModal } = useUIState();
   const [waiting, setWaiting] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [denied, setDenied] = useState();
   const [userName, setUserName] = useState('');
 
-  // Tell Daily to initialise devices (even through we're not yet in a call)
+  // Initialise devices (even though we're not yet in a call)
   useEffect(() => {
     if (!callObject) return;
     callObject.startCamera();
@@ -46,7 +54,7 @@ export const HairCheck = () => {
     // Set the local participants name
     await callObject.setUserName(userName);
 
-    // Attempt to jin the call
+    // Async request access (this will block until the call owner responds to the knock)
     const { access } = callObject.accessState();
     await callObject.join();
 
@@ -61,9 +69,11 @@ export const HairCheck = () => {
       });
 
       if (granted) {
+        // Note: we don't have to do any thing here as the call state will mutate
         console.log('👋 Access granted');
       } else {
         console.log('❌ Access denied');
+        setDenied(true);
       }
     }
   };
@@ -163,7 +173,12 @@ export const HairCheck = () => {
           <footer>
             {waiting ? (
               <div className="waiting">
-                <Loader /> <span>Waiting for host to grant access</span>
+                <Loader />
+                {denied ? (
+                  <span>Call owner denied request</span>
+                ) : (
+                  <span>Waiting for host to grant access</span>
+                )}
               </div>
             ) : (
               <>
