@@ -1,11 +1,11 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { debounce } from 'debounce';
 import { useCallState } from '../contexts/CallProvider';
 import { useSound } from './useSound';
 
 /**
- * Convenience hook to play `join.mp3` when first other participants joins.
+ * Convenience hook to play `join.mp3` when participants join the call
  */
 export const useJoinSound = () => {
   const { callObject } = useCallState();
