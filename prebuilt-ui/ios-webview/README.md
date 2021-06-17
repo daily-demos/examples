@@ -4,7 +4,7 @@
 
 ## What does this demo do?
 
-Wraps a prebuilt UI call in a WKWebView
+Embeds the Daily Prebuilt UI in native iOS applicaiton using WKWebView
 
 Notes:
 
@@ -14,6 +14,5 @@ Notes:
 ### Getting started
 
 - Load XCode project
-- Run on an device / simulator targeting iOS >= 14.3
-
-## How does this example work?
+- Update the url property found in [ViewController.swift](./WebViewPrebuilt/ViewController.swift)
+- Run on device / simulator targeting iOS >= 14.3

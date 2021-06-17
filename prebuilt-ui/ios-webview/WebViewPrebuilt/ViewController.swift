@@ -24,7 +24,7 @@ class ViewController: UIViewController {
         webView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
         webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
 
-        let url = URL(string: "https://jpt.staging.daily.co/hello");
+        let url = URL(string: "[YOUR DAILY ROOM URL HERE]");
         
         webView.load(URLRequest(url: url!));
     }
