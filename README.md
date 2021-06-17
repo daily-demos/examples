@@ -22,11 +22,7 @@ Examples that showcase the Daily CallObject using our Javascript library
 
 ## [Prebuilt UI](./dailyjs/prebuilt-ui)
 
-Work in progress, examples coming soon
-
-## [React Native (Mobile)](./dailyjs/react-native)
-
-Work in progress, examples coming soon
+Examples that showcase using and customizing the Daily Prebuilt UI
 
 ---
 
