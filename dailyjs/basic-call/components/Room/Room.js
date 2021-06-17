@@ -1,4 +1,5 @@
 import React from 'react';
+import { Audio } from '@dailyjs/shared/components/Audio';
 import {
   WaitingRoomModal,
   WaitingRoomNotification,
@@ -16,7 +17,6 @@ import { ReactComponent as IconMicOn } from '@dailyjs/shared/icons/mic-on-md.svg
 import { ReactComponent as IconSettings } from '@dailyjs/shared/icons/settings-md.svg';
 import PropTypes from 'prop-types';
 
-import { Audio } from '../Audio';
 import { VideoGrid } from '../VideoGrid';
 import { Header } from './Header';
 import { Tray, TrayButton } from './Tray';
