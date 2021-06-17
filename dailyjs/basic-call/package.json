@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@dailyjs/shared": "*",
-    "debounce": "^1.2.1",
     "next": "^10.2.0",
     "pluralize": "^8.0.0",
     "react": "^17.0.2",

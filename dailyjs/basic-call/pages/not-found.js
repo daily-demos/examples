@@ -1,5 +1,5 @@
 import React from 'react';
-import MessageCard from '../components/MessageCard';
+import MessageCard from '@dailyjs/shared/components/MessageCard';
 
 export default function RoomNotFound() {
   return (

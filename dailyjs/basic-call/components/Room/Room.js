@@ -9,6 +9,7 @@ import { useMediaDevices } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 import { useWaitingRoom } from '@dailyjs/shared/contexts/WaitingRoomProvider';
+import useJoinSound from '@dailyjs/shared/hooks/useJoinSound';
 import { ReactComponent as IconCameraOff } from '@dailyjs/shared/icons/camera-off-md.svg';
 import { ReactComponent as IconCameraOn } from '@dailyjs/shared/icons/camera-on-md.svg';
 import { ReactComponent as IconLeave } from '@dailyjs/shared/icons/leave-md.svg';
@@ -27,6 +28,8 @@ export const Room = ({ onLeave }) => {
   const { isCamMuted, isMicMuted } = useMediaDevices();
   const { setShowModal, showModal } = useWaitingRoom();
   const { localParticipant } = useParticipants();
+
+  useJoinSound();
 
   const toggleCamera = (newState) => {
     if (!callObject) return false;
