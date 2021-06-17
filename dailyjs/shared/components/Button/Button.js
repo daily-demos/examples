@@ -194,12 +194,28 @@ export const Button = forwardRef(
             height: 42px;
           }
 
+          .button.tiny {
+            height: 32px;
+            font-size: 11px;
+            border-radius: var(--radius-xs);
+            text-transform: uppercase;
+          }
+
+          .button.tiny-square {
+            padding: 0px;
+            height: 32px;
+            width: 32px;
+          }
+          .button.small-square {
+            padding: 0px;
+            height: 42px;
+            width: 42px;
+          }
           .button.medium-square {
             padding: 0px;
             height: 48px;
             width: 48px;
           }
-
           .button.large-square {
             padding: 0px;
             height: 52px;
@@ -271,6 +287,21 @@ export const Button = forwardRef(
           }
           .button.outline:focus {
             box-shadow: 0 0 0px 3px rgba(255, 255, 255, 0.15);
+          }
+
+          .button.outline-gray {
+            background: transparent;
+            border: 1px solid var(--gray-light);
+            color: var(--text-light);
+          }
+          .button.outline-gray:hover,
+          .button.outline-gray:focus,
+          .button.outline-gray:active {
+            border: 1px solid var(--gray-default);
+            box-shadow: none;
+          }
+          .button.outline-gray:focus {
+            box-shadow: 0 0 0px 3px rgba(0, 0, 0, 0.05);
           }
 
           .button.muted {

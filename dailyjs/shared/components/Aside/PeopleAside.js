@@ -32,13 +32,15 @@ const PersonRow = ({ participant, isOwner = false }) => (
       ) : (
         <>
           <Button
-            size="medium-square"
+            size="tiny-square"
+            disabled={participant.isCamMuted}
             variant={participant.isCamMuted ? 'error-light' : 'success-light'}
           >
             {participant.isCamMuted ? <IconCamOff /> : <IconCamOn />}
           </Button>
           <Button
-            size="medium-square"
+            size="tiny-square"
+            disabled={participant.isMicMuted}
             variant={participant.isMicMuted ? 'error-light' : 'success-light'}
           >
             {participant.isMicMuted ? <IconMicOff /> : <IconMicOn />}
@@ -50,15 +52,14 @@ const PersonRow = ({ participant, isOwner = false }) => (
       .person-row {
         display: flex;
         border-bottom: 1px solid var(--gray-light);
-        padding: var(--spacing-xs) 0;
+        padding-bottom: var(--spacing-xxxs);
+        margin-bottom: var(--spacing-xxxs);
         justify-content: space-between;
         align-items: center;
-        margin: 0 var(--spacing-xs);
       }
-
       .person-row .actions {
         display: flex;
-        gap: var(--spacing-xxs);
+        gap: var(--spacing-xxxs);
       }
 
       .mute-state {
@@ -95,8 +96,11 @@ export const PeopleAside = () => {
   return (
     <Aside>
       {isOwner && (
-        <>
+        <div className="owner-actions">
           <Button
+            fullWidth
+            size="tiny"
+            variant="outline-gray"
             onClick={() =>
               callObject.updateParticipants({ '*': { setAudio: false } })
             }
@@ -104,17 +108,36 @@ export const PeopleAside = () => {
             Mute all mics
           </Button>
           <Button
+            fullWidth
+            size="tiny"
+            variant="outline-gray"
             onClick={() =>
               callObject.updateParticipants({ '*': { setVideo: false } })
             }
           >
-            Mute all cam
+            Mute all cams
           </Button>
-        </>
+        </div>
       )}
-      {allParticipants.map((p) => (
-        <PersonRow participant={p} key={p.id} isOwner={isOwner} />
-      ))}
+      <div className="rows">
+        {allParticipants.map((p) => (
+          <PersonRow participant={p} key={p.id} isOwner={isOwner} />
+        ))}
+      </div>
+      <style jsx>
+        {`
+          .owner-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xxxs);
+            margin: var(--spacing-xs) var(--spacing-xxs);
+          }
+
+          .rows {
+            margin: var(--spacing-xxs);
+          }
+        `}
+      </style>
     </Aside>
   );
 };
