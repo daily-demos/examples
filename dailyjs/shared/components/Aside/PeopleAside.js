@@ -12,7 +12,7 @@ import { Button } from '../Button';
 
 const PersonRow = ({ participant, isOwner = false }) => (
   <div className="person-row">
-    <div>
+    <div className="name">
       {participant.name} {participant.isLocal && '(You)'}
     </div>
     <div className="actions">
@@ -57,9 +57,16 @@ const PersonRow = ({ participant, isOwner = false }) => (
         justify-content: space-between;
         align-items: center;
       }
+
+      .person-row .name {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
       .person-row .actions {
         display: flex;
         gap: var(--spacing-xxxs);
+        margin-left: var(--spacing-xs);
       }
 
       .mute-state {
