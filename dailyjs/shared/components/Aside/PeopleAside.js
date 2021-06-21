@@ -93,7 +93,7 @@ PersonRow.propTypes = {
 
 export const PeopleAside = () => {
   const { callObject } = useCallState();
-  const { showPeopleAside } = useUIState();
+  const { showPeopleAside, setShowPeopleAside } = useUIState();
   const { allParticipants, isOwner } = useParticipants();
 
   if (!showPeopleAside) {
@@ -101,7 +101,7 @@ export const PeopleAside = () => {
   }
 
   return (
-    <Aside>
+    <Aside onClose={() => setShowPeopleAside(false)}>
       {isOwner && (
         <div className="owner-actions">
           <Button
