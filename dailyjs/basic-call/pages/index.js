@@ -66,6 +66,7 @@ export default function Index({ domain, isConfigured = false }) {
           <NotConfigured />
         ) : (
           <Intro
+            title={process.env.PROJECT_TITLE}
             room={roomName}
             error={tokenError}
             fetching={fetchingToken}
@@ -119,6 +120,9 @@ export async function getStaticProps() {
 
   // Pass through domain as prop
   return {
-    props: { domain: process.env.DAILY_DOMAIN || null, isConfigured },
+    props: {
+      domain: process.env.DAILY_DOMAIN || null,
+      isConfigured,
+    },
   };
 }

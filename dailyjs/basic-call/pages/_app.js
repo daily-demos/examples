@@ -1,4 +1,5 @@
 import React from 'react';
+import GlobalHead from '@dailyjs/shared/components/GlobalHead';
 import GlobalStyle from '@dailyjs/shared/components/GlobalStyle';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
@@ -7,13 +8,9 @@ function App({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>Daily - Basic Call Example</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
+        <title>Daily - {process.env.PROJECT_TITLE}</title>
       </Head>
+      <GlobalHead />
       <GlobalStyle />
       <Component {...pageProps} />
     </>
