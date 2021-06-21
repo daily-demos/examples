@@ -41,10 +41,8 @@ class ViewController: UIViewController {
         configuration.allowsInlineMediaPlayback = true
         // … and without user interaction:
         configuration.mediaTypesRequiringUserActionForPlayback = []
-        
         configuration.defaultWebpagePreferences = webpagePreferences
 
-        // We don't intend to ever show the webview, so we give it a zero-size:
         let webView = WKWebView(
             frame: CGRect.zero,
             configuration: configuration
@@ -58,8 +56,6 @@ class ViewController: UIViewController {
             Version/14.1 Mobile/15E148 Safari/604.1
         """
 
-        // Since the webview is off-screen anyway these are
-        // not strictly necessary, but it doesn't harm either:
         webView.allowsBackForwardNavigationGestures = false
         webView.scrollView.isScrollEnabled = false
 
