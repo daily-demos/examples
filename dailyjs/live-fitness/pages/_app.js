@@ -8,7 +8,7 @@ function App({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <title>Daily - Basic Call Example</title>
+        <title>Daily - Live Fitness Demo</title>
       </Head>
       <GlobalHead />
       <GlobalStyle />
