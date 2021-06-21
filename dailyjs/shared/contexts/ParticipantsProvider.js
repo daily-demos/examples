@@ -81,6 +81,11 @@ export const ParticipantsProvider = ({ children }) => {
     [allParticipants]
   );
 
+  const isOwner = useDeepCompareMemo(
+    () => localParticipant?.isOwner,
+    [localParticipant]
+  );
+
   /**
    * The participant who should be rendered prominently right now
    */
@@ -221,6 +226,7 @@ export const ParticipantsProvider = ({ children }) => {
         setUsername,
         swapParticipantPosition,
         username,
+        isOwner,
       }}
     >
       {children}

@@ -84,7 +84,7 @@ export const WaitingRoomNotification = () => {
               Allow
             </Button>
           )}
-          <Button onClick={handleDenyClick} size="small" variant="error">
+          <Button onClick={handleDenyClick} size="small" variant="warning">
             {hasMultiplePeopleWaiting ? 'Deny All' : 'Deny'}
           </Button>
         </CardFooter>

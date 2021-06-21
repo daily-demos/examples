@@ -121,15 +121,40 @@ export const Button = forwardRef(
             cursor: not-allowed;
           }
 
-          .button.error {
+          .button.warning {
             background: var(--secondary-default);
             border-color: var(--secondary-default);
           }
-          .button.error:focus {
+          .button.warning:focus {
             box-shadow: 0 0 0px 3px ${hexa(theme.secondary.default, 0.35)};
           }
-          .button.error:hover {
+          .button.warning:hover {
             border-color: var(--secondary-dark);
+          }
+
+          .button.error {
+            background: var(--red-default);
+            border-color: var(--red-default);
+          }
+          .button.error:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.red.default, 0.35)};
+          }
+          .button.error:hover {
+            border-color: var(--red-dark);
+          }
+
+          .button.error-light {
+            background: var(--red-light);
+            border-color: var(--red-light);
+            color: var(--red-default);
+          }
+          .button.error-light:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.red.default, 0.35)};
+          }
+          .button.error-light:hover {
+            color: white;
+            background: var(--red-default);
+            border-color: var(--red-default);
           }
 
           .button.success {
@@ -141,6 +166,20 @@ export const Button = forwardRef(
           }
           .button.success:hover {
             border-color: var(--green-dark);
+          }
+
+          .button.success-light {
+            background: var(--green-light);
+            border-color: var(--green-light);
+            color: var(--green-default);
+          }
+          .button.success-light:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.green.default, 0.35)};
+          }
+          .button.success-light:hover {
+            color: white;
+            background: var(--green-default);
+            border-color: var(--green-default);
           }
 
           .button.shadow {
@@ -155,12 +194,28 @@ export const Button = forwardRef(
             height: 42px;
           }
 
+          .button.tiny {
+            height: 32px;
+            font-size: 11px;
+            border-radius: var(--radius-xs);
+            text-transform: uppercase;
+          }
+
+          .button.tiny-square {
+            padding: 0px;
+            height: 32px;
+            width: 32px;
+          }
+          .button.small-square {
+            padding: 0px;
+            height: 42px;
+            width: 42px;
+          }
           .button.medium-square {
             padding: 0px;
             height: 48px;
             width: 48px;
           }
-
           .button.large-square {
             padding: 0px;
             height: 52px;
@@ -179,7 +234,6 @@ export const Button = forwardRef(
             color: white;
             border: 0px;
           }
-
           .button.translucent:hover,
           .button.translucent:focus,
           .button.translucent:active {
@@ -194,7 +248,6 @@ export const Button = forwardRef(
             color: white;
             border: 0px;
           }
-
           .button.blur:hover,
           .button.blur:focus,
           .button.blur:active {
@@ -202,7 +255,6 @@ export const Button = forwardRef(
             box-shadow: none;
             background: ${hexa(theme.blue.default, 1)};
           }
-
           .button.blur:focus {
             box-shadow: 0 0 0px 3px ${hexa(theme.blue.default, 0.35)};
           }
@@ -212,14 +264,12 @@ export const Button = forwardRef(
             color: white;
             border: 0px;
           }
-
           .button.dark:hover,
           .button.dark:focus,
           .button.dark:active {
             background: ${theme.blue.default};
             border: 0px;
           }
-
           .button.dark:focus {
             box-shadow: 0 0 0px 3px rgba(255, 255, 255, 0.15);
           }
@@ -237,6 +287,21 @@ export const Button = forwardRef(
           }
           .button.outline:focus {
             box-shadow: 0 0 0px 3px rgba(255, 255, 255, 0.15);
+          }
+
+          .button.outline-gray {
+            background: transparent;
+            border: 1px solid var(--gray-light);
+            color: var(--text-light);
+          }
+          .button.outline-gray:hover,
+          .button.outline-gray:focus,
+          .button.outline-gray:active {
+            border: 1px solid var(--gray-default);
+            box-shadow: none;
+          }
+          .button.outline-gray:focus {
+            box-shadow: 0 0 0px 3px rgba(0, 0, 0, 0.05);
           }
 
           .button.muted {

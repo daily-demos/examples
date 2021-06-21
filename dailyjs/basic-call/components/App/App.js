@@ -3,6 +3,7 @@ import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useCallUI } from '@dailyjs/shared/hooks/useCallUI';
 
 import Room from '../Room';
+import { Asides } from './Asides';
 import { Modals } from './Modals';
 
 export const App = () => {
@@ -19,6 +20,7 @@ export const App = () => {
       <div className="app">
         {componentForState()}
         <Modals />
+        <Asides />
         <style jsx>{`
           color: white;
           height: 100vh;

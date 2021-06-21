@@ -20,7 +20,7 @@ export const WaitingParticipantRow = ({ participant }) => {
         <Button onClick={handleAllowClick} size="small" variant="success">
           Allow
         </Button>
-        <Button onClick={handleDenyClick} size="small" variant="error">
+        <Button onClick={handleDenyClick} size="small" variant="warning">
           Deny
         </Button>
       </div>
