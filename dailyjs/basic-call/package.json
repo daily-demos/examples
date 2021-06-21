@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@dailyjs/shared": "*",
-    "next": "^10.2.0",
+    "next": "^11.0.0",
     "pluralize": "^8.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
@@ -17,6 +17,6 @@
   "devDependencies": {
     "babel-plugin-module-resolver": "^4.1.0",
     "next-compose-plugins": "^2.2.1",
-    "next-transpile-modules": "^6.4.0"
+    "next-transpile-modules": "^8.0.0"
   }
 }
