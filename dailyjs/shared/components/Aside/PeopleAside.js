@@ -10,6 +10,8 @@ import { useParticipants } from '../../contexts/ParticipantsProvider';
 import { useUIState } from '../../contexts/UIStateProvider';
 import { Button } from '../Button';
 
+export const PEOPLE_ASIDE = 'people';
+
 const PersonRow = ({ participant, isOwner = false }) => (
   <div className="person-row">
     <div className="name">
@@ -93,15 +95,15 @@ PersonRow.propTypes = {
 
 export const PeopleAside = () => {
   const { callObject } = useCallState();
-  const { showPeopleAside, setShowPeopleAside } = useUIState();
+  const { showAside, setShowAside } = useUIState();
   const { allParticipants, isOwner } = useParticipants();
 
-  if (!showPeopleAside) {
+  if (!showAside && showAside !== PEOPLE_ASIDE) {
     return null;
   }
 
   return (
-    <Aside onClose={() => setShowPeopleAside(false)}>
+    <Aside onClose={() => setShowAside(false)}>
       {isOwner && (
         <div className="owner-actions">
           <Button

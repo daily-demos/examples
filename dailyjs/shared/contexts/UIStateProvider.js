@@ -5,15 +5,15 @@ export const UIStateContext = createContext();
 
 export const UIStateProvider = ({ children }) => {
   const [showDeviceModal, setShowDeviceModal] = useState(false);
-  const [showPeopleAside, setShowPeopleAside] = useState(false);
+  const [showAside, setShowAside] = useState();
 
   return (
     <UIStateContext.Provider
       value={{
         showDeviceModal,
         setShowDeviceModal,
-        showPeopleAside,
-        setShowPeopleAside,
+        showAside,
+        setShowAside,
       }}
     >
       {children}

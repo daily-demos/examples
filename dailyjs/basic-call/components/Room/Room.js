@@ -19,13 +19,14 @@ import { ReactComponent as IconPeople } from '@dailyjs/shared/icons/people-md.sv
 import { ReactComponent as IconSettings } from '@dailyjs/shared/icons/settings-md.svg';
 import PropTypes from 'prop-types';
 
+import { PEOPLE_ASIDE } from '../../../shared/components/Aside/PeopleAside';
 import { VideoGrid } from '../VideoGrid';
 import { Header } from './Header';
 import { Tray, TrayButton } from './Tray';
 
 export const Room = ({ onLeave }) => {
   const { callObject } = useCallState();
-  const { setShowDeviceModal, setShowPeopleAside } = useUIState();
+  const { setShowDeviceModal, setShowAside } = useUIState();
   const { isCamMuted, isMicMuted } = useMediaDevices();
   const { setShowModal, showModal } = useWaitingRoom();
   const { localParticipant } = useParticipants();
@@ -81,7 +82,7 @@ export const Room = ({ onLeave }) => {
 
         <TrayButton
           label="People"
-          onClick={() => setShowPeopleAside((p) => !p)}
+          onClick={() => setShowAside((p) => (p ? null : PEOPLE_ASIDE))}
         >
           <IconPeople />
         </TrayButton>
