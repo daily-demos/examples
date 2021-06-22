@@ -1,13 +1,18 @@
-# Prebuilt UI Examples
+# WKWebView prebuilt example
 
-Daily Prebuilt makes it easy for developers to add video calls — in minutes — to any site or app. Out-of-the-box features include 1,000 person calls, recording, dual screen sharing, and more. Our secure infrastructure is trusted worldwide, from startups to Fortune 500 companies.
+![WebViewPrebuilt](./image.png)
 
-These examples demonstrate how to customise and extend the prebuilt UI.
+## What does this demo do?
 
----
+Embeds the Daily Prebuilt UI in native iOS applicaiton using WKWebView
 
-## Examples
+Notes:
 
-### [🤙 iOS WebView](./ios-webview)
+- `getUserMedia` support was added to WKWebView in iOS >=14.4
+- You must add both `NSCameraUsageDescription` & `NSMicrophoneUsageDescription` to `info.plist` or `navigator.mediaDevices` will resolve as undefined
 
-Shows how to wrap the prebuilt UI in a native iOS application (using WKWebView)
+### Getting started
+
+- Load XCode project
+- Update the url property found in [ViewController.swift](./WebViewPrebuilt/ViewController.swift)
+- Run on device / simulator targeting iOS >=14.4
