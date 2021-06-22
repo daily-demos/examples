@@ -8,7 +8,9 @@ This repository uses [yarn workspaces](https://classic.yarnpkg.com/en/docs/works
 
 Setup dependencies via `yarn install`.
 
-Run an example via `yarn workspace @dailyjs/basic-call dev` (replacing `basic-call` with the name of the demo)
+Add the required environment variables (e.g. your Daily API key) for the demo being used. Each demo's README will list the required environment variables to run it locally.
+
+Run an example via `yarn workspace @dailyjs/basic-call dev` (replacing `basic-call` with the name of the demo).
 
 Please note: these demos are intended as educational resources for using the Daily platform as well as showcasing common usage patterns and best practices. That said, they are not intended to be used as production ready applications.
 
