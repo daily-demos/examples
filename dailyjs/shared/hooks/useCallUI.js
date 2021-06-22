@@ -74,8 +74,14 @@ export const useCallUI = ({
     }
 
     return (
-      <MessageCard error header="An error occured">
-        An unknown error has occured in the call loop. This should not happen!
+      <MessageCard
+        error
+        header="An unknown error occured"
+        onBack={() => window.location.reload()}
+      >
+        A fatal error occured in the call loop. Please check you have entered a
+        valid <code>DAILY_DOMAIN</code> and <code>DAILY_API_KEY</code>{' '}
+        environmental variables.
       </MessageCard>
     );
   }, [

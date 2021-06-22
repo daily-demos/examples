@@ -26,6 +26,7 @@ export const CardHeader = ({ children }) => (
       h2 {
         font-size: 1.375rem;
         margin: 0px;
+        color: var(--text-default);
       }
 
       & + :global(.card-body) {
