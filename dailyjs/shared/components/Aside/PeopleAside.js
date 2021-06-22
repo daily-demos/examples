@@ -98,7 +98,7 @@ export const PeopleAside = () => {
   const { showAside, setShowAside } = useUIState();
   const { allParticipants, isOwner } = useParticipants();
 
-  if (!showAside && showAside !== PEOPLE_ASIDE) {
+  if (!showAside || showAside !== PEOPLE_ASIDE) {
     return null;
   }
 

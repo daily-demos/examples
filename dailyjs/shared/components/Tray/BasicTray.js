@@ -14,8 +14,7 @@ import { Tray, TrayButton } from './Tray';
 
 export const BasicTray = () => {
   const { callObject, leave } = useCallState();
-  const { customTrayComponent, setShowDeviceModal, setShowAside } =
-    useUIState();
+  const { customTrayComponent, setShowDeviceModal, toggleAside } = useUIState();
   const { isCamMuted, isMicMuted } = useMediaDevices();
 
   const toggleCamera = (newState) => {
@@ -48,10 +47,7 @@ export const BasicTray = () => {
         <IconSettings />
       </TrayButton>
 
-      <TrayButton
-        label="People"
-        onClick={() => setShowAside((p) => (p ? null : PEOPLE_ASIDE))}
-      >
+      <TrayButton label="People" onClick={() => toggleAside(PEOPLE_ASIDE)}>
         <IconPeople />
       </TrayButton>
 
