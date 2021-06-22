@@ -1,5 +1,6 @@
 import React from 'react';
 import { Audio } from '@dailyjs/shared/components/Audio';
+import { Tray, TrayButton } from '@dailyjs/shared/components/Tray';
 import {
   WaitingRoomModal,
   WaitingRoomNotification,
@@ -22,7 +23,6 @@ import PropTypes from 'prop-types';
 import { PEOPLE_ASIDE } from '../../../shared/components/Aside/PeopleAside';
 import { VideoGrid } from '../VideoGrid';
 import { Header } from './Header';
-import { Tray, TrayButton } from './Tray';
 
 export const Room = ({ onLeave }) => {
   const { callObject } = useCallState();

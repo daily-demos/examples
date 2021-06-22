@@ -1,16 +1,18 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { PeopleAside } from '@dailyjs/shared/components/Aside/PeopleAside';
+import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 
-export const Asides = ({ asides }) => (
-  <>
-    {asides.map((A) => (
-      <A key={A.name} />
-    ))}
-  </>
-);
+export const Asides = () => {
+  const { asides } = useUIState();
 
-Asides.propTypes = {
-  asides: PropTypes.arrayOf(PropTypes.func),
+  return (
+    <>
+      <PeopleAside />
+      {asides.map((AsideComponent) => (
+        <AsideComponent key={AsideComponent.name} />
+      ))}
+    </>
+  );
 };
 
 export default Asides;

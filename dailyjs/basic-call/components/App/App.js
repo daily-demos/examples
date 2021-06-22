@@ -7,7 +7,7 @@ import Room from '../Room';
 import { Asides } from './Asides';
 import { Modals } from './Modals';
 
-export const App = ({ asides }) => {
+export const App = () => {
   const { state, leave } = useCallState();
 
   const componentForState = useCallUI({
@@ -21,7 +21,7 @@ export const App = ({ asides }) => {
       <div className="app">
         {componentForState()}
         <Modals />
-        <Asides asides={asides} />
+        <Asides />
         <style jsx>{`
           color: white;
           height: 100vh;
@@ -35,7 +35,7 @@ export const App = ({ asides }) => {
         `}</style>
       </div>
     ),
-    [componentForState, asides]
+    [componentForState]
   );
 };
 

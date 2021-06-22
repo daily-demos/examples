@@ -12,7 +12,7 @@ function App({ Component, pageProps }) {
       </Head>
       <GlobalHead />
       <GlobalStyle />
-      <Component {...pageProps} />
+      <Component asides={App.asides} {...pageProps} />
     </>
   );
 }
@@ -26,5 +26,7 @@ App.propTypes = {
   Component: PropTypes.elementType,
   pageProps: PropTypes.object,
 };
+
+App.asides = [];
 
 export default App;

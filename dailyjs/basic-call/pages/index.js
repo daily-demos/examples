@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { PeopleAside } from '@dailyjs/shared/components/Aside';
 import { CallProvider } from '@dailyjs/shared/contexts/CallProvider';
 import { MediaDeviceProvider } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { ParticipantsProvider } from '@dailyjs/shared/contexts/ParticipantsProvider';
@@ -18,7 +17,7 @@ import { Intro, NotConfigured } from '../components/Intro';
  * - Set call owner status
  * - Finally, renders the main application loop
  */
-export default function Index({ domain, isConfigured = false }) {
+export default function Index({ domain, isConfigured = false, asides }) {
   const [roomName, setRoomName] = useState('');
   const [fetchingToken, setFetchingToken] = useState(false);
   const [token, setToken] = useState();
@@ -93,13 +92,13 @@ export default function Index({ domain, isConfigured = false }) {
    * Main call UI
    */
   return (
-    <UIStateProvider>
+    <UIStateProvider asides={asides}>
       <CallProvider domain={domain} room={roomName} token={token}>
         <ParticipantsProvider>
           <TracksProvider>
             <MediaDeviceProvider>
               <WaitingRoomProvider>
-                <App asides={Index.asides} />
+                <App />
               </WaitingRoomProvider>
             </MediaDeviceProvider>
           </TracksProvider>
@@ -112,9 +111,8 @@ export default function Index({ domain, isConfigured = false }) {
 Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
   domain: PropTypes.string,
+  asides: PropTypes.arrayOf(PropTypes.func),
 };
-
-Index.asides = [PeopleAside];
 
 export async function getStaticProps() {
   // Check that both domain and key env vars are set
