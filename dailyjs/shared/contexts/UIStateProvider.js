@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export const UIStateContext = createContext();
 
-export const UIStateProvider = ({ asides, children }) => {
+export const UIStateProvider = ({ asides, customTrayComponent, children }) => {
   const [showDeviceModal, setShowDeviceModal] = useState(false);
   const [showAside, setShowAside] = useState();
 
@@ -11,6 +11,7 @@ export const UIStateProvider = ({ asides, children }) => {
     <UIStateContext.Provider
       value={{
         asides,
+        customTrayComponent,
         showDeviceModal,
         setShowDeviceModal,
         showAside,
@@ -25,6 +26,7 @@ export const UIStateProvider = ({ asides, children }) => {
 UIStateProvider.propTypes = {
   children: PropTypes.node,
   asides: PropTypes.arrayOf(PropTypes.func),
+  customTrayComponent: PropTypes.node,
 };
 
 export const useUIState = () => useContext(UIStateContext);

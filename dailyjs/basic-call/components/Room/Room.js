@@ -1,47 +1,22 @@
 import React from 'react';
 import { Audio } from '@dailyjs/shared/components/Audio';
-import { Tray, TrayButton } from '@dailyjs/shared/components/Tray';
+import { BasicTray } from '@dailyjs/shared/components/Tray';
 import {
   WaitingRoomModal,
   WaitingRoomNotification,
 } from '@dailyjs/shared/components/WaitingRoom';
-import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
-import { useMediaDevices } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 import { useWaitingRoom } from '@dailyjs/shared/contexts/WaitingRoomProvider';
 import useJoinSound from '@dailyjs/shared/hooks/useJoinSound';
-import { ReactComponent as IconCameraOff } from '@dailyjs/shared/icons/camera-off-md.svg';
-import { ReactComponent as IconCameraOn } from '@dailyjs/shared/icons/camera-on-md.svg';
-import { ReactComponent as IconLeave } from '@dailyjs/shared/icons/leave-md.svg';
-import { ReactComponent as IconMicOff } from '@dailyjs/shared/icons/mic-off-md.svg';
-import { ReactComponent as IconMicOn } from '@dailyjs/shared/icons/mic-on-md.svg';
-import { ReactComponent as IconPeople } from '@dailyjs/shared/icons/people-md.svg';
-import { ReactComponent as IconSettings } from '@dailyjs/shared/icons/settings-md.svg';
-import PropTypes from 'prop-types';
 
-import { PEOPLE_ASIDE } from '../../../shared/components/Aside/PeopleAside';
 import { VideoGrid } from '../VideoGrid';
 import { Header } from './Header';
 
-export const Room = ({ onLeave }) => {
-  const { callObject } = useCallState();
-  const { setShowDeviceModal, setShowAside } = useUIState();
-  const { isCamMuted, isMicMuted } = useMediaDevices();
+export const Room = () => {
   const { setShowModal, showModal } = useWaitingRoom();
   const { localParticipant } = useParticipants();
 
   useJoinSound();
-
-  const toggleCamera = (newState) => {
-    if (!callObject) return false;
-    return callObject.setLocalVideo(newState);
-  };
-
-  const toggleMic = (newState) => {
-    if (!callObject) return false;
-    return callObject.setLocalAudio(newState);
-  };
 
   return (
     <div className="room">
@@ -61,39 +36,7 @@ export const Room = ({ onLeave }) => {
         </>
       )}
 
-      <Tray>
-        <TrayButton
-          label="Camera"
-          onClick={() => toggleCamera(isCamMuted)}
-          orange={isCamMuted}
-        >
-          {isCamMuted ? <IconCameraOff /> : <IconCameraOn />}
-        </TrayButton>
-        <TrayButton
-          label="Mic"
-          onClick={() => toggleMic(isMicMuted)}
-          orange={isMicMuted}
-        >
-          {isMicMuted ? <IconMicOff /> : <IconMicOn />}
-        </TrayButton>
-        <TrayButton label="Settings" onClick={() => setShowDeviceModal(true)}>
-          <IconSettings />
-        </TrayButton>
-
-        <TrayButton
-          label="People"
-          onClick={() => setShowAside((p) => (p ? null : PEOPLE_ASIDE))}
-        >
-          <IconPeople />
-        </TrayButton>
-
-        <span className="divider" />
-
-        <TrayButton label="Leave" onClick={onLeave} orange>
-          <IconLeave />
-        </TrayButton>
-      </Tray>
-
+      <BasicTray />
       <Audio />
 
       <style jsx>{`
@@ -116,10 +59,6 @@ export const Room = ({ onLeave }) => {
       `}</style>
     </div>
   );
-};
-
-Room.propTypes = {
-  onLeave: PropTypes.func.isRequired,
 };
 
 export default Room;

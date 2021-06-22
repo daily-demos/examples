@@ -12,7 +12,11 @@ function App({ Component, pageProps }) {
       </Head>
       <GlobalHead />
       <GlobalStyle />
-      <Component asides={App.asides} {...pageProps} />
+      <Component
+        asides={App.asides}
+        customTrayComponent={App.customTrayComponent}
+        {...pageProps}
+      />
     </>
   );
 }
@@ -28,5 +32,6 @@ App.propTypes = {
 };
 
 App.asides = [];
+App.customTrayComponent = null;
 
 export default App;

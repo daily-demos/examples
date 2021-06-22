@@ -17,7 +17,12 @@ import { Intro, NotConfigured } from '../components/Intro';
  * - Set call owner status
  * - Finally, renders the main application loop
  */
-export default function Index({ domain, isConfigured = false, asides }) {
+export default function Index({
+  domain,
+  isConfigured = false,
+  asides,
+  customTrayComponent,
+}) {
   const [roomName, setRoomName] = useState('');
   const [fetchingToken, setFetchingToken] = useState(false);
   const [token, setToken] = useState();
@@ -92,7 +97,7 @@ export default function Index({ domain, isConfigured = false, asides }) {
    * Main call UI
    */
   return (
-    <UIStateProvider asides={asides}>
+    <UIStateProvider asides={asides} customTrayComponent={customTrayComponent}>
       <CallProvider domain={domain} room={roomName} token={token}>
         <ParticipantsProvider>
           <TracksProvider>
@@ -112,6 +117,7 @@ Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
   domain: PropTypes.string,
   asides: PropTypes.arrayOf(PropTypes.func),
+  customTrayComponent: PropTypes.node,
 };
 
 export async function getStaticProps() {

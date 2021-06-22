@@ -8,11 +8,11 @@ import { Asides } from './Asides';
 import { Modals } from './Modals';
 
 export const App = () => {
-  const { state, leave } = useCallState();
+  const { state } = useCallState();
 
   const componentForState = useCallUI({
     state,
-    room: () => <Room onLeave={() => leave()} />,
+    room: () => <Room />,
   });
 
   // Memoize children to avoid unnecassary renders from HOC
