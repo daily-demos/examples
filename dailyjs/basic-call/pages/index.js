@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { PeopleAside } from '@dailyjs/shared/components/Aside';
 import { CallProvider } from '@dailyjs/shared/contexts/CallProvider';
 import { MediaDeviceProvider } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { ParticipantsProvider } from '@dailyjs/shared/contexts/ParticipantsProvider';
@@ -98,7 +99,7 @@ export default function Index({ domain, isConfigured = false }) {
           <TracksProvider>
             <MediaDeviceProvider>
               <WaitingRoomProvider>
-                <App />
+                <App asides={Index.asides} />
               </WaitingRoomProvider>
             </MediaDeviceProvider>
           </TracksProvider>
@@ -112,6 +113,8 @@ Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
   domain: PropTypes.string,
 };
+
+Index.asides = [PeopleAside];
 
 export async function getStaticProps() {
   // Check that both domain and key env vars are set

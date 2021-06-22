@@ -1,10 +1,16 @@
 import React from 'react';
-import { PeopleAside } from '@dailyjs/shared/components/Aside';
+import PropTypes from 'prop-types';
 
-export const Asides = () => (
+export const Asides = ({ asides }) => (
   <>
-    <PeopleAside />
+    {asides.map((A) => (
+      <A key={A.name} />
+    ))}
   </>
 );
+
+Asides.propTypes = {
+  asides: PropTypes.arrayOf(PropTypes.func),
+};
 
 export default Asides;

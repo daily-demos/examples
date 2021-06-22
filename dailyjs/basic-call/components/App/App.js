@@ -2,11 +2,12 @@ import React, { useMemo } from 'react';
 import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useCallUI } from '@dailyjs/shared/hooks/useCallUI';
 
+import PropTypes from 'prop-types';
 import Room from '../Room';
 import { Asides } from './Asides';
 import { Modals } from './Modals';
 
-export const App = () => {
+export const App = ({ asides }) => {
   const { state, leave } = useCallState();
 
   const componentForState = useCallUI({
@@ -20,7 +21,7 @@ export const App = () => {
       <div className="app">
         {componentForState()}
         <Modals />
-        <Asides />
+        <Asides asides={asides} />
         <style jsx>{`
           color: white;
           height: 100vh;
@@ -34,8 +35,12 @@ export const App = () => {
         `}</style>
       </div>
     ),
-    [componentForState]
+    [componentForState, asides]
   );
+};
+
+App.propTypes = {
+  asides: PropTypes.arrayOf(PropTypes.func),
 };
 
 export default App;
