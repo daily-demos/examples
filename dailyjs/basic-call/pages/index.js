@@ -20,11 +20,12 @@ import { Intro, NotConfigured } from '../components/Intro';
 export default function Index({
   domain,
   isConfigured = false,
+  predefinedRoom = false,
   asides,
   customTrayComponent,
   customAppComponent,
 }) {
-  const [roomName, setRoomName] = useState('');
+  const [roomName, setRoomName] = useState(predefinedRoom || '');
   const [fetchingToken, setFetchingToken] = useState(false);
   const [token, setToken] = useState();
   const [tokenError, setTokenError] = useState();
@@ -116,6 +117,7 @@ export default function Index({
 
 Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
+  predefinedRoom: PropTypes.bool.isRequired,
   domain: PropTypes.string,
   asides: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
@@ -127,11 +129,15 @@ export async function getStaticProps() {
   const isConfigured =
     !!process.env.DAILY_DOMAIN && !!process.env.DAILY_API_KEY;
 
+  // Have we predefined a room to use?
+  const predefinedRoom = process.env.DAILY_ROOM || false;
+
   // Pass through domain as prop
   return {
     props: {
       domain: process.env.DAILY_DOMAIN || null,
       isConfigured,
+      predefinedRoom,
     },
   };
 }
