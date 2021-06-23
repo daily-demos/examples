@@ -1,37 +1,61 @@
 import React from 'react';
 import Button from '@dailyjs/shared/components/Button';
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-export const TrayButton = ({ children, label, onClick, orange = false }) => (
-  <div className={orange ? 'tray-button orange' : 'tray-button'}>
-    <Button onClick={() => onClick()} variant="dark" size="large-square">
-      {children}
-    </Button>
-    <span>{label}</span>
+export const TrayButton = ({
+  children,
+  label,
+  onClick,
+  bubble = false,
+  orange = false,
+}) => {
+  const cx = classNames('tray-button', { orange, bubble });
+  return (
+    <div className={cx}>
+      <Button onClick={() => onClick()} variant="dark" size="large-square">
+        {children}
+      </Button>
+      <span>{label}</span>
 
-    <style jsx>{`
-      .tray-button {
-        text-align: center;
-        user-select: none;
-      }
+      <style jsx>{`
+        .tray-button {
+          text-align: center;
+          user-select: none;
+          position: relative;
+        }
 
-      .tray-button.orange :global(.button) {
-        color: var(--secondary-dark);
-      }
+        .tray-button.orange :global(.button) {
+          color: var(--secondary-dark);
+        }
 
-      span {
-        color: white;
-        font-weight: var(--weight-medium);
-        font-size: 12px;
-      }
-    `}</style>
-  </div>
-);
+        .tray-button.bubble::after {
+          position: absolute;
+          content: '';
+          top: 10px;
+          right: 10px;
+          width: 9px;
+          height: 9px;
+          background: var(--green-default);
+          border-radius: 50%;
+          z-index: 99;
+        }
+
+        span {
+          color: white;
+          font-weight: var(--weight-medium);
+          font-size: 12px;
+        }
+      `}</style>
+    </div>
+  );
+};
 
 TrayButton.propTypes = {
   children: PropTypes.node,
   onClick: PropTypes.func,
   orange: PropTypes.bool,
+  bubble: PropTypes.bool,
   label: PropTypes.string.isRequired,
 };
 

@@ -15,6 +15,7 @@ function App({ Component, pageProps }) {
       <Component
         asides={App.asides}
         customTrayComponent={App.customTrayComponent}
+        customAppComponent={App.customAppComponent}
         {...pageProps}
       />
     </>
@@ -33,5 +34,6 @@ App.propTypes = {
 
 App.asides = [];
 App.customTrayComponent = null;
+App.customAppComponent = null;
 
 export default App;

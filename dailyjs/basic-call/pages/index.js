@@ -22,6 +22,7 @@ export default function Index({
   isConfigured = false,
   asides,
   customTrayComponent,
+  customAppComponent,
 }) {
   const [roomName, setRoomName] = useState('');
   const [fetchingToken, setFetchingToken] = useState(false);
@@ -103,7 +104,7 @@ export default function Index({
           <TracksProvider>
             <MediaDeviceProvider>
               <WaitingRoomProvider>
-                <App />
+                {customAppComponent || <App />}
               </WaitingRoomProvider>
             </MediaDeviceProvider>
           </TracksProvider>
@@ -118,6 +119,7 @@ Index.propTypes = {
   domain: PropTypes.string,
   asides: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
+  customAppComponent: PropTypes.node,
 };
 
 export async function getStaticProps() {

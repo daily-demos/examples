@@ -29,3 +29,7 @@ These examples re-use some common components, contexts, hooks and libraries. The
 ### [🤙 Basic call](./basic-call)
 
 The basic call demo (derived from our prebuilt UI codebase) demonstrates how to create a video and audio call using Call Object mode.
+
+### [💬 Text chat](./text-chat)
+
+Send messages to other participants using sendAppMessage
