@@ -29,8 +29,6 @@ export const ChatProvider = ({ children }) => {
       ]);
 
       setHasNewMessages(true);
-
-      // Play notification here...
     },
     [callObject]
   );

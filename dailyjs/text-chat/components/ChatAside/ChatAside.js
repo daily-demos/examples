@@ -4,21 +4,31 @@ import { Button } from '@dailyjs/shared/components/Button';
 import { TextInput } from '@dailyjs/shared/components/Input';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 import { useChat } from '../../contexts/ChatProvider';
+import { useMessageSound } from '../../hooks/useMessageSound';
 
 export const CHAT_ASIDE = 'chat';
 
 export const ChatAside = () => {
   const { showAside, setShowAside } = useUIState();
-  const { sendMessage, chatHistory, setHasNewMessages } = useChat();
+  const { sendMessage, chatHistory, hasNewMessages, setHasNewMessages } =
+    useChat();
   const [newMessage, setNewMessage] = useState('');
+  const playMessageSound = useMessageSound();
+
   const chatWindowRef = useRef();
 
   useEffect(() => {
-    // Clear out any new message otifications if we're showing the chat screen
+    // Clear out any new message notifications if we're showing the chat screen
     if (showAside === CHAT_ASIDE) {
       setHasNewMessages(false);
     }
   }, [showAside, chatHistory.length, setHasNewMessages]);
+
+  useEffect(() => {
+    if (hasNewMessages && showAside !== CHAT_ASIDE) {
+      playMessageSound();
+    }
+  }, [playMessageSound, showAside, hasNewMessages]);
 
   useEffect(() => {
     if (chatWindowRef.current) {

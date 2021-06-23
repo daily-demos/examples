@@ -7,6 +7,7 @@
 - Use [sendAppMessage](https://docs.daily.co/reference#%EF%B8%8F-sendappmessage) to send messages
 - Listen for incoming messages using the call object `app-message` event
 - Extend the basic call demo with a chat provider and aside
+- Show a notification bubble on chat tray button when a new message is received
 - Demonstrate how to play a sound whenever a message is received
 
 Please note: this demo is not currently mobile optimised
