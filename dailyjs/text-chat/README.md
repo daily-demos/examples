@@ -2,7 +2,11 @@
 
 ![Text Chat](./image.png)
 
+### Live example
+
 **[See it in action here ➡️](https://dailyjs-text-chat.vercel.app)**
+
+---
 
 ## What does this demo do?
 

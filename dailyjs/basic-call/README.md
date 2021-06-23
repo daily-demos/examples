@@ -2,9 +2,11 @@
 
 ![Basic Call](./image.png)
 
-## Live example
+### Live example
 
 **[See it in action here ➡️](https://dailyjs-basic-call.vercel.app)**
+
+---
 
 ## What does this demo do?
 
