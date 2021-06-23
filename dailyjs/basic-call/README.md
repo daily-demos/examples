@@ -18,7 +18,7 @@ Please note: this demo is not currently mobile optimised
 
 ```
 # set both DAILY_API_KEY and DAILY_DOMAIN
-mv env.example env.local
+mv env.example .env.local
 
 # from project root...
 yarn
@@ -43,9 +43,3 @@ Abstraction hook that manages Daily call state and error handling
 
 **[ParticipantProvider.js](../shared/contexts/ParticipantProvider.js)**
 Manages participant state and abstracts common selectors / derived data
-
-## Deploy your own
-
-Deploy the example using Vercel
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fdaily-demos%2Fexamples%2Ftree%2Fmain%2Fdailyjs%2Fbasic-call&env=DAILY_DOMAIN,DAILY_API_KEY&project-name=dailyjs-basic-call&demo-title=Daily%20Basic%20Call%20Demo)
