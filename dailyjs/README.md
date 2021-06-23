@@ -8,23 +8,21 @@ The basic call demo (derived from our prebuilt UI codebase) demonstrates how to 
 
 Send messages to other participants using sendAppMessage
 
-Run an examples with `yarn workspace @dailyjs/[demo-name] dev` (replacing `[demo-name]` with the name of the demo you'd like to run e.g. `basic-call`.
-
-- Please ensure your Daily rooms are setup to use [web sockets](https://docs.daily.co/reference#domain-configuration)
-- Follow the instructions within each demo first, making sure to set all the necassary local environment variables etc
-- Examples are served using [nextjs](https://nextjs.org/)
-
 ---
 
 ## Getting started
 
 We recommend starting with the [basic call](./basic-call) example, showcasing the common flow of a call Daily call, device management and error handling.
 
+Run an examples with `yarn workspace @dailyjs/[demo-name] dev` (replacing `[demo-name]` with the name of the demo you'd like to run e.g. `basic-call`.
+
+- Please ensure your Daily rooms are setup to use [web sockets](https://docs.daily.co/reference#domain-configuration)
+- Follow the instructions within each demo first, making sure to set all the necassary local environment variables etc
+- Examples are served using [nextjs](https://nextjs.org/)
+
 ## Shared code
 
 These examples re-use some common components, contexts, hooks and libraries. These can be found in the [shared](./shared) folder.
-
----
 
 ## Deploy your own on Vercel
 
