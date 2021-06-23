@@ -8,6 +8,9 @@
     "dailyjs/*",
     "prebuilt-ui/*"
   ],
+  "engines": {
+    "node": ">=0.12"
+  },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "babel-plugin-inline-react-svg": "^2.0.1",

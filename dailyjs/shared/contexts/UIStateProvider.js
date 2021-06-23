@@ -1,19 +1,26 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { useCallback, createContext, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 export const UIStateContext = createContext();
 
-export const UIStateProvider = ({ children }) => {
+export const UIStateProvider = ({ asides, customTrayComponent, children }) => {
   const [showDeviceModal, setShowDeviceModal] = useState(false);
-  const [showPeopleAside, setShowPeopleAside] = useState(false);
+  const [showAside, setShowAside] = useState();
+
+  const toggleAside = useCallback((newAside) => {
+    setShowAside((p) => (p === newAside ? null : newAside));
+  }, []);
 
   return (
     <UIStateContext.Provider
       value={{
+        asides,
+        customTrayComponent,
         showDeviceModal,
         setShowDeviceModal,
-        showPeopleAside,
-        setShowPeopleAside,
+        toggleAside,
+        showAside,
+        setShowAside,
       }}
     >
       {children}
@@ -23,6 +30,8 @@ export const UIStateProvider = ({ children }) => {
 
 UIStateProvider.propTypes = {
   children: PropTypes.node,
+  asides: PropTypes.arrayOf(PropTypes.func),
+  customTrayComponent: PropTypes.node,
 };
 
 export const useUIState = () => useContext(UIStateContext);

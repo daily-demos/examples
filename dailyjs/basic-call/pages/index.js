@@ -17,7 +17,13 @@ import { Intro, NotConfigured } from '../components/Intro';
  * - Set call owner status
  * - Finally, renders the main application loop
  */
-export default function Index({ domain, isConfigured = false }) {
+export default function Index({
+  domain,
+  isConfigured = false,
+  asides,
+  customTrayComponent,
+  customAppComponent,
+}) {
   const [roomName, setRoomName] = useState('');
   const [fetchingToken, setFetchingToken] = useState(false);
   const [token, setToken] = useState();
@@ -66,6 +72,7 @@ export default function Index({ domain, isConfigured = false }) {
           <NotConfigured />
         ) : (
           <Intro
+            title={process.env.PROJECT_TITLE}
             room={roomName}
             error={tokenError}
             fetching={fetchingToken}
@@ -91,13 +98,13 @@ export default function Index({ domain, isConfigured = false }) {
    * Main call UI
    */
   return (
-    <UIStateProvider>
+    <UIStateProvider asides={asides} customTrayComponent={customTrayComponent}>
       <CallProvider domain={domain} room={roomName} token={token}>
         <ParticipantsProvider>
           <TracksProvider>
             <MediaDeviceProvider>
               <WaitingRoomProvider>
-                <App />
+                {customAppComponent || <App />}
               </WaitingRoomProvider>
             </MediaDeviceProvider>
           </TracksProvider>
@@ -110,6 +117,9 @@ export default function Index({ domain, isConfigured = false }) {
 Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
   domain: PropTypes.string,
+  asides: PropTypes.arrayOf(PropTypes.func),
+  customTrayComponent: PropTypes.node,
+  customAppComponent: PropTypes.node,
 };
 
 export async function getStaticProps() {
@@ -119,6 +129,9 @@ export async function getStaticProps() {
 
   // Pass through domain as prop
   return {
-    props: { domain: process.env.DAILY_DOMAIN || null, isConfigured },
+    props: {
+      domain: process.env.DAILY_DOMAIN || null,
+      isConfigured,
+    },
   };
 }

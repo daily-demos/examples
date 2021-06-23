@@ -16,7 +16,14 @@ import PropTypes from 'prop-types';
  * ---
  * Specify which room we would like to join
  */
-export const Intro = ({ room, error, domain, onJoin, fetching = false }) => {
+export const Intro = ({
+  room,
+  error,
+  domain,
+  onJoin,
+  title,
+  fetching = false,
+}) => {
   const [roomName, setRoomName] = useState();
   const [owner, setOwner] = useState(false);
   const [fetchToken, setFetchToken] = useState(false);
@@ -27,7 +34,7 @@ export const Intro = ({ room, error, domain, onJoin, fetching = false }) => {
 
   return (
     <Card>
-      <CardHeader>Daily Basic Call Example</CardHeader>
+      <CardHeader>{title}</CardHeader>
       <CardBody>
         {error && (
           <Well variant="error">
@@ -67,6 +74,7 @@ export const Intro = ({ room, error, domain, onJoin, fetching = false }) => {
 
 Intro.propTypes = {
   room: PropTypes.string,
+  title: PropTypes.string,
   error: PropTypes.string,
   domain: PropTypes.string.isRequired,
   onJoin: PropTypes.func.isRequired,

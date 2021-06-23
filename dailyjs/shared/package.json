@@ -6,8 +6,9 @@
   "dependencies": {
     "@daily-co/daily-js": "^0.12.0",
     "classnames": "^2.3.1",
-    "no-scroll": "^2.1.1",
     "debounce": "^1.2.1",
+    "nanoid": "^3.1.23",
+    "no-scroll": "^2.1.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

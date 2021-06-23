@@ -1,6 +1,6 @@
 {
-  "name": "@dailyjs/basic-call",
-  "description": "Basic Call Example",
+  "name": "@dailyjs/text-chat",
+  "description": "Basic Call + Chat Example",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@dailyjs/shared": "*",
+    "@dailyjs/basic-call": "*",
     "next": "^11.0.0",
     "pluralize": "^8.0.0",
     "react": "^17.0.2",
@@ -19,8 +20,5 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "^8.0.0"
-  },
-  "engines": {
-    "node": ">=0.12"
   }
 }
