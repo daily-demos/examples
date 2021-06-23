@@ -242,6 +242,19 @@ export const Button = forwardRef(
             background: ${hexa(theme.blue.light, 1)};
           }
 
+          .button.transparent {
+            background: transparent;
+            color: var(--primary-default);
+            border: 0px;
+          }
+          .button.transparent:hover,
+          .button.transparent:focus,
+          .button.transparent:active {
+            border: 0px;
+            box-shadow: none;
+            color: var(--primary-dark);
+          }
+
           .button.blur {
             background: ${hexa(theme.blue.default, 0.35)};
             backdrop-filter: blur(10px);

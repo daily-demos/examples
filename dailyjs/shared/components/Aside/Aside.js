@@ -22,6 +22,8 @@ export const Aside = ({ onClose, children }) => (
       .call-aside {
         background: white;
         position: relative;
+        flex-shrink: 0;
+        flex-grow: 0;
         width: ${ASIDE_WIDTH}px;
         height: 100vh;
         box-sizing: border-box;
@@ -32,6 +34,9 @@ export const Aside = ({ onClose, children }) => (
       .call-aside .inner {
         overflow-x: hidden;
         overflow-y: scroll;
+        height: 100%;
+        display: flex;
+        flex-flow: column wrap;
       }
 
       .call-aside .close {

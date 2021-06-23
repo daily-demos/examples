@@ -120,6 +120,12 @@ const InputContainer = ({ children, prefix, className }) => (
         color: var(--text-mid);
         opacity: 1;
       }
+
+      .transparent :global(input) {
+        background: transparent;
+        border: 0px;
+        box-shadow: none;
+      }
     `}</style>
   </div>
 );

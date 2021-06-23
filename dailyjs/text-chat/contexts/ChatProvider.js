@@ -53,7 +53,7 @@ export const ChatProvider = ({ children }) => {
       // Update local chat history
       return setChatHistory((oldState) => [
         ...oldState,
-        { sender, message, id: nanoid() },
+        { sender, message, id: nanoid(), isLocal: true },
       ]);
     },
     [callObject]
