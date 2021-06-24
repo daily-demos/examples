@@ -1,5 +1,6 @@
 import React from 'react';
 import { PEOPLE_ASIDE } from '@dailyjs/shared/components/Aside/PeopleAside';
+import { DEVICE_MODAL } from '@dailyjs/shared/components/DeviceSelectModal';
 import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useMediaDevices } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
@@ -14,7 +15,7 @@ import { Tray, TrayButton } from './Tray';
 
 export const BasicTray = () => {
   const { callObject, leave } = useCallState();
-  const { customTrayComponent, setShowDeviceModal, toggleAside } = useUIState();
+  const { customTrayComponent, openModal, toggleAside } = useUIState();
   const { isCamMuted, isMicMuted } = useMediaDevices();
 
   const toggleCamera = (newState) => {
@@ -43,7 +44,7 @@ export const BasicTray = () => {
       >
         {isMicMuted ? <IconMicOff /> : <IconMicOn />}
       </TrayButton>
-      <TrayButton label="Settings" onClick={() => setShowDeviceModal(true)}>
+      <TrayButton label="Settings" onClick={() => openModal(DEVICE_MODAL)}>
         <IconSettings />
       </TrayButton>
 

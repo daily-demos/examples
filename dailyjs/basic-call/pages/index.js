@@ -22,6 +22,7 @@ export default function Index({
   isConfigured = false,
   predefinedRoom = false,
   asides,
+  modals,
   customTrayComponent,
   customAppComponent,
 }) {
@@ -99,7 +100,11 @@ export default function Index({
    * Main call UI
    */
   return (
-    <UIStateProvider asides={asides} customTrayComponent={customTrayComponent}>
+    <UIStateProvider
+      asides={asides}
+      modals={modals}
+      customTrayComponent={customTrayComponent}
+    >
       <CallProvider domain={domain} room={roomName} token={token}>
         <ParticipantsProvider>
           <TracksProvider>
@@ -120,6 +125,7 @@ Index.propTypes = {
   predefinedRoom: PropTypes.bool,
   domain: PropTypes.string,
   asides: PropTypes.arrayOf(PropTypes.func),
+  modals: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
   customAppComponent: PropTypes.node,
 };

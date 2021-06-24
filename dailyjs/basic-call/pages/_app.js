@@ -14,6 +14,7 @@ function App({ Component, pageProps }) {
       <GlobalStyle />
       <Component
         asides={App.asides}
+        modals={App.modals}
         customTrayComponent={App.customTrayComponent}
         customAppComponent={App.customAppComponent}
         {...pageProps}
@@ -33,6 +34,7 @@ App.propTypes = {
 };
 
 App.asides = [];
+App.modals = [];
 App.customTrayComponent = null;
 App.customAppComponent = null;
 
