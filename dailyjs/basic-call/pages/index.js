@@ -117,7 +117,7 @@ export default function Index({
 
 Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
-  predefinedRoom: PropTypes.bool.isRequired,
+  predefinedRoom: PropTypes.bool,
   domain: PropTypes.string,
   asides: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
