@@ -1,13 +1,13 @@
 import React from 'react';
 
 import App from '@dailyjs/basic-call/components/App';
-import { ChatProvider } from '../../contexts/ChatProvider';
+import { LiveStreamingProvider } from '../../contexts/LiveStreamingProvider';
 
-// Extend our basic call app component with the chat context
-export const AppWithChat = () => (
-  <ChatProvider>
+// Extend our basic call app component with the live streaming context
+export const AppWithLiveStreaming = () => (
+  <LiveStreamingProvider>
     <App />
-  </ChatProvider>
+  </LiveStreamingProvider>
 );
 
-export default AppWithChat;
+export default AppWithLiveStreaming;

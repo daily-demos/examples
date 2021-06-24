@@ -12,6 +12,7 @@ export const UIStateProvider = ({
 }) => {
   const [showAside, setShowAside] = useState();
   const [activeModals, setActiveModals] = useState({});
+  const [customCapsule, setCustomCapsule] = useState();
 
   const openModal = useCallback((modalName) => {
     setActiveModals((prevState) => ({
@@ -45,6 +46,8 @@ export const UIStateProvider = ({
         toggleAside,
         showAside,
         setShowAside,
+        customCapsule,
+        setCustomCapsule,
       }}
     >
       {children}

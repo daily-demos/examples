@@ -12,6 +12,7 @@ export const GlobalStyle = () => (
       --primary-dark: ${theme.primary.dark};
       --secondary-default: ${theme.secondary.default};
       --secondary-dark: ${theme.secondary.dark};
+      --secondary-light: ${theme.secondary.light};
       --blue-light: ${theme.blue.light};
       --blue-default: ${theme.blue.default};
       --blue-dark: ${theme.blue.dark};

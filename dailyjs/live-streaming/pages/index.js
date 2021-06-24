@@ -10,6 +10,8 @@ export async function getStaticProps() {
     props: {
       domain: process.env.DAILY_DOMAIN || null,
       isConfigured,
+      forceFetchToken: true,
+      forceOwner: true,
     },
   };
 }

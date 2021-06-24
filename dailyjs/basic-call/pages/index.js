@@ -21,6 +21,8 @@ export default function Index({
   domain,
   isConfigured = false,
   predefinedRoom = false,
+  forceFetchToken = false,
+  forceOwner = false,
   asides,
   modals,
   customTrayComponent,
@@ -74,6 +76,8 @@ export default function Index({
           <NotConfigured />
         ) : (
           <Intro
+            forceFetchToken
+            forceOwner
             title={process.env.PROJECT_TITLE}
             room={roomName}
             error={tokenError}
@@ -128,6 +132,8 @@ Index.propTypes = {
   modals: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
   customAppComponent: PropTypes.node,
+  forceFetchToken: PropTypes.bool,
+  forceOwner: PropTypes.bool,
 };
 
 export async function getStaticProps() {
