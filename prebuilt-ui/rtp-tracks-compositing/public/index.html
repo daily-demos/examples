@@ -1,0 +1,207 @@
+<html>
+  <head>
+    <title>Instructor View</title>
+    <script src="https://unpkg.com/@daily-co/daily-js"></script>
+  </head>
+
+  <body onload="main()">
+    <div id="buttons">
+      <button id="start" onclick="startSession()">Start Session</button>
+      <button id="stop" onclick="stopSession()">Stop Session</button>
+      <span id="recording-url"></span>
+    </div>
+    <script>
+      var recordingId = '';
+
+      async function main() {
+      	window.call = DailyIframe.createFrame({
+      		url: 'YOUR_ROOM_URL_HERE',
+      		showLeaveButton: true,
+      		iframeStyle: {
+      			position: 'fixed',
+      			bottom: '0',
+      			left: '0',
+      			width: '100%',
+      			height: '90%',
+      		},
+      		dailyConfig: {
+      			experimentalChromeVideoMuteLightOff: true,
+      		},
+      	});
+
+      	call.on('recording-started', (e) => {
+      		console.log(
+      			'Recording started, id: ',
+      			e.recordingId,
+      			', Instructor session: ',
+      			window.instructorSessionId
+      		);
+      		recordingId = e.recordingId;
+      	});
+
+      	call.on('recording-stopped', (e) => {
+      		console.log('Recording stopped');
+      	});
+
+      	call.on('left-meeting', (e) => {
+      		// might want to just start processing the recording after the meeting starts in case the instructor closes the window
+      		// or use webhook-meeting-end to process recording
+      		console.log('Leaving meeting');
+      	});
+
+      	window.token = await createMeetingToken({
+      		enable_recording: 'rtp-tracks',
+      		user_name: 'Instructor',
+      		user_id: 'instructor',
+      		is_owner: true,
+      	});
+
+      	let participants = await call.join({
+      		token: token
+      	});
+
+      	call.setLocalVideo(true);
+      	call.setActiveSpeakerMode(false);
+
+      	window.instructorSessionId = participants.local.session_id;
+      }
+
+      async function createMeetingToken(properties) {
+      	let response = await fetch('/api/daily/meeting-tokens', {
+      		method: 'post',
+      		body: JSON.stringify({
+      			properties
+      		}),
+      	});
+      	return (await response.json()).token;
+      }
+
+      async function startSession() {
+      	call.sendAppMessage({
+      		message: 'startSession'
+      	}, '*');
+      	call.startRecording();
+      }
+
+      async function stopSession() {
+      	call.sendAppMessage({
+      		message: 'stopSession'
+      	}, '*');
+      	call.stopRecording();
+      	console.log('Starting processing for recording id:', recordingId);
+      	processRecording(￼)
+      }
+
+      // recording post-processing code that could be moved server-side so
+      // you don't have to leave a browser window open
+
+      var tracks;
+
+      async function wait(ms = 1000) {
+      	return new Promise(resolve => {
+      		setTimeout(resolve, ms);
+      	});
+      }
+
+      async function getRecordingInfo(recordingId) {
+      	let response = await fetch(
+      		"/api/daily/recordings/" + recordingId, {
+      			method: "get",
+      		}
+      	);
+      	// todo: a cleaner way to get the most recent recording in the room?
+      	//console.log("response: ", (await response.text()))
+      	return await response.json();
+      }
+
+      async function awaitTracks(recordingId) {
+      	while (true) {
+      		let rec = await getRecordingInfo(recordingId);
+      		// console.log("Recording info: ", rec);
+      		if (
+      			rec.tracks.find(e => e.type == "audio" && e.user_id == "instructor") &&
+      			rec.tracks.find(e => e.type == "video" && e.user_id == "instructor")
+      		) {
+      			return rec.tracks;
+      		} else {
+      			console.log("Waiting for tracks, currently: ", rec.tracks)
+      			await wait();
+      		}
+      	}
+      }
+
+      async function awaitComposite(compositeId, recordingId) {
+      	while (true) {
+      		let comp = await fetch(
+      			`/api/daily/recordings/${recordingId}/composites`
+      		);
+      		let latest = (await comp.json()).newest_composite;
+      		//console.log("Latest composite: ", latest);
+      		if (latest && latest.id == compositeId) {
+      			return latest.download_url;
+      		} else {
+      			console.log("waiting on composite " + compositeId + "...");
+      			await wait();
+      		}
+      	}
+      }
+
+      async function processRecording(recordingId) {
+      	// let recordingId = (await getRecordingInfo()).id;
+      	console.log("Waiting for tracks to be available...");
+      	tracks = await awaitTracks(recordingId);
+
+      	let instructorTracks = {
+      		audio: tracks.find(e => e.type == "audio" && e.user_id == "instructor"),
+      		video: tracks.find(e => e.type == "video" && e.user_id == "instructor")
+      	};
+
+      	//console.log("Found instructor tracks: ", instructorTracks)
+      	let recipe = {
+      		composite_mode: "tracks-layout",
+      		size: instructorTracks.video.resolution,
+      		tracks: [{
+      				id: instructorTracks.audio.id
+      			},
+      			{
+      				id: instructorTracks.video.id,
+      				size: instructorTracks.video.resolution,
+      				position: "0x0"
+      			}
+      		]
+      	};
+      	// console.log("Recipe: ", recipe);
+
+      	let composite = await fetch(
+      		`/api/daily/recordings/${recordingId}/composites`, {
+      			method: "post",
+      			body: JSON.stringify(recipe)
+      		}
+      	);
+      	let compositeId = (await composite.json()).id;
+
+      	console.log("Compositing...");
+
+      	let compositeResult = await awaitComposite(compositeId, recordingId);
+
+      	//let earl = await getDownloadUrl(recordingId, compositeId);
+      	let earl = `/api/daily/recordings/${recordingId}/composites/${compositeId}.mp4`
+      	//let videoId = await brightcove.importFromUrl(earl)
+      	console.log("video URL: ", earl);
+      	// Do whatever you want with your completed video URL here
+      	document.querySelector("#recording-url").innerHTML = `<a href=${earl}>Download Video</a>`
+      }
+
+      async function getDownloadUrl(recording_id, composite_id) {
+      	let response = await fetch(
+      		`/api/daily/recordings/${recording_id}/composites/${composite_id}.mp4`, {
+      			redirect: "manual",
+      			follow: 0
+      		}
+      	);
+      	console.log('download url response: ', response.headers.get("location"))
+      	return response.headers.get("location");
+      }
+    </script>
+  </body>
+</html>
