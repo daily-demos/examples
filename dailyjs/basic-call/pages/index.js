@@ -76,8 +76,8 @@ export default function Index({
           <NotConfigured />
         ) : (
           <Intro
-            forceFetchToken
-            forceOwner
+            forceFetchToken={forceFetchToken}
+            forceOwner={forceOwner}
             title={process.env.PROJECT_TITLE}
             room={roomName}
             error={tokenError}

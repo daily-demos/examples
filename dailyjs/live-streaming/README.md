@@ -32,7 +32,7 @@ yarn workspace @dailyjs/live-streaming dev
 
 In this example we extend the [basic call demo](../basic-call) with live streaming functionality.
 
-We pass a custom tray object, a custom app object (wrapping the original in a new `LiveStreamingProvider`) and a custom modal.
+We pass a custom tray object, a custom app object (wrapping the original in a new `LiveStreamingProvider`) and a custom modal. We also symlink both the `public` and `pages/api` folders from the basic call.
 
 Single live streaming is only available to call owners, you must create a token when joining the call (for simplicity, we have disabled the abiltiy to join the call as a guest.)
 
