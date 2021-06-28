@@ -20,6 +20,7 @@ export const LiveStreamingProvider = ({ children }) => {
   const handleStreamStarted = useCallback(() => {
     console.log('📺 Live stream started');
     setIsStreaming(true);
+    setStreamError(null);
     setCustomCapsule({ variant: 'recording', label: 'Live streaming' });
   }, [setCustomCapsule]);
 

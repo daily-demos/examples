@@ -269,7 +269,7 @@ export const SelectInput = ({
 SelectInput.propTypes = {
   onChange: PropTypes.func,
   children: PropTypes.node,
-  value: PropTypes.number,
+  value: PropTypes.any,
   variant: PropTypes.string,
   label: PropTypes.string,
 };

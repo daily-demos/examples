@@ -117,6 +117,12 @@ export const GlobalStyle = () => (
       padding: 2px 6px;
       font-size: 0.875rem;
     }
+
+    hr {
+      border: 0;
+      height: 1px;
+      background: var(--gray-light);
+    }
   `}</style>
 );
 
