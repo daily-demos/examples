@@ -18,6 +18,8 @@ export const DeviceSelect = () => {
     return <div>Loading devices...</div>;
   }
 
+  console.log(currentDevices);
+
   return (
     <>
       <Field label="Select camera:">

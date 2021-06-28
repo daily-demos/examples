@@ -227,7 +227,7 @@ export const useDevices = (callObject) => {
     async (newSpeakers, useLocalStorage = true) => {
       if (
         !callObject ||
-        newSpeakers.deviceId === currentDevices?.speakers?.deviceId
+        newSpeakers.deviceId === currentDevices?.speaker?.deviceId
       ) {
         return;
       }
@@ -242,7 +242,7 @@ export const useDevices = (callObject) => {
         outputDeviceId: newSpeakers.deviceId,
       });
 
-      setCurrentDevices((prev) => ({ ...prev, speakers: newSpeakers }));
+      setCurrentDevices((prev) => ({ ...prev, speaker: newSpeakers }));
     },
     [callObject, currentDevices]
   );
