@@ -64,7 +64,7 @@ function tracksReducer(prevState, action) {
       const newSubscriptions = { ...subscriptions };
       const newVideoTracks = { ...videoTracks };
 
-      action.items.forEach(({ participant, track }) => {
+      action.items.forEach(([participant, track]) => {
         const id = participant ? getId(participant) : null;
         const screenId = participant ? getScreenId(id) : null;
 
