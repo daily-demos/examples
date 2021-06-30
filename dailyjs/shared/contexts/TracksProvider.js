@@ -219,21 +219,19 @@ export const TracksProvider = ({ children }) => {
       const callParticipants = callObject.participants();
       const updates = ids.reduce((o, id) => {
         const { subscribed } = callParticipants?.[id]?.tracks?.audio;
-        const result = {};
+        const result = { ...o[id] };
         if (!subscribed) {
-          result[id] = {
-            setSubscribedTracks: {
-              audio: true,
-              screenAudio: true,
-              screenVideo: true,
-            },
+          result.setSubscribedTracks = {
+            audio: true,
+            screenAudio: true,
+            screenVideo: true,
           };
         }
 
         if (rtcpeers?.getCurrentType?.() === 'peer-to-peer') {
-          result[id].setSubscribedTracks.video = true;
+          result.setSubscribedTracks.video = true;
         }
-        return { ...o, ...result };
+        return { [id]: result };
       }, {});
       callObject.updateParticipants(updates);
     }, 100);
