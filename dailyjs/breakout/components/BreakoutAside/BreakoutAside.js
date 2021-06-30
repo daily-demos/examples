@@ -1,39 +1,22 @@
-import {React, useState } from 'react';
+import { React } from 'react';
 import Aside from '@dailyjs/shared/components/Aside';
 import { Button } from '@dailyjs/shared/components/Button';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
-import PropTypes from 'prop-types';
 import { useBreakout } from '../../contexts/BreakoutProvider'
 
 export const BREAKOUT_ASIDE = 'breakout';
 
-const ParticipantsRow = ({ participant }) => (
-  <div className="person-row">
-    <div className="name">
-      {participant.name} {participant.isLocal && '(You)'}
-    </div>
-  </div>
-);
-ParticipantsRow.propTypes = {
-  participant: PropTypes.object,
-};
-
 export const BreakoutAside = () => {
   const { showAside, setShowAside } = useUIState();
   const { participantCount, participants } = useParticipants();
-  const { previewParticipantsIntoGroups } = useBreakout();
-
+  const { ParticipantsRow, previewParticipantsIntoGroups, showParticipants, showGroupsPreview } = useBreakout();
 
   if (!showAside || showAside !== BREAKOUT_ASIDE) {
     return null;
   }
 
-  function showParticipants(){
-    return (participants.filter(p => !p.isOwner).map((p) => (
-      <ParticipantsRow participant={p} key={p.id}>{p.name}</ParticipantsRow>
-    )))
-  }
+  const toggleCreateGatherGroups = () => console.log("todo");
 
   return (
     <Aside onClose={() => setShowAside(false)}>
@@ -50,7 +33,6 @@ export const BreakoutAside = () => {
                   How many groups?
                   <input
                       id="breakoutRoomsNumber"
-                      size="tiny"
                       type="number"
                       min="1"
                       max="10"
@@ -73,22 +55,16 @@ export const BreakoutAside = () => {
               ))
             }
             <strong>Participants:</strong>
-            { showParticipants() }
+            { showGroupsPreview().length ? showGroupsPreview() : showParticipants() }
           </div>
         </main>
-        <footer className="breakout-footer">
-          <Button 
-            size="tiny" 
-            onClick={() => console.log("todo")}
-          >
-            Create groups / Gather groups toggle
-        </Button>           
-        </footer>
+        <Button 
+          size="tiny" 
+          onClick={() => toggleCreateGatherGroups() }
+        >
+          Create groups
+        </Button>
       <style jsx>{`
-          .breakout-footer {
-            padding-top: 10em;
-          }
-        }
       `}</style>
     </Aside>
   );

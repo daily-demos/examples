@@ -5,24 +5,51 @@ import React, {
     useState,
   } from 'react';
   import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
+  import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
   import PropTypes from 'prop-types';
-  
+
   export const BreakoutContext = createContext();
   
   export const BreakoutProvider = ({ children }) => {
     const { callObject } = useCallState();
     const [participantGroups, setParticipantGroups] = useState([]);
+    const { participants } = useParticipants();
 
-    function previewParticipantsIntoGroups(participantsArray) {
+    const ParticipantsRow = ({ participant }) => (
+        <div className="person-row">
+          <div className="name">
+            {participant.name} {participant.isLocal && '(You)'}
+          </div>
+        </div>
+      );
+      ParticipantsRow.propTypes = {
+        participant: PropTypes.object,
+      };
+      
+    function showParticipants(){
+        return (participants.filter(p => !p.isOwner).map((p) => (
+          <ParticipantsRow participant={p} key={p.id}>{p.name}</ParticipantsRow>
+        )))
+      }
+    
+      function previewParticipantsIntoGroups(participantsArray) {
         const groupNum = document.getElementById("breakoutRoomsNumber").value || 1
-        // Split participants into user-specified number of groups
         const splitGroups = [];
-        // eslint-disable-next-line no-plusplus
         for (let i = groupNum; i > 0; i--) {
             splitGroups.push(participantsArray.splice(0, Math.ceil(participantsArray.length / i)));
         }
-        setParticipantGroups(splitGroups);
-        console.log(participantGroups)
+        return setParticipantGroups(splitGroups);
+      }
+    
+      function showGroupsPreview() {
+        const groupsPreview = [];
+        participantGroups.forEach((group, index) => (
+          groupsPreview.push(<em>Group { (index+1) }</em>),
+          group.forEach(p => (
+            groupsPreview.push(<ParticipantsRow participant={p} key={p.id}>{p.name}</ParticipantsRow>)
+          ))
+        ))
+        return groupsPreview
       }
 
     useEffect(() => {
@@ -36,7 +63,10 @@ import React, {
     return (
       <BreakoutContext.Provider
         value={{
-            previewParticipantsIntoGroups
+            ParticipantsRow,
+            previewParticipantsIntoGroups,
+            showGroupsPreview,
+            showParticipants
         }}
       >
         {children}

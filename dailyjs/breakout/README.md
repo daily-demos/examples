@@ -4,7 +4,7 @@ TODO: Representational image
 
 ### Live example
 
-**[See it in action here ➡️](https://dailyjs-text-chat.vercel.app)**
+**[See it in action here ➡️](https://dailyjs-breakout.vercel.app)**
 
 ## What does this demo do?
 
