@@ -46,6 +46,14 @@ function getScreenId(id) {
   return `${id}-screen`;
 }
 
+function isLocalId(id) {
+  return typeof id === 'string' && id === 'local';
+}
+
+function isScreenId(id) {
+  return typeof id === 'string' && id.endsWith('-screen');
+}
+
 // ---Helpers ---
 
 function getMaxPosition(participants) {
@@ -261,10 +269,12 @@ export {
   ACTIVE_SPEAKER,
   getId,
   getScreenId,
+  isLocalId,
+  isScreenId,
+  participantsReducer,
   initialParticipantsState,
   PARTICIPANT_JOINED,
   PARTICIPANT_LEFT,
   PARTICIPANT_UPDATED,
-  participantsReducer,
   SWAP_POSITION,
 };

@@ -1,57 +1,208 @@
+/* global rtcpeers */
+
 import React, {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
 } from 'react';
 
 import PropTypes from 'prop-types';
 
+import { sortByKey } from '../lib/sortByKey';
 import { useCallState } from './CallProvider';
+import { useParticipants } from './ParticipantsProvider';
+import { isLocalId, isScreenId } from './participantsState';
 import {
   initialTracksState,
   REMOVE_TRACKS,
   TRACK_STARTED,
   TRACK_STOPPED,
-  UPDATE_TRACKS,
+  UPDATE_SUBSCRIPTIONS,
   tracksReducer,
 } from './tracksState';
+
+/**
+ * Maximum amount of concurrently subscribed most recent speakers.
+ */
+const MAX_RECENT_SPEAKER_COUNT = 6;
+/**
+ * Threshold up to which all videos will be subscribed.
+ * If the remote participant count passes this threshold,
+ * cam subscriptions are defined by UI view modes.
+ */
+const SUBSCRIBE_ALL_VIDEO_THRESHOLD = 9;
 
 const TracksContext = createContext(null);
 
 export const TracksProvider = ({ children }) => {
   const { callObject } = useCallState();
+  const { participants } = useParticipants();
   const [state, dispatch] = useReducer(tracksReducer, initialTracksState);
 
+  const recentSpeakerIds = useMemo(
+    () =>
+      participants
+        .filter((p) => Boolean(p.lastActiveDate) && !p.isLocal)
+        .sort((a, b) => sortByKey(a, b, 'lastActiveDate'))
+        .slice(-MAX_RECENT_SPEAKER_COUNT)
+        .map((p) => p.id)
+        .reverse(),
+    [participants]
+  );
+
+  const pauseVideoTrack = useCallback((id) => {
+    /**
+     * Ignore undefined, local or screenshare.
+     */
+    if (!id || isLocalId(id) || isScreenId(id)) return;
+    if (!rtcpeers.soup.implementationIsAcceptingCalls) {
+      return;
+    }
+    const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
+    if (!consumer) return;
+    rtcpeers.soup?.pauseConsumer(consumer);
+  }, []);
+
+  const resumeVideoTrack = useCallback(
+    (id) => {
+      /**
+       * Ignore undefined, local or screenshare.
+       */
+      if (!id || isLocalId(id) || isScreenId(id)) return;
+
+      const videoTrack = callObject.participants()?.[id]?.tracks?.video;
+      if (!videoTrack?.subscribed) {
+        callObject.updateParticipant(id, {
+          setSubscribedTracks: true,
+        });
+        return;
+      }
+      if (!rtcpeers.soup.implementationIsAcceptingCalls) {
+        return;
+      }
+      const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
+      if (!consumer) return;
+      rtcpeers.soup?.resumeConsumer(consumer);
+    },
+    [callObject]
+  );
+
+  const remoteParticipantIds = useMemo(
+    () => participants.filter((p) => !p.isLocal).map((p) => p.id),
+    [participants]
+  );
+
+  /**
+   * Updates cam subscriptions based on passed ids.
+   *
+   * @param ids Array of ids to subscribe to, all others will be unsubscribed.
+   * @param pausedIds Array of ids that should be subscribed, but paused.
+   */
+  const updateCamSubscriptions = useCallback(
+    (ids, pausedIds = []) => {
+      if (!callObject) return;
+      const subscribedIds =
+        remoteParticipantIds.length <= SUBSCRIBE_ALL_VIDEO_THRESHOLD
+          ? [...remoteParticipantIds]
+          : [...ids, ...recentSpeakerIds];
+      const updates = remoteParticipantIds.reduce((u, id) => {
+        const shouldSubscribe = subscribedIds.includes(id);
+        const isSubscribed =
+          callObject.participants()?.[id]?.tracks?.video?.subscribed;
+        if (
+          isLocalId(id) ||
+          isScreenId(id) ||
+          (shouldSubscribe && isSubscribed)
+        )
+          return u;
+        const result = {
+          setSubscribedTracks: {
+            audio: true,
+            screenAudio: true,
+            screenVideo: true,
+            video: shouldSubscribe,
+          },
+        };
+        return { ...u, [id]: result };
+      }, {});
+
+      dispatch({
+        type: UPDATE_SUBSCRIPTIONS,
+        subscriptions: {
+          video: subscribedIds.reduce((v, id) => {
+            const result = {
+              id,
+              paused: pausedIds.includes(id) || !ids.includes(id),
+            };
+            return { ...v, [id]: result };
+          }, {}),
+        },
+      });
+
+      ids
+        .filter((id) => !pausedIds.includes(id))
+        .forEach((id) => {
+          const p = callObject.participants()?.[id];
+          if (p?.tracks?.video?.subscribed) {
+            resumeVideoTrack(id);
+          }
+        });
+
+      callObject.updateParticipants(updates);
+    },
+    [callObject, remoteParticipantIds, recentSpeakerIds, resumeVideoTrack]
+  );
+
   useEffect(() => {
-    if (!callObject) return false;
+    if (!callObject) {
+      return false;
+    }
+
+    const trackStoppedQueue = [];
 
     const handleTrackStarted = ({ participant, track }) => {
+      if (state.subscriptions.video?.[participant.session_id]?.paused) {
+        pauseVideoTrack(participant.session_id);
+      }
+      /**
+       * If track for participant was recently stopped, remove it from queue,
+       * so we don't run into a stale state.
+       */
+      const stoppingIdx = trackStoppedQueue.findIndex(
+        ([p, t]) =>
+          p.session_id === participant.session_id && t.kind === track.kind
+      );
+      if (stoppingIdx >= 0) {
+        trackStoppedQueue.splice(stoppingIdx, 1);
+      }
       dispatch({
         type: TRACK_STARTED,
         participant,
         track,
       });
     };
+
+    const trackStoppedBatchInterval = setInterval(() => {
+      if (!trackStoppedQueue.length) {
+        return;
+      }
+      dispatch({
+        type: TRACK_STOPPED,
+        items: trackStoppedQueue.splice(0, trackStoppedQueue.length),
+      });
+    }, 3000);
+
     const handleTrackStopped = ({ participant, track }) => {
       if (participant) {
-        dispatch({
-          type: TRACK_STOPPED,
-          participant,
-          track,
-        });
+        trackStoppedQueue.push([participant, track]);
       }
     };
     const handleParticipantLeft = ({ participant }) => {
       dispatch({
         type: REMOVE_TRACKS,
-        participant,
-      });
-    };
-    const handleParticipantUpdated = ({ participant }) => {
-      dispatch({
-        type: UPDATE_TRACKS,
         participant,
       });
     };
@@ -62,14 +213,15 @@ export const TracksProvider = ({ children }) => {
       joinedSubscriptionQueue.push(participant.session_id);
     };
 
-    const batchInterval = setInterval(() => {
+    const joinBatchInterval = setInterval(() => {
       if (!joinedSubscriptionQueue.length) return;
       const ids = joinedSubscriptionQueue.splice(0);
-      const participants = callObject.participants();
+      const callParticipants = callObject.participants();
       const updates = ids.reduce((o, id) => {
-        const { subscribed } = participants?.[id]?.tracks?.audio;
+        const { subscribed } = callParticipants?.[id]?.tracks?.audio;
+        const result = {};
         if (!subscribed) {
-          o[id] = {
+          result[id] = {
             setSubscribedTracks: {
               audio: true,
               screenAudio: true,
@@ -77,7 +229,11 @@ export const TracksProvider = ({ children }) => {
             },
           };
         }
-        return o;
+
+        if (rtcpeers?.getCurrentType?.() === 'peer-to-peer') {
+          result[id].setSubscribedTracks.video = true;
+        }
+        return { ...o, ...result };
       }, {});
       callObject.updateParticipants(updates);
     }, 100);
@@ -86,63 +242,23 @@ export const TracksProvider = ({ children }) => {
     callObject.on('track-stopped', handleTrackStopped);
     callObject.on('participant-joined', handleParticipantJoined);
     callObject.on('participant-left', handleParticipantLeft);
-    callObject.on('participant-updated', handleParticipantUpdated);
     return () => {
-      clearInterval(batchInterval);
+      clearInterval(joinBatchInterval);
+      clearInterval(trackStoppedBatchInterval);
       callObject.off('track-started', handleTrackStarted);
       callObject.off('track-stopped', handleTrackStopped);
       callObject.off('participant-joined', handleParticipantJoined);
       callObject.off('participant-left', handleParticipantLeft);
-      callObject.off('participant-updated', handleParticipantUpdated);
     };
-  }, [callObject]);
+  }, [callObject, pauseVideoTrack, state.subscriptions.video]);
 
-  const pauseVideoTrack = useCallback(
-    (id) => {
-      if (!callObject) return;
-      /**
-       * Ignore undefined, local or screenshare.
-       */
-      if (!id || id.includes('local') || id.includes('screen')) return;
-      // eslint-disable-next-line
-      if (!rtcpeers.soup.implementationIsAcceptingCalls) {
-        return;
+  useEffect(() => {
+    Object.values(state.subscriptions.video).forEach(({ id, paused }) => {
+      if (paused) {
+        pauseVideoTrack(id);
       }
-      // eslint-disable-next-line
-      const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
-      if (!consumer) return;
-      // eslint-disable-next-line
-      rtcpeers.soup?.pauseConsumer(consumer);
-    },
-    [callObject]
-  );
-
-  const resumeVideoTrack = useCallback(
-    (id) => {
-      /**
-       * Ignore undefined, local or screenshare.
-       */
-      if (!id || id.includes('local') || id.includes('screen')) return;
-
-      const videoTrack = callObject.participants()?.[id]?.tracks?.video;
-      if (!videoTrack?.subscribed) {
-        callObject.updateParticipant(id, {
-          setSubscribedTracks: true,
-        });
-        return;
-      }
-      // eslint-disable-next-line
-      if (!rtcpeers.soup.implementationIsAcceptingCalls) {
-        return;
-      }
-      // eslint-disable-next-line
-      const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
-      if (!consumer) return;
-      // eslint-disable-next-line
-      rtcpeers.soup?.resumeConsumer(consumer);
-    },
-    [callObject]
-  );
+    });
+  }, [pauseVideoTrack, state.subscriptions.video]);
 
   return (
     <TracksContext.Provider
@@ -150,7 +266,10 @@ export const TracksProvider = ({ children }) => {
         audioTracks: state.audioTracks,
         pauseVideoTrack,
         resumeVideoTrack,
+        remoteParticipantIds,
+        updateCamSubscriptions,
         videoTracks: state.videoTracks,
+        recentSpeakerIds,
       }}
     >
       {children}

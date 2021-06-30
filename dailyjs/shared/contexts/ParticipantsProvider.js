@@ -26,7 +26,7 @@ import {
 export const ParticipantsContext = createContext();
 
 export const ParticipantsProvider = ({ children }) => {
-  const { broadcast, callObject } = useCallState();
+  const { callObject } = useCallState();
   const [state, dispatch] = useReducer(
     participantsReducer,
     initialParticipantsState
@@ -37,20 +37,17 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * ALL participants (incl. shared screens) in a convenient array
    */
-  const allParticipants = useDeepCompareMemo(
-    () => Object.values(state.participants),
-    [state?.participants]
+  const allParticipants = useMemo(
+    () => [...state.participants, ...state.screens],
+    [state?.participants, state?.screens]
   );
 
   /**
    * Only return participants that should be visible in the call
    */
   const participants = useDeepCompareMemo(
-    () =>
-      !broadcast
-        ? allParticipants
-        : allParticipants.filter((p) => p?.isOwner || p?.isScreenshare),
-    [broadcast, allParticipants]
+    () => allParticipants.filter((p) => p?.isOwner),
+    [allParticipants]
   );
 
   /**
@@ -98,6 +95,19 @@ export const ParticipantsProvider = ({ children }) => {
     const isPresent = participants.some((p) => p?.id === activeParticipant?.id);
 
     const displayableParticipants = participants.filter((p) => !p?.isLocal);
+
+    if (
+      !isPresent &&
+      displayableParticipants.length > 0 &&
+      displayableParticipants.every((p) => p.isMicMuted && !p.lastActiveDate)
+    ) {
+      // Return first cam on participant in case everybody is muted and nobody ever talked
+      // or first remote participant, in case everybody's cam is muted, too.
+      return (
+        displayableParticipants.find((p) => !p.isCamMuted) ??
+        displayableParticipants?.[0]
+      );
+    }
 
     const sorted = displayableParticipants
       .sort((a, b) => sortByKey(a, b, 'lastActiveDate'))

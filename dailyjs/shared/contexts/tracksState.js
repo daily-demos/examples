@@ -3,6 +3,9 @@ import { getId, getScreenId } from './participantsState';
 const initialTracksState = {
   audioTracks: {},
   videoTracks: {},
+  subscriptions: {
+    video: {},
+  },
 };
 
 // --- Actions ---
@@ -10,19 +13,21 @@ const initialTracksState = {
 const TRACK_STARTED = 'TRACK_STARTED';
 const TRACK_STOPPED = 'TRACK_STOPPED';
 const REMOVE_TRACKS = 'REMOVE_TRACKS';
-const UPDATE_TRACKS = 'UPDATE_TRACKS';
+const UPDATE_SUBSCRIPTIONS = 'UPDATE_SUBSCRIPTIONS';
 
 // --- Reducer and helpers --
 
 function tracksReducer(prevState, action) {
   switch (action.type) {
-    case TRACK_STARTED:
-    case TRACK_STOPPED: {
-      const id = action.participant ? getId(action.participant) : null;
-      const screenId = action.participant ? getScreenId(id) : null;
+    case TRACK_STARTED: {
+      const id = getId(action.participant);
+      const screenId = getScreenId(id);
 
-      if (action.track.kind === 'audio' && !action.participant?.local) {
-        // Ignore local audio from mic and screen share
+      if (action.track.kind === 'audio') {
+        if (action.participant?.local) {
+          // Ignore local audio from mic and screen share
+          return prevState;
+        }
         const newAudioTracks = {
           [id]: action.participant.tracks.audio,
         };
@@ -52,8 +57,42 @@ function tracksReducer(prevState, action) {
         },
       };
     }
+    case TRACK_STOPPED: {
+      const { audioTracks, subscriptions, videoTracks } = prevState;
+
+      const newAudioTracks = { ...audioTracks };
+      const newSubscriptions = { ...subscriptions };
+      const newVideoTracks = { ...videoTracks };
+
+      action.items.forEach(({ participant, track }) => {
+        const id = participant ? getId(participant) : null;
+        const screenId = participant ? getScreenId(id) : null;
+
+        if (track.kind === 'audio') {
+          if (!participant?.local) {
+            // Ignore local audio from mic and screen share
+            newAudioTracks[id] = participant.tracks.audio;
+            if (participant.screen) {
+              newAudioTracks[screenId] = participant.tracks.screenAudio;
+            }
+          }
+        } else if (track.kind === 'video') {
+          newVideoTracks[id] = participant.tracks.video;
+          if (participant.screen) {
+            newVideoTracks[screenId] = participant.tracks.screenVideo;
+          }
+        }
+      });
+
+      return {
+        audioTracks: newAudioTracks,
+        subscriptions: newSubscriptions,
+        videoTracks: newVideoTracks,
+      };
+    }
+
     case REMOVE_TRACKS: {
-      const { audioTracks, videoTracks } = prevState;
+      const { audioTracks, subscriptions, videoTracks } = prevState;
       const id = getId(action.participant);
       const screenId = getScreenId(id);
 
@@ -64,39 +103,17 @@ function tracksReducer(prevState, action) {
 
       return {
         audioTracks,
+        subscriptions,
         videoTracks,
       };
     }
-    case UPDATE_TRACKS: {
-      const { audioTracks, videoTracks } = prevState;
-      const id = getId(action.participant);
-      const screenId = getScreenId(id);
 
-      const newAudioTracks = {
-        ...audioTracks,
-      };
-      const newVideoTracks = {
-        ...videoTracks,
-        [id]: action.participant.tracks.video,
-      };
-      if (!action.participant.local) {
-        newAudioTracks[id] = action.participant.tracks.audio;
-      }
-      if (action.participant.screen) {
-        newVideoTracks[screenId] = action.participant.tracks.screenVideo;
-        if (!action.participant.local) {
-          newAudioTracks[screenId] = action.participant.tracks.screenAudio;
-        }
-      } else {
-        delete newAudioTracks[screenId];
-        delete newVideoTracks[screenId];
-      }
-
+    case UPDATE_SUBSCRIPTIONS:
       return {
-        audioTracks: newAudioTracks,
-        videoTracks: newVideoTracks,
+        ...prevState,
+        subscriptions: action.subscriptions,
       };
-    }
+
     default:
       throw new Error();
   }
@@ -104,9 +121,9 @@ function tracksReducer(prevState, action) {
 
 export {
   initialTracksState,
+  tracksReducer,
   REMOVE_TRACKS,
   TRACK_STARTED,
   TRACK_STOPPED,
-  UPDATE_TRACKS,
-  tracksReducer,
+  UPDATE_SUBSCRIPTIONS,
 };
