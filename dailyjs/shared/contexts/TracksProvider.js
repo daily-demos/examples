@@ -137,7 +137,7 @@ export const TracksProvider = ({ children }) => {
               id,
               paused: pausedIds.includes(id) || !ids.includes(id),
             };
-            return { ...v, [id]: result };
+            return { ...v, ...result };
           }, {}),
         },
       });
