@@ -1,3 +1,11 @@
+/**
+ * Track state & reducer
+ * ---
+ * All (participant & screen) video and audio tracks indexed on participant ID
+ * If using manual track subscriptions, we'll also keep a record of those
+ * and their playing / paused state
+ */
+
 import { getId, getScreenId } from './participantsState';
 
 const initialTracksState = {
