@@ -186,7 +186,6 @@ export const TracksProvider = ({ children }) => {
     };
 
     const trackStoppedBatchInterval = setInterval(() => {
-      console.log(trackStoppedQueue);
       if (!trackStoppedQueue.length) {
         return;
       }

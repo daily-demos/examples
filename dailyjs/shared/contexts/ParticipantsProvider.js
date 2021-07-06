@@ -8,7 +8,6 @@ import React, {
   useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
-import { useDeepCompareMemo } from 'use-deep-compare';
 
 import { sortByKey } from '../lib/sortByKey';
 
@@ -45,16 +44,13 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * Only return participants that should be visible in the call
    */
-  const participants = useDeepCompareMemo(
-    () => allParticipants.filter((p) => p?.isOwner),
-    [allParticipants]
-  );
+  const participants = useMemo(() => state.participants, [state.participants]);
 
   /**
    * The number of participants, who are not a shared screen
    * (technically a shared screen counts as a participant, but we shouldn't tell humans)
    */
-  const participantCount = useDeepCompareMemo(
+  const participantCount = useMemo(
     () => participants.filter(({ isScreenshare }) => !isScreenshare).length,
     [participants]
   );
@@ -62,7 +58,7 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * The participant who most recently got mentioned via a `active-speaker-change` event
    */
-  const activeParticipant = useDeepCompareMemo(
+  const activeParticipant = useMemo(
     () => participants.find(({ isActiveSpeaker }) => isActiveSpeaker),
     [participants]
   );
@@ -70,7 +66,7 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * The local participant
    */
-  const localParticipant = useDeepCompareMemo(
+  const localParticipant = useMemo(
     () =>
       allParticipants.find(
         ({ isLocal, isScreenshare }) => isLocal && !isScreenshare
@@ -78,10 +74,7 @@ export const ParticipantsProvider = ({ children }) => {
     [allParticipants]
   );
 
-  const isOwner = useDeepCompareMemo(
-    () => localParticipant?.isOwner,
-    [localParticipant]
-  );
+  const isOwner = useMemo(() => localParticipant?.isOwner, [localParticipant]);
 
   /**
    * The participant who should be rendered prominently right now
@@ -119,7 +112,7 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * Screen shares
    */
-  const screens = useDeepCompareMemo(
+  const screens = useMemo(
     () => allParticipants.filter(({ isScreenshare }) => isScreenshare),
     [allParticipants]
   );
