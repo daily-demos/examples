@@ -4,14 +4,16 @@ import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 import { Button } from '../Button';
 import { DeviceSelect } from '../DeviceSelect';
 
+export const DEVICE_MODAL = 'device';
+
 export const DeviceSelectModal = () => {
-  const { showDeviceModal, setShowDeviceModal } = useUIState();
+  const { currentModals, closeModal } = useUIState();
 
   return (
     <Modal
       title="Select your device"
-      isOpen={showDeviceModal}
-      onClose={() => setShowDeviceModal(false)}
+      isOpen={currentModals[DEVICE_MODAL]}
+      onClose={() => closeModal(DEVICE_MODAL)}
       actions={[
         <Button fullWidth variant="outline">
           Cancel

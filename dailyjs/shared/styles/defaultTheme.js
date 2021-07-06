@@ -10,6 +10,7 @@ export const defaultTheme = {
   secondary: {
     default: '#FF9254',
     dark: '#FB651E',
+    light: '#FF9254',
   },
 
   blue: {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Button from '@dailyjs/shared/components/Button';
+import { DEVICE_MODAL } from '@dailyjs/shared/components/DeviceSelectModal/DeviceSelectModal';
 import { TextInput } from '@dailyjs/shared/components/Input';
 import Loader from '@dailyjs/shared/components/Loader';
 import { MuteButton } from '@dailyjs/shared/components/MuteButtons';
@@ -33,7 +34,7 @@ export const HairCheck = () => {
   const { localParticipant } = useParticipants();
   const { deviceState, camError, micError, isCamMuted, isMicMuted } =
     useMediaDevices();
-  const { showDeviceModal, setShowDeviceModal } = useUIState();
+  const { openModal } = useUIState();
   const [waiting, setWaiting] = useState(false);
   const [joining, setJoining] = useState(false);
   const [denied, setDenied] = useState();
@@ -143,7 +144,7 @@ export const HairCheck = () => {
                 className="device-button"
                 size="medium-square"
                 variant="blur"
-                onClick={() => setShowDeviceModal(!showDeviceModal)}
+                onClick={() => openModal(DEVICE_MODAL)}
               >
                 <IconSettings />
               </Button>

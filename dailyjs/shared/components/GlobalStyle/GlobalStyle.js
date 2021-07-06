@@ -12,6 +12,7 @@ export const GlobalStyle = () => (
       --primary-dark: ${theme.primary.dark};
       --secondary-default: ${theme.secondary.default};
       --secondary-dark: ${theme.secondary.dark};
+      --secondary-light: ${theme.secondary.light};
       --blue-light: ${theme.blue.light};
       --blue-default: ${theme.blue.default};
       --blue-dark: ${theme.blue.dark};
@@ -115,6 +116,12 @@ export const GlobalStyle = () => (
       border-radius: 3px;
       padding: 2px 6px;
       font-size: 0.875rem;
+    }
+
+    hr {
+      border: 0;
+      height: 1px;
+      background: var(--gray-light);
     }
   `}</style>
 );

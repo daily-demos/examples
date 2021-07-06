@@ -23,10 +23,12 @@ export const Intro = ({
   onJoin,
   title,
   fetching = false,
+  forceFetchToken = false,
+  forceOwner = false,
 }) => {
   const [roomName, setRoomName] = useState();
-  const [owner, setOwner] = useState(false);
-  const [fetchToken, setFetchToken] = useState(false);
+  const [fetchToken, setFetchToken] = useState(forceFetchToken);
+  const [owner, setOwner] = useState(forceOwner);
 
   useEffect(() => {
     setRoomName(room);
@@ -51,10 +53,12 @@ export const Intro = ({
             required
           />
         </Field>
-        <Field label="Fetch meeting token">
-          <BooleanInput onChange={(e) => setFetchToken(e.target.checked)} />
-        </Field>
-        {fetchToken && (
+        {!forceFetchToken && (
+          <Field label="Fetch meeting token">
+            <BooleanInput onChange={(e) => setFetchToken(e.target.checked)} />
+          </Field>
+        )}
+        {fetchToken && !forceOwner && (
           <Field label="Join as owner">
             <BooleanInput onChange={(e) => setOwner(e.target.checked)} />
           </Field>
@@ -79,6 +83,8 @@ Intro.propTypes = {
   domain: PropTypes.string.isRequired,
   onJoin: PropTypes.func.isRequired,
   fetching: PropTypes.bool,
+  forceFetchToken: PropTypes.bool,
+  forceOwner: PropTypes.bool,
 };
 
 export default Intro;

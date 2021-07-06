@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
+import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 
 export const Header = () => {
   const { participantCount } = useParticipants();
+  const { customCapsule } = useUIState();
 
   return useMemo(
     () => (
@@ -14,6 +16,12 @@ export const Header = () => {
             participantCount > 1 ? 'participants' : 'participant'
           }`}
         </div>
+        {customCapsule && (
+          <div className={`capsule ${customCapsule.variant}`}>
+            {customCapsule.variant === 'recording' && <span />}
+            {customCapsule.label}
+          </div>
+        )}
 
         <style jsx>{`
           .room-header {
@@ -31,6 +39,9 @@ export const Header = () => {
           }
 
           .capsule {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xxxs);
             background-color: var(--blue-dark);
             border-radius: var(--radius-sm);
             padding: var(--spacing-xxs) var(--spacing-xs);
@@ -39,10 +50,35 @@ export const Header = () => {
             font-weight: var(--weight-medium);
             user-select: none;
           }
+
+          .capsule.recording {
+            background: var(--secondary-default);
+          }
+
+          .capsule.recording span {
+            display: block;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 12px;
+            animation: capsulePulse 2s infinite linear;
+          }
+
+          @keyframes capsulePulse {
+            0% {
+              opacity: 1;
+            }
+            50% {
+              opacity: 0.25;
+            }
+            100% {
+              opacity: 1;
+            }
+          }
         `}</style>
       </header>
     ),
-    [participantCount]
+    [participantCount, customCapsule]
   );
 };
 
