@@ -5,6 +5,8 @@ import { ParticipantsProvider } from '@dailyjs/shared/contexts/ParticipantsProvi
 import { TracksProvider } from '@dailyjs/shared/contexts/TracksProvider';
 import { UIStateProvider } from '@dailyjs/shared/contexts/UIStateProvider';
 import { WaitingRoomProvider } from '@dailyjs/shared/contexts/WaitingRoomProvider';
+import getDemoProps from '@dailyjs/shared/lib/demoProps';
+
 import PropTypes from 'prop-types';
 import App from '../components/App';
 import { Intro, NotConfigured } from '../components/Intro';
@@ -20,7 +22,7 @@ import { Intro, NotConfigured } from '../components/Intro';
 export default function Index({
   domain,
   isConfigured = false,
-  predefinedRoom = false,
+  predefinedRoom = '',
   forceFetchToken = false,
   forceOwner = false,
   asides,
@@ -28,7 +30,7 @@ export default function Index({
   customTrayComponent,
   customAppComponent,
 }) {
-  const [roomName, setRoomName] = useState(predefinedRoom || '');
+  const [roomName, setRoomName] = useState(predefinedRoom);
   const [fetchingToken, setFetchingToken] = useState(false);
   const [token, setToken] = useState();
   const [tokenError, setTokenError] = useState();
@@ -126,7 +128,7 @@ export default function Index({
 
 Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
-  predefinedRoom: PropTypes.bool,
+  predefinedRoom: PropTypes.string,
   domain: PropTypes.string,
   asides: PropTypes.arrayOf(PropTypes.func),
   modals: PropTypes.arrayOf(PropTypes.func),
@@ -137,19 +139,9 @@ Index.propTypes = {
 };
 
 export async function getStaticProps() {
-  // Check that both domain and key env vars are set
-  const isConfigured =
-    !!process.env.DAILY_DOMAIN && !!process.env.DAILY_API_KEY;
+  const defaultProps = getDemoProps();
 
-  // Have we predefined a room to use?
-  const predefinedRoom = process.env.DAILY_ROOM || false;
-
-  // Pass through domain as prop
   return {
-    props: {
-      domain: process.env.DAILY_DOMAIN || null,
-      isConfigured,
-      predefinedRoom,
-    },
+    props: defaultProps,
   };
 }
