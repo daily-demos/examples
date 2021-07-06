@@ -3,12 +3,22 @@ import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import usePreferredLayer from '@dailyjs/shared/hooks/usePreferredLayer';
+import sortByKey from '@dailyjs/shared/lib/sortByKey';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
+/**
+ * Basic unpaginated video tile grid
+ *
+ * Note: this component is designed to work with automated track subscriptions
+ * and is only suitable for small call sizes as it will show all participants
+ * and not paginate.
+ *
+ * Note: this grid does not show screenshares (just participant cams)
+ */
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { allParticipants } = useParticipants();
+    const { participants } = useParticipants();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -34,9 +44,14 @@ export const VideoGrid = React.memo(
       };
     }, []);
 
+    const sortedParticipants = useMemo(
+      () => participants.sort((a, b) => sortByKey(a, b, 'position')),
+      [participants]
+    );
+
     const layout = useMemo(() => {
       const aspectRatio = DEFAULT_ASPECT_RATIO;
-      const tileCount = allParticipants.length || 0;
+      const tileCount = participants.length || 0;
       const w = dimensions.width;
       const h = dimensions.height;
 
@@ -75,11 +90,11 @@ export const VideoGrid = React.memo(
       }
 
       return bestLayout;
-    }, [dimensions, allParticipants]);
+    }, [dimensions, participants]);
 
     const tiles = useDeepCompareMemo(
       () =>
-        allParticipants.map((p) => (
+        sortedParticipants.map((p) => (
           <Tile
             participant={p}
             key={p.id}
@@ -87,12 +102,12 @@ export const VideoGrid = React.memo(
             style={{ maxWidth: layout.width, maxHeight: layout.height }}
           />
         )),
-      [layout, allParticipants]
+      [layout, sortedParticipants]
     );
 
     usePreferredLayer();
 
-    if (!allParticipants.length) {
+    if (!participants.length) {
       return null;
     }
 
