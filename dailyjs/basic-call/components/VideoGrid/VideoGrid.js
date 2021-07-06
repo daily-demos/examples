@@ -2,14 +2,13 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
+import usePreferredLayer from '@dailyjs/shared/hooks/usePreferredLayer';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
     const { allParticipants } = useParticipants();
-    const { resumeVideoTrack } = useTracks();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -91,40 +90,7 @@ export const VideoGrid = React.memo(
       [layout, allParticipants]
     );
 
-    /**
-     * Set bandwidth layer based on amount of visible participants
-     */
-    useEffect(() => {
-      if (
-        typeof rtcpeers === 'undefined' ||
-        // eslint-disable-next-line no-undef
-        rtcpeers?.getCurrentType() !== 'sfu'
-      )
-        return;
-
-      // eslint-disable-next-line no-undef
-      const sfu = rtcpeers.soup;
-      const count = allParticipants.length;
-
-      allParticipants.forEach(({ id }) => {
-        if (count < 5) {
-          // High quality video for calls with < 5 people per page
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 2);
-        } else if (count < 10) {
-          // Medium quality video for calls with < 10 people per page
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 1);
-        } else {
-          // Low quality video for calls with 10 or more people per page
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 0);
-        }
-      });
-    }, [allParticipants]);
-
-    useEffect(() => {
-      allParticipants.forEach(
-        (p) => p.id !== 'local' && resumeVideoTrack(p.id)
-      );
-    }, [allParticipants, resumeVideoTrack]);
+    usePreferredLayer();
 
     if (!allParticipants.length) {
       return null;
