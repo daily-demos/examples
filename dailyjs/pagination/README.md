@@ -31,7 +31,7 @@ When call sizes exceed a certain volume (~12 or more particpants) it's important
 
 This demo introduces a new paginated grid component that subscribes to any tiles that are in view. Our subscription API allows for the subscribing, pausing, resuming and unsubscribing of tracks. The grid component will:
 
-1. Subscribe to all participants on the call.
+1. Subscribe to all participants on the current and adjacent pages.
 2. Pause participants video if they are not in view (i.e. on the current page.) Pausing is optimal over unsubscribing in this particular use case since unsubscribing a track results in a full teardown of the data stream. Re-subscribing to a track is perceivably slower than pausing and resuming.
 3. Play / resume participant's video when they are on the current page.
 4. Unsubscribe from a participant's video if they are not on an adjacent page (explained below.)
