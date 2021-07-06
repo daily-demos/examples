@@ -58,13 +58,6 @@ function isScreenId(id) {
 
 // ---Helpers ---
 
-function getMaxPosition(participants) {
-  return Math.max(
-    1,
-    Math.max(...Object.values(participants).map(({ position }) => position))
-  );
-}
-
 function getNewParticipant(participant) {
   const id = getId(participant);
 

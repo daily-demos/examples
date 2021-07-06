@@ -3,17 +3,18 @@ import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import usePreferredLayer from '@dailyjs/shared/hooks/usePreferredLayer';
-import sortByKey from '@dailyjs/shared/lib/sortByKey';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 /**
- * Basic unpaginated video tile grid
+ * Basic unpaginated video tile grid, scaled by aspect ratio
  *
  * Note: this component is designed to work with automated track subscriptions
  * and is only suitable for small call sizes as it will show all participants
  * and not paginate.
  *
  * Note: this grid does not show screenshares (just participant cams)
+ *
+ * Note: this grid does not sort participants
  */
 export const VideoGrid = React.memo(
   () => {
@@ -24,6 +25,7 @@ export const VideoGrid = React.memo(
       height: 1,
     });
 
+    // Keep a reference to the width and height of the page, so we can repack
     useEffect(() => {
       let frame;
       const handleResize = () => {
@@ -44,11 +46,7 @@ export const VideoGrid = React.memo(
       };
     }, []);
 
-    const sortedParticipants = useMemo(
-      () => participants.sort((a, b) => sortByKey(a, b, 'position')),
-      [participants]
-    );
-
+    // Basic brute-force packing algo
     const layout = useMemo(() => {
       const aspectRatio = DEFAULT_ASPECT_RATIO;
       const tileCount = participants.length || 0;
@@ -92,9 +90,10 @@ export const VideoGrid = React.memo(
       return bestLayout;
     }, [dimensions, participants]);
 
+    // Memoize our tile list to avoid unnecassary re-renders
     const tiles = useDeepCompareMemo(
       () =>
-        sortedParticipants.map((p) => (
+        participants.map((p) => (
           <Tile
             participant={p}
             key={p.id}
@@ -102,9 +101,11 @@ export const VideoGrid = React.memo(
             style={{ maxWidth: layout.width, maxHeight: layout.height }}
           />
         )),
-      [layout, sortedParticipants]
+      [layout, participants]
     );
 
+    // Optimise performance by reducing video quality
+    // when more participants join (if in SFU mode)
     usePreferredLayer();
 
     if (!participants.length) {

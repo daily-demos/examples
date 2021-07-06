@@ -13,8 +13,9 @@ import { sortByKey } from '../lib/sortByKey';
 
 import { useCallState } from './CallProvider';
 import {
-  ACTIVE_SPEAKER,
   initialParticipantsState,
+  isLocalId,
+  ACTIVE_SPEAKER,
   PARTICIPANT_JOINED,
   PARTICIPANT_LEFT,
   PARTICIPANT_UPDATED,
@@ -131,6 +132,7 @@ export const ParticipantsProvider = ({ children }) => {
   };
 
   const swapParticipantPosition = (id1, id2) => {
+    if (id1 === id2 || !id1 || !id2 || isLocalId(id1) || isLocalId(id2)) return;
     dispatch({
       type: SWAP_POSITION,
       id1,
