@@ -10,18 +10,15 @@ export const BREAKOUT_ASIDE = 'breakout';
 export const BreakoutAside = () => {
   const { showAside, setShowAside } = useUIState();
   const { participantCount, participants } = useParticipants();
-  const { ParticipantsRow, previewParticipantsIntoGroups, showParticipants, showGroupsPreview } = useBreakout();
+  const { previewParticipantsIntoGroups, showParticipants, showGroupsPreview, toggleCreateGatherGroups } = useBreakout();
 
   if (!showAside || showAside !== BREAKOUT_ASIDE) {
     return null;
   }
 
-  const toggleCreateGatherGroups = () => console.log("todo");
-
   return (
     <Aside onClose={() => setShowAside(false)}>
       <header className="breakout-header">
-        {/* Need at least 5 people in the room for breakouts */}
         {`${
             participantCount > 4 ? 
             `There are ${participantCount} participants` : 
@@ -30,7 +27,6 @@ export const BreakoutAside = () => {
         {/* Increase to 5 when ready */}
         { participantCount > 0 &&
               <div>
-                  How many groups?
                   <input
                       id="breakoutRoomsNumber"
                       type="number"
@@ -54,17 +50,31 @@ export const BreakoutAside = () => {
               <ParticipantsRow participant={p} key={p.id}>{p.name}</ParticipantsRow>
               ))
             }
+            <br/>
             <strong>Participants:</strong>
-            { showGroupsPreview().length ? showGroupsPreview() : showParticipants() }
+            <br/>
+            { showGroupsPreview().length > 0 ? showGroupsPreview() : showParticipants() }
           </div>
         </main>
-        <Button 
-          size="tiny" 
-          onClick={() => toggleCreateGatherGroups() }
-        >
-          Create groups
-        </Button>
+        { showGroupsPreview().length > 0 && 
+          <Button 
+            size="tiny" 
+            onClick={() => toggleCreateGatherGroups() }
+          >
+          Create / Gather groups
+          </Button>
+        }
       <style jsx>{`
+        #breakoutRoomsNumber {
+          width: 4em;
+          float: left;
+          margin-right: 1em;
+          margin-left: 0.5em;
+          font-size: 18px;
+          padding: 0.2em;
+          border: 1px solid var(--gray-light);
+          border-radius: var(--radius-xs);
+        }
       `}</style>
     </Aside>
   );

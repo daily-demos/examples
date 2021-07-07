@@ -12,8 +12,9 @@ import React, {
   
   export const BreakoutProvider = ({ children }) => {
     const { callObject } = useCallState();
-    const [participantGroups, setParticipantGroups] = useState([]);
-    const { participants } = useParticipants();
+    const [ breakoutPreview, setBreakoutPreview ] = useState([]);
+    const [ breakoutGroups, setBreakoutGroups ] = useState();
+    const { localParticipant, participants } = useParticipants();
 
     const ParticipantsRow = ({ participant }) => (
         <div className="person-row">
@@ -32,41 +33,77 @@ import React, {
         )))
       }
     
-      function previewParticipantsIntoGroups(participantsArray) {
+    function previewParticipantsIntoGroups(participantsArray) {
         const groupNum = document.getElementById("breakoutRoomsNumber").value || 1
         const splitGroups = [];
+        // eslint-disable-next-line no-plusplus
         for (let i = groupNum; i > 0; i--) {
             splitGroups.push(participantsArray.splice(0, Math.ceil(participantsArray.length / i)));
         }
-        return setParticipantGroups(splitGroups);
-      }
-    
-      function showGroupsPreview() {
+        return setBreakoutPreview(splitGroups);
+    }
+
+    function showGroupsPreview() {
         const groupsPreview = [];
-        participantGroups.forEach((group, index) => (
-          groupsPreview.push(<em>Group { (index+1) }</em>),
-          group.forEach(p => (
-            groupsPreview.push(<ParticipantsRow participant={p} key={p.id}>{p.name}</ParticipantsRow>)
-          ))
+        breakoutPreview.forEach((group, index) => (
+            (groupsPreview.push(<em>Group { (index+1) }</em>),
+            group.forEach(p => (
+                groupsPreview.push(<ParticipantsRow participant={p} key={p.id}>{p.name}</ParticipantsRow>)
+            )))
         ))
         return groupsPreview
-      }
+    }
+
+    function setCreateGroups(groups) {
+        console.log(`setCreateGroups`);
+        setBreakoutGroups(groups)
+    }
+
+    function setGatherGroups() {
+        setBreakoutGroups()
+        console.log(` setGatherGroups`);
+        callObject.setSubscribeToTracksAutomatically(true)
+    }
+
+    function toggleCreateGatherGroups() {
+        if (breakoutGroups) {
+            setGatherGroups()
+        } else {
+            setCreateGroups(breakoutPreview)
+        }
+    }
 
     useEffect(() => {
-      if (!callObject) {
-        return false;
-      }
-  
-      return () => callObject;
-    }, [callObject]);
+        if (!callObject) {
+            return false;
+        }
+
+        // This will need to move
+        if (breakoutGroups) {
+            callObject.setSubscribeToTracksAutomatically(false)
+            breakoutGroups.forEach(group => {
+                if (group.includes(localParticipant)) {
+                    group.forEach(p => (
+                        callObject.updateParticipant(p.id, {
+                            setSubscribedTracks: true,
+                        })
+                    ))
+                }            
+            });
+        }
+
+        return () => callObject;
+    }, [breakoutGroups, localParticipant, callObject]);
   
     return (
       <BreakoutContext.Provider
         value={{
-            ParticipantsRow,
             previewParticipantsIntoGroups,
             showGroupsPreview,
-            showParticipants
+            showParticipants,
+            setCreateGroups,
+            setGatherGroups,
+            toggleCreateGatherGroups,
         }}
       >
         {children}
