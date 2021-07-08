@@ -29,7 +29,7 @@ export const PaginatedVideoGrid = () => {
   } = useParticipants();
   const activeSpeakerId = useActiveSpeaker();
 
-  const { maxCamSubscriptions, updateCamSubscriptions } = useTracks();
+  const { updateCamSubscriptions } = useTracks();
 
   const displayableParticipantCount = useMemo(
     () => participantCount,
@@ -98,7 +98,7 @@ export const PaginatedVideoGrid = () => {
     const n = Math.min(pageSize, displayableParticipantCount);
     if (n === 0) return [width, height];
     const dims = [];
-    for (let i = 1; i <= n; i + 1) {
+    for (let i = 1; i <= n; i += 1) {
       let maxWidthPerTile = (width - (i - 1)) / i;
       let maxHeightPerTile = maxWidthPerTile / DEFAULT_ASPECT_RATIO;
       const rows = Math.ceil(n / i);
@@ -131,11 +131,7 @@ export const PaginatedVideoGrid = () => {
    * Play / pause tracks based on pagination
    */
   const camSubscriptions = useMemo(() => {
-    const maxSubs = maxCamSubscriptions
-      ? // avoid subscribing to only a portion of a page
-        Math.max(maxCamSubscriptions, pageSize)
-      : // if no maximum is set, subscribe to adjacent pages
-        3 * pageSize;
+    const maxSubs = 3 * pageSize;
 
     // Determine participant ids to subscribe to, based on page.
     let subscribedIds = [];
@@ -163,7 +159,7 @@ export const PaginatedVideoGrid = () => {
         break;
     }
 
-    // Determine subscribed, but invisible (= paused) video tracks.
+    // Determine subscribed, but invisible (= paused) video tracks
     const invisibleSubscribedIds = subscribedIds.filter(
       (id) => id !== 'local' && !visibleParticipants.some((vp) => vp.id === id)
     );
@@ -171,18 +167,13 @@ export const PaginatedVideoGrid = () => {
       subscribedIds: subscribedIds.filter((id) => id !== 'local'),
       pausedIds: invisibleSubscribedIds,
     };
-  }, [maxCamSubscriptions, page, pageSize, participants, visibleParticipants]);
+  }, [page, pageSize, participants, visibleParticipants]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      updateCamSubscriptions(
-        camSubscriptions?.subscribedIds,
-        camSubscriptions?.pausedIds
-      );
-    }, 50);
-    return () => {
-      clearTimeout(timeout);
-    };
+    updateCamSubscriptions(
+      camSubscriptions?.subscribedIds,
+      camSubscriptions?.pausedIds
+    );
   }, [
     camSubscriptions?.subscribedIds,
     camSubscriptions?.pausedIds,
@@ -256,6 +247,7 @@ export const PaginatedVideoGrid = () => {
         <Tile
           participant={p}
           mirrored
+          key={p.id}
           style={{
             maxHeight: tileHeight,
             maxWidth: tileWidth,
@@ -281,7 +273,7 @@ export const PaginatedVideoGrid = () => {
           &laquo;
         </button>
       )}
-      <div>{tiles}</div>
+      <div className="tiles">{tiles}</div>
       {pages > 1 && page < pages && (
         <button type="button" onClick={handleNextClick}>
           &raquo;
@@ -296,11 +288,10 @@ export const PaginatedVideoGrid = () => {
           position: relative;
           width: 100%;
         }
-        .tiles {
+        .grid .tiles {
           align-items: center;
           display: flex;
           flex-flow: row wrap;
-          gap: 1px;
           max-height: 100%;
           justify-content: center;
           margin: auto;

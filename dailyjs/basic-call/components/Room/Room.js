@@ -63,7 +63,7 @@ export const Room = ({ MainComponent = VideoGrid }) => {
 };
 
 Room.propTypes = {
-  MainComponent: PropTypes.node,
+  MainComponent: PropTypes.func,
 };
 
 export default Room;
