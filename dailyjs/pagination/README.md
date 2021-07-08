@@ -25,6 +25,8 @@ yarn
 yarn workspace @dailyjs/live-streaming dev
 ```
 
+Note that this example uses a env `MANUAL_TRACK_SUBS=1` which will disable [automatic track management](https://docs.daily.co/reference#%EF%B8%8F-setsubscribetotracksautomatically).
+
 ## How does this example work?
 
 When call sizes exceed a certain volume (~12 or more particpants) it's important to start optimising for both bandwidth and CPU. Using manual track subscriptions allows each client to specify which participants they want to receive video and/or audio from, reducing how much data needs to be downloaded as well as the number of connections our servers maintain (subsequently supporting increased participant counts.)

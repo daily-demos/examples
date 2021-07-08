@@ -9,10 +9,11 @@ import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useWaitingRoom } from '@dailyjs/shared/contexts/WaitingRoomProvider';
 import useJoinSound from '@dailyjs/shared/hooks/useJoinSound';
 
+import PropTypes from 'prop-types';
 import { VideoGrid } from '../VideoGrid';
 import { Header } from './Header';
 
-export const Room = () => {
+export const Room = ({ MainComponent = VideoGrid }) => {
   const { setShowModal, showModal } = useWaitingRoom();
   const { localParticipant } = useParticipants();
 
@@ -23,7 +24,7 @@ export const Room = () => {
       <Header />
 
       <main>
-        <VideoGrid />
+        <MainComponent />
       </main>
 
       {/* Show waiting room notification & modal if call owner */}
@@ -59,6 +60,10 @@ export const Room = () => {
       `}</style>
     </div>
   );
+};
+
+Room.propTypes = {
+  MainComponent: PropTypes.node,
 };
 
 export default Room;

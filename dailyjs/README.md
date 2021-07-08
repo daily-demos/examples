@@ -12,6 +12,10 @@ Send messages to other participants using sendAppMessage
 
 Broadcast call to a custom RTMP endpoint using a variety of difference layout modes
 
+### [📃 Pagination](./pagination)
+
+Demonstrates using manual track management to support larger call sizes
+
 ---
 
 ## Getting started

@@ -7,12 +7,13 @@ import Room from '../Room';
 import { Asides } from './Asides';
 import { Modals } from './Modals';
 
-export const App = () => {
+export const App = ({ customComponentForState }) => {
   const { state } = useCallState();
 
   const componentForState = useCallUI({
     state,
     room: () => <Room />,
+    ...customComponentForState,
   });
 
   // Memoize children to avoid unnecassary renders from HOC
@@ -41,6 +42,7 @@ export const App = () => {
 
 App.propTypes = {
   asides: PropTypes.arrayOf(PropTypes.func),
+  customComponentsForState: PropTypes.any,
 };
 
 export default App;

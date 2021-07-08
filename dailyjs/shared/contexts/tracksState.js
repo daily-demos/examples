@@ -11,9 +11,6 @@ import { getId, getScreenId } from './participantsState';
 const initialTracksState = {
   audioTracks: {},
   videoTracks: {},
-  subscriptions: {
-    video: {},
-  },
 };
 
 // --- Actions ---
@@ -21,7 +18,6 @@ const initialTracksState = {
 const TRACK_STARTED = 'TRACK_STARTED';
 const TRACK_STOPPED = 'TRACK_STOPPED';
 const REMOVE_TRACKS = 'REMOVE_TRACKS';
-const UPDATE_SUBSCRIPTIONS = 'UPDATE_SUBSCRIPTIONS';
 
 // --- Reducer and helpers --
 
@@ -65,11 +61,11 @@ function tracksReducer(prevState, action) {
         },
       };
     }
+
     case TRACK_STOPPED: {
-      const { audioTracks, subscriptions, videoTracks } = prevState;
+      const { audioTracks, videoTracks } = prevState;
 
       const newAudioTracks = { ...audioTracks };
-      const newSubscriptions = { ...subscriptions };
       const newVideoTracks = { ...videoTracks };
 
       action.items.forEach(([participant, track]) => {
@@ -94,13 +90,12 @@ function tracksReducer(prevState, action) {
 
       return {
         audioTracks: newAudioTracks,
-        subscriptions: newSubscriptions,
         videoTracks: newVideoTracks,
       };
     }
 
     case REMOVE_TRACKS: {
-      const { audioTracks, subscriptions, videoTracks } = prevState;
+      const { audioTracks, videoTracks } = prevState;
       const id = getId(action.participant);
       const screenId = getScreenId(id);
 
@@ -111,16 +106,9 @@ function tracksReducer(prevState, action) {
 
       return {
         audioTracks,
-        subscriptions,
         videoTracks,
       };
     }
-
-    case UPDATE_SUBSCRIPTIONS:
-      return {
-        ...prevState,
-        subscriptions: action.subscriptions,
-      };
 
     default:
       throw new Error();
@@ -133,5 +121,4 @@ export {
   REMOVE_TRACKS,
   TRACK_STARTED,
   TRACK_STOPPED,
-  UPDATE_SUBSCRIPTIONS,
 };

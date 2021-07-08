@@ -20,7 +20,6 @@ import {
   REMOVE_TRACKS,
   TRACK_STARTED,
   TRACK_STOPPED,
-  UPDATE_SUBSCRIPTIONS,
   tracksReducer,
 } from './tracksState';
 
@@ -54,9 +53,7 @@ export const TracksProvider = ({ children }) => {
   );
 
   const pauseVideoTrack = useCallback((id) => {
-    /**
-     * Ignore undefined, local or screenshare.
-     */
+    // Ignore undefined, local or screenshare
     if (!id || isLocalId(id) || isScreenId(id)) return;
     if (!rtcpeers.soup.implementationIsAcceptingCalls) {
       return;
@@ -68,9 +65,7 @@ export const TracksProvider = ({ children }) => {
 
   const resumeVideoTrack = useCallback(
     (id) => {
-      /**
-       * Ignore undefined, local or screenshare.
-       */
+      // Ignore undefined, local or screenshare
       if (!id || isLocalId(id) || isScreenId(id)) return;
 
       const videoTrack = callObject.participants()?.[id]?.tracks?.video;
@@ -108,16 +103,34 @@ export const TracksProvider = ({ children }) => {
         remoteParticipantIds.length <= SUBSCRIBE_ALL_VIDEO_THRESHOLD
           ? [...remoteParticipantIds]
           : [...ids, ...recentSpeakerIds];
+
       const updates = remoteParticipantIds.reduce((u, id) => {
         const shouldSubscribe = subscribedIds.includes(id);
+        const shouldPause = pausedIds.includes(id);
         const isSubscribed =
           callObject.participants()?.[id]?.tracks?.video?.subscribed;
+
+        // Set resume state for newly subscribed tracks
+        if (shouldSubscribe) {
+          rtcpeers.soup.setResumeOnSubscribeForTrack(
+            id,
+            'cam-video',
+            !pausedIds.includes(id)
+          );
+        }
+
+        // Pause already subscribed tracks
+        if (shouldSubscribe && shouldPause) {
+          pauseVideoTrack(id);
+        }
+
         if (
           isLocalId(id) ||
           isScreenId(id) ||
           (shouldSubscribe && isSubscribed)
         )
           return u;
+
         const result = {
           setSubscribedTracks: {
             audio: true,
@@ -129,19 +142,7 @@ export const TracksProvider = ({ children }) => {
         return { ...u, [id]: result };
       }, {});
 
-      dispatch({
-        type: UPDATE_SUBSCRIPTIONS,
-        subscriptions: {
-          video: subscribedIds.reduce((v, id) => {
-            const result = {
-              id,
-              paused: pausedIds.includes(id) || !ids.includes(id),
-            };
-            return { ...v, ...result };
-          }, {}),
-        },
-      });
-
+      // Fast resume already subscribed videos
       ids
         .filter((id) => !pausedIds.includes(id))
         .forEach((id) => {
@@ -153,23 +154,24 @@ export const TracksProvider = ({ children }) => {
 
       callObject.updateParticipants(updates);
     },
-    [callObject, remoteParticipantIds, recentSpeakerIds, resumeVideoTrack]
+    [
+      callObject,
+      remoteParticipantIds,
+      recentSpeakerIds,
+      pauseVideoTrack,
+      resumeVideoTrack,
+    ]
   );
 
   useEffect(() => {
-    if (!callObject) {
-      return false;
-    }
+    if (!callObject) return false;
 
     const trackStoppedQueue = [];
 
     const handleTrackStarted = ({ participant, track }) => {
-      if (state.subscriptions.video?.[participant.session_id]?.paused) {
-        pauseVideoTrack(participant.session_id);
-      }
       /**
        * If track for participant was recently stopped, remove it from queue,
-       * so we don't run into a stale state.
+       * so we don't run into a stale state
        */
       const stoppingIdx = trackStoppedQueue.findIndex(
         ([p, t]) =>
@@ -186,9 +188,7 @@ export const TracksProvider = ({ children }) => {
     };
 
     const trackStoppedBatchInterval = setInterval(() => {
-      if (!trackStoppedQueue.length) {
-        return;
-      }
+      if (!trackStoppedQueue.length) return;
       dispatch({
         type: TRACK_STOPPED,
         items: trackStoppedQueue.splice(0, trackStoppedQueue.length),
@@ -248,25 +248,17 @@ export const TracksProvider = ({ children }) => {
       callObject.off('participant-joined', handleParticipantJoined);
       callObject.off('participant-left', handleParticipantLeft);
     };
-  }, [callObject, pauseVideoTrack, state.subscriptions.video]);
-
-  useEffect(() => {
-    Object.values(state.subscriptions.video).forEach(({ id, paused }) => {
-      if (paused) {
-        pauseVideoTrack(id);
-      }
-    });
-  }, [pauseVideoTrack, state.subscriptions.video]);
+  }, [callObject, pauseVideoTrack]);
 
   return (
     <TracksContext.Provider
       value={{
         audioTracks: state.audioTracks,
+        videoTracks: state.videoTracks,
         pauseVideoTrack,
         resumeVideoTrack,
-        remoteParticipantIds,
         updateCamSubscriptions,
-        videoTracks: state.videoTracks,
+        remoteParticipantIds,
         recentSpeakerIds,
       }}
     >
