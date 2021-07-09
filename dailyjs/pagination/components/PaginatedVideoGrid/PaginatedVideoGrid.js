@@ -1,5 +1,3 @@
-/* global rtcpeers */
-
 import React, {
   useCallback,
   useMemo,
@@ -7,16 +5,19 @@ import React, {
   useRef,
   useState,
 } from 'react';
-
+import { Button } from '@dailyjs/shared/components/Button';
 import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
 import { useActiveSpeaker } from '@dailyjs/shared/hooks/useActiveSpeaker';
+import usePreferredLayer from '@dailyjs/shared/hooks/usePreferredLayer';
+import { ReactComponent as IconArrow } from '@dailyjs/shared/icons/raquo-md.svg';
 import sortByKey from '@dailyjs/shared/lib/sortByKey';
-
+import { debounce } from 'debounce';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
+// --- Constants
 const MIN_TILE_WIDTH = 280;
 const MAX_TILES_PER_PAGE = 12;
 
@@ -31,11 +32,13 @@ export const PaginatedVideoGrid = () => {
 
   const { updateCamSubscriptions } = useTracks();
 
+  // Memoized participant count (does not include screen shares)
   const displayableParticipantCount = useMemo(
     () => participantCount,
     [participantCount]
   );
 
+  // Grid size (dictated by screen size)
   const [dimensions, setDimensions] = useState({
     width: 1,
     height: 1,
@@ -69,30 +72,33 @@ export const PaginatedVideoGrid = () => {
     };
   }, []);
 
+  // Memoized reference to the max columns and rows possible given screen size
   const [maxColumns, maxRows] = useMemo(() => {
     const { width, height } = dimensions;
-
     const columns = Math.max(1, Math.floor(width / MIN_TILE_WIDTH));
     const widthPerTile = width / columns;
     const rows = Math.max(1, Math.floor(height / (widthPerTile * (9 / 16))));
-
     return [columns, rows];
   }, [dimensions]);
 
+  // Memoized count of how many tiles can we show per page
   const pageSize = useMemo(
     () => Math.min(maxColumns * maxRows, maxTilesPerPage),
     [maxColumns, maxRows, maxTilesPerPage]
   );
 
+  // Calc and set the total number of pages as participant count mutates
   useEffect(() => {
     setPages(Math.ceil(displayableParticipantCount / pageSize));
   }, [pageSize, displayableParticipantCount]);
 
+  // Make sure we never see a blank page (if we're on the last page and people leave)
   useEffect(() => {
     if (page <= pages) return;
     setPage(pages);
   }, [page, pages]);
 
+  // Brutishly calculate the dimensions of each tile given the size of the grid
   const [tileWidth, tileHeight] = useMemo(() => {
     const { width, height } = dimensions;
     const n = Math.min(pageSize, displayableParticipantCount);
@@ -119,6 +125,7 @@ export const PaginatedVideoGrid = () => {
     );
   }, [dimensions, pageSize, displayableParticipantCount]);
 
+  // Memoized array of participants on the current page (those we can see)
   const visibleParticipants = useMemo(
     () =>
       participants.length - page * pageSize > 0
@@ -129,6 +136,8 @@ export const PaginatedVideoGrid = () => {
 
   /**
    * Play / pause tracks based on pagination
+   * Note: we pause adjacent page tracks and unsubscribe from everything else
+   * Please refer to project README for more information
    */
   const camSubscriptions = useMemo(() => {
     const maxSubs = 3 * pageSize;
@@ -169,40 +178,26 @@ export const PaginatedVideoGrid = () => {
     };
   }, [page, pageSize, participants, visibleParticipants]);
 
+  // Update subscriptions when array of subscribed or paused participants mutates
+  const debouncedUpdate = useCallback(
+    (subIds, pausedIds) =>
+      debounce(() => updateCamSubscriptions(subIds, pausedIds), 90),
+    [updateCamSubscriptions]
+  );
+
   useEffect(() => {
-    updateCamSubscriptions(
+    debouncedUpdate(
       camSubscriptions?.subscribedIds,
       camSubscriptions?.pausedIds
     );
   }, [
     camSubscriptions?.subscribedIds,
     camSubscriptions?.pausedIds,
-    updateCamSubscriptions,
+    debouncedUpdate,
   ]);
 
-  /**
-   * Set bandwidth layer based on amount of visible participants
-   */
-  useEffect(() => {
-    if (typeof rtcpeers === 'undefined' || rtcpeers?.getCurrentType() !== 'sfu')
-      return;
-
-    const sfu = rtcpeers.soup;
-    const count = visibleParticipants.length;
-
-    visibleParticipants.forEach(({ id }) => {
-      if (count < 5) {
-        // High quality video for calls with < 5 people per page
-        sfu.setPreferredLayerForTrack(id, 'cam-video', 2);
-      } else if (count < 10) {
-        // Medium quality video for calls with < 10 people per page
-        sfu.setPreferredLayerForTrack(id, 'cam-video', 1);
-      } else {
-        // Low quality video for calls with 10 or more people per page
-        sfu.setPreferredLayerForTrack(id, 'cam-video', 0);
-      }
-    });
-  }, [visibleParticipants]);
+  // Set bandwidth layer based on amount of visible participants
+  usePreferredLayer(visibleParticipants);
 
   /**
    * Handle position updates based on active speaker events
@@ -268,17 +263,23 @@ export const PaginatedVideoGrid = () => {
 
   return (
     <div ref={gridRef} className="grid">
-      {pages > 1 && page > 1 && (
-        <button type="button" onClick={handlePrevClick}>
-          &laquo;
-        </button>
-      )}
+      <Button
+        className="page-button prev"
+        disabled={!(pages > 1 && page > 1)}
+        type="button"
+        onClick={handlePrevClick}
+      >
+        <IconArrow />
+      </Button>
       <div className="tiles">{tiles}</div>
-      {pages > 1 && page < pages && (
-        <button type="button" onClick={handleNextClick}>
-          &raquo;
-        </button>
-      )}
+      <Button
+        className="page-button next"
+        disabled={!(pages > 1 && page < pages)}
+        type="button"
+        onClick={handleNextClick}
+      >
+        <IconArrow />
+      </Button>
       <style jsx>{`
         .grid {
           align-items: center;
@@ -292,11 +293,31 @@ export const PaginatedVideoGrid = () => {
           align-items: center;
           display: flex;
           flex-flow: row wrap;
+          gap: 1px;
           max-height: 100%;
           justify-content: center;
           margin: auto;
           overflow: hidden;
           width: 100%;
+        }
+
+        .grid :global(.page-button) {
+          border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+          height: 84px;
+          padding: 0px var(--spacing-xxxs) 0px var(--spacing-xxs);
+          background-color: var(--blue-default);
+          color: white;
+          border-right: 0px;
+        }
+
+        .grid :global(.page-button):disabled {
+          color: var(--blue-dark);
+          background-color: var(--blue-light);
+          border-color: var(--blue-light);
+        }
+
+        .grid :global(.page-button.prev) {
+          transform: scaleX(-1);
         }
       `}</style>
     </div>

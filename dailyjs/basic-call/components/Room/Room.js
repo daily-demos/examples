@@ -54,7 +54,6 @@ export const Room = ({ MainComponent = VideoGrid }) => {
           overflow: hidden;
           min-height: 0px;
           height: 100%;
-          padding: var(--spacing-xxxs);
           box-sizing: border-box;
         }
       `}</style>

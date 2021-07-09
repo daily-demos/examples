@@ -1,7 +1,6 @@
 /* global rtcpeers */
 
 import { useEffect } from 'react';
-import { useParticipants } from '../contexts/ParticipantsProvider';
 
 /**
  * This hook will switch between one of the 3 simulcast layers
@@ -15,9 +14,7 @@ import { useParticipants } from '../contexts/ParticipantsProvider';
  *
  * Note: this will have no effect when not in SFU mode
  */
-export const usePreferredLayer = () => {
-  const { allParticipants } = useParticipants();
-
+export const usePreferredLayer = (participants) => {
   /**
    * Set bandwidth layer based on amount of visible participants
    */
@@ -26,9 +23,9 @@ export const usePreferredLayer = () => {
       return;
 
     const sfu = rtcpeers.soup;
-    const count = allParticipants.length;
+    const count = participants.length;
 
-    allParticipants.forEach(({ id }) => {
+    participants.forEach(({ id }) => {
       if (count < 5) {
         // High quality video for calls with < 5 people per page
         sfu.setPreferredLayerForTrack(id, 'cam-video', 2);
@@ -40,7 +37,7 @@ export const usePreferredLayer = () => {
         sfu.setPreferredLayerForTrack(id, 'cam-video', 0);
       }
     });
-  }, [allParticipants]);
+  }, [participants]);
 };
 
 export default usePreferredLayer;

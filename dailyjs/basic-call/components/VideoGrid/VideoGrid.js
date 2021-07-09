@@ -19,7 +19,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { participants } = useParticipants();
+    const { participants, allParticipants } = useParticipants();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -106,7 +106,7 @@ export const VideoGrid = React.memo(
 
     // Optimise performance by reducing video quality
     // when more participants join (if in SFU mode)
-    usePreferredLayer();
+    usePreferredLayer(allParticipants);
 
     if (!participants.length) {
       return null;

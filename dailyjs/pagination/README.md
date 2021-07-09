@@ -25,7 +25,7 @@ yarn
 yarn workspace @dailyjs/live-streaming dev
 ```
 
-Note that this example uses a env `MANUAL_TRACK_SUBS=1` which will disable [automatic track management](https://docs.daily.co/reference#%EF%B8%8F-setsubscribetotracksautomatically).
+Note: this example uses an additional env `MANUAL_TRACK_SUBS=1` that will disable [automatic track management](https://docs.daily.co/reference#%EF%B8%8F-setsubscribetotracksautomatically).
 
 ## How does this example work?
 
