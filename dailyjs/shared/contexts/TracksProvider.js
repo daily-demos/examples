@@ -75,13 +75,7 @@ export const TracksProvider = ({ children }) => {
   const resumeVideoTrack = useCallback(
     (id) => {
       // Ignore undefined, local or screenshare
-      if (
-        !id ||
-        isLocalId(id) ||
-        isScreenId(id) ||
-        rtcpeers.getCurrentType() !== 'sfu'
-      )
-        return;
+      if (!id || isLocalId(id) || isScreenId(id)) return;
 
       const videoTrack = callObject.participants()?.[id]?.tracks?.video;
       if (!videoTrack?.subscribed) {
@@ -131,16 +125,9 @@ export const TracksProvider = ({ children }) => {
         const isSubscribed =
           callObject.participants()?.[id]?.tracks?.video?.subscribed;
 
-        // Set resume state for newly subscribed tracks
-        if (shouldSubscribe) {
-          rtcpeers.soup.setResumeOnSubscribeForTrack(
-            id,
-            'cam-video',
-            !pausedIds.includes(id)
-          );
-        }
-
-        // Pause already subscribed tracks
+        /**
+         * Pause already subscribed tracks.
+         */
         if (shouldSubscribe && shouldPause) {
           pauseVideoTrack(id);
         }
@@ -149,8 +136,9 @@ export const TracksProvider = ({ children }) => {
           isLocalId(id) ||
           isScreenId(id) ||
           (shouldSubscribe && isSubscribed)
-        )
+        ) {
           return u;
+        }
 
         const result = {
           setSubscribedTracks: {
