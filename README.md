@@ -22,7 +22,7 @@ Please note: these demos are intended as educational resources for using the Dai
 
 Examples that showcase the Daily CallObject using our Javascript library
 
-## [Prebuilt UI](./dailyjs/prebuilt-ui)
+## [Prebuilt UI](./prebuilt-ui)
 
 Examples that showcase using and customizing the Daily Prebuilt UI
 
