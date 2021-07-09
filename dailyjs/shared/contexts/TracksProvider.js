@@ -54,19 +54,34 @@ export const TracksProvider = ({ children }) => {
 
   const pauseVideoTrack = useCallback((id) => {
     // Ignore undefined, local or screenshare
-    if (!id || isLocalId(id) || isScreenId(id)) return;
+    if (
+      !id ||
+      isLocalId(id) ||
+      isScreenId(id) ||
+      rtcpeers.getCurrentType() !== 'sfu'
+    )
+      return;
     if (!rtcpeers.soup.implementationIsAcceptingCalls) {
       return;
     }
     const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
-    if (!consumer) return;
-    rtcpeers.soup?.pauseConsumer(consumer);
+    if (!consumer) {
+      rtcpeers.soup.setResumeOnSubscribeForTrack(id, 'cam-video', false);
+    } else {
+      rtcpeers.soup.pauseConsumer(consumer);
+    }
   }, []);
 
   const resumeVideoTrack = useCallback(
     (id) => {
       // Ignore undefined, local or screenshare
-      if (!id || isLocalId(id) || isScreenId(id)) return;
+      if (
+        !id ||
+        isLocalId(id) ||
+        isScreenId(id) ||
+        rtcpeers.getCurrentType() !== 'sfu'
+      )
+        return;
 
       const videoTrack = callObject.participants()?.[id]?.tracks?.video;
       if (!videoTrack?.subscribed) {
@@ -75,12 +90,18 @@ export const TracksProvider = ({ children }) => {
         });
         return;
       }
-      if (!rtcpeers.soup.implementationIsAcceptingCalls) {
+      if (
+        rtcpeers.getCurrentType() !== 'sfu' ||
+        !rtcpeers.soup.implementationIsAcceptingCalls
+      ) {
         return;
       }
       const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
-      if (!consumer) return;
-      rtcpeers.soup?.resumeConsumer(consumer);
+      if (!consumer) {
+        rtcpeers.soup.setResumeOnSubscribeForTrack(id, 'cam-video', true);
+      } else {
+        rtcpeers.soup.resumeConsumer(consumer);
+      }
     },
     [callObject]
   );
