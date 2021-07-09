@@ -289,6 +289,7 @@ export const PaginatedVideoGrid = () => {
           position: relative;
           width: 100%;
         }
+
         .grid .tiles {
           align-items: center;
           display: flex;
