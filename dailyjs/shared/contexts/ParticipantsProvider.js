@@ -123,6 +123,25 @@ export const ParticipantsProvider = ({ children }) => {
    */
   const username = callObject?.participants()?.local?.user_name ?? '';
 
+  const [muteNewParticipants, setMuteNewParticipants] = useState(false);
+
+  const muteAll = useCallback(
+    (muteFutureParticipants = false) => {
+      if (!localParticipant.isOwner) return;
+      setMuteNewParticipants(muteFutureParticipants);
+      const unmutedParticipants = participants.filter(
+        (p) => !p.isLocal && !p.isMicMuted
+      );
+      if (!unmutedParticipants.length) return;
+      const result = unmutedParticipants.reduce(
+        (o, p) => ({ ...o[p.id], setAudio: false }),
+        {}
+      );
+      callObject.updateParticipants(result);
+    },
+    [callObject, localParticipant, participants]
+  );
+
   /**
    * Sets the local participant's name in daily-js
    * @param name The new username
@@ -227,6 +246,8 @@ export const ParticipantsProvider = ({ children }) => {
         participantMarkedForRemoval,
         participants,
         screens,
+        muteNewParticipants,
+        muteAll,
         setParticipantMarkedForRemoval,
         setUsername,
         swapParticipantPosition,

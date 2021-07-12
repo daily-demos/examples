@@ -238,7 +238,10 @@ export const TracksProvider = ({ children }) => {
         }
 
         if (rtcpeers?.getCurrentType?.() === 'peer-to-peer') {
-          result.setSubscribedTracks.video = true;
+          result.setSubscribedTracks = {
+            ...result.setSubscribedTracks,
+            video: true,
+          };
         }
         return { [id]: result };
       }, {});
