@@ -53,7 +53,9 @@ export const TracksProvider = ({ children }) => {
   );
 
   const pauseVideoTrack = useCallback((id) => {
-    // Ignore undefined, local or screenshare
+    /**
+     * Ignore undefined, local or screenshare.
+     */
     if (
       !id ||
       isLocalId(id) ||
@@ -74,27 +76,36 @@ export const TracksProvider = ({ children }) => {
 
   const resumeVideoTrack = useCallback(
     (id) => {
-      // Ignore undefined, local or screenshare
+      /**
+       * Ignore undefined, local or screenshare.
+       */
       if (!id || isLocalId(id) || isScreenId(id)) return;
-
       const videoTrack = callObject.participants()?.[id]?.tracks?.video;
-      if (!videoTrack?.subscribed) {
+
+      const subscribe = () => {
+        if (videoTrack?.subscribed) return;
         callObject.updateParticipant(id, {
           setSubscribedTracks: true,
         });
-        return;
-      }
-      if (
-        rtcpeers.getCurrentType() !== 'sfu' ||
-        !rtcpeers.soup.implementationIsAcceptingCalls
-      ) {
-        return;
-      }
-      const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
-      if (!consumer) {
-        rtcpeers.soup.setResumeOnSubscribeForTrack(id, 'cam-video', true);
-      } else {
-        rtcpeers.soup.resumeConsumer(consumer);
+      };
+
+      switch (rtcpeers.getCurrentType()) {
+        case 'peer-to-peer':
+          subscribe();
+          break;
+        case 'sfu': {
+          if (!rtcpeers.soup.implementationIsAcceptingCalls) return;
+          const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
+          if (!(consumer && consumer.appData)) {
+            rtcpeers.soup.setResumeOnSubscribeForTrack(id, 'cam-video', true);
+            subscribe();
+          } else {
+            rtcpeers.soup.resumeConsumer(consumer);
+          }
+          break;
+        }
+        default:
+          break;
       }
     },
     [callObject]
@@ -130,6 +141,13 @@ export const TracksProvider = ({ children }) => {
          */
         if (shouldSubscribe && shouldPause) {
           pauseVideoTrack(id);
+        }
+
+        /**
+         * Fast resume tracks.
+         */
+        if (shouldSubscribe && !shouldPause) {
+          resumeVideoTrack(id);
         }
 
         if (
