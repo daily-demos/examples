@@ -4,8 +4,11 @@ import Button from '@dailyjs/shared/components/Button';
 import { TrayButton } from '@dailyjs/shared/components/Tray';
 import { ReactComponent as IconStar } from '@dailyjs/shared/icons/star-md.svg';
 
+const COOLDOWN = 1500;
+
 export const Tray = () => {
   const [showEmojis, setShowEmojis] = useState(false);
+  const [isThrottled, setIsThrottled] = useState(false);
 
   function sendEmoji(emoji) {
     // Dispatch custom event here so the local user can see their own emoji
@@ -13,7 +16,17 @@ export const Tray = () => {
       new CustomEvent('reaction_added', { detail: { emoji } })
     );
     setShowEmojis(false);
+    setIsThrottled(true);
   }
+
+  // Pseudo-throttling (should ideally be done serverside)
+  useEffect(() => {
+    if (!isThrottled) {
+      return false;
+    }
+    const t = setTimeout(() => setIsThrottled(false), COOLDOWN);
+    return () => clearTimeout(t);
+  }, [isThrottled]);
 
   return (
     <div>
@@ -42,7 +55,11 @@ export const Tray = () => {
           </Button>
         </div>
       )}
-      <TrayButton label="Emoji" onClick={() => setShowEmojis(!showEmojis)}>
+      <TrayButton
+        label="Emoji"
+        onClick={() => setShowEmojis(!showEmojis)}
+        disabled={isThrottled}
+      >
         <IconStar />
       </TrayButton>
       <style jsx>{`
