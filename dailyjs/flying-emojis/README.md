@@ -1,20 +1,18 @@
-# Text Chat
+# Flying Emojis
 
-![Text Chat](./image.png)
+![Flying Emojis](./image.png)
 
 ### Live example
 
-**[See it in action here ➡️](https://dailyjs-text-chat.vercel.app)**
+**[See it in action here ➡️](https://dailyjs-flying-emojis.vercel.app)**
 
 ---
 
 ## What does this demo do?
 
-- Use [sendAppMessage](https://docs.daily.co/reference#%EF%B8%8F-sendappmessage) to send messages
-- Listen for incoming messages using the call object `app-message` event
-- Extend the basic call demo with a chat provider and aside
-- Show a notification bubble on chat tray button when a new message is received
-- Demonstrate how to play a sound whenever a message is received
+- Use [sendAppMessage](https://docs.daily.co/reference#%EF%B8%8F-sendappmessage) to send flying emojis to all clients
+- Implements a custom `<App />` that adds `<FlyingEmojisOverlay />` component that listens for incoming emoji events and appends a new node to the DOM
+- Todo: pool emoji DOM nodes to optimise on DOM mutations
 
 Please note: this demo is not currently mobile optimised
 
@@ -25,16 +23,8 @@ Please note: this demo is not currently mobile optimised
 mv env.example .env.local
 
 yarn
-yarn workspace @dailyjs/text-chat dev
+yarn workspace @dailyjs/flying-emojis dev
 ```
-
-## How does this example work?
-
-In this example we extend the [basic call demo](../basic-call) with the ability to send chat messages.
-
-We pass a custom tray object, a custom app object (wrapping the original in a new `ChatProvider`) as well as add our `ChatAside` panel. We also symlink both the `public` and `pages/api` folders from the basic call.
-
-In a real world use case you would likely want to implement serverside logic so that participants joining a call can retrieve previously sent messages. This round trip could be done inside of the Chat context.
 
 ## Deploy your own on Vercel
 

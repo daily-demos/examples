@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Button from '@dailyjs/shared/components/Button';
 import { TrayButton } from '@dailyjs/shared/components/Tray';
@@ -12,7 +12,6 @@ export const Tray = () => {
     window.dispatchEvent(
       new CustomEvent('reaction_added', { detail: { emoji } })
     );
-
     setShowEmojis(false);
   }
 
@@ -20,8 +19,27 @@ export const Tray = () => {
     <div>
       {showEmojis && (
         <div className="emojis">
-          <Button onClick={() => sendEmoji('fire')}>A</Button>
-          <Button onClick={() => sendEmoji('squid')}>B</Button>
+          <Button
+            variant="outline-gray"
+            size="small-square"
+            onClick={() => sendEmoji('fire')}
+          >
+            🔥
+          </Button>
+          <Button
+            variant="outline-gray"
+            size="small-square"
+            onClick={() => sendEmoji('squid')}
+          >
+            🦑
+          </Button>
+          <Button
+            variant="outline-gray"
+            size="small-square"
+            onClick={() => sendEmoji('laugh')}
+          >
+            🤣
+          </Button>
         </div>
       )}
       <TrayButton label="Emoji" onClick={() => setShowEmojis(!showEmojis)}>
@@ -33,8 +51,15 @@ export const Tray = () => {
         .emojis {
           position: absolute;
           display: flex;
-          top: -50px;
+          top: calc(-100% + var(--spacing-xs));
+          left: 0px;
+          transform: translateX(calc(-50% + 26px));
           z-index: 99;
+          background: white;
+          padding: var(--spacing-xxxs);
+          column-gap: 5px;
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-depth-2);
         }
       `}</style>
     </div>

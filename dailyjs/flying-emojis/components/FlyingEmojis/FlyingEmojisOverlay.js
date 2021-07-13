@@ -4,6 +4,7 @@ import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 const EMOJI_MAP = {
   fire: '🔥',
   squid: '🦑',
+  laugh: '🤣',
 };
 
 export const FlyingEmojisOverlay = () => {
@@ -23,7 +24,7 @@ export const FlyingEmojisOverlay = () => {
         return;
       }
 
-      console.log(`⭐ New flying emoji: ${emoji}`);
+      console.log(`⭐ Displaying flying emoji: ${emoji}`);
 
       const node = document.createElement('div');
       node.appendChild(document.createTextNode(EMOJI_MAP[emoji]));
@@ -93,8 +94,8 @@ export const FlyingEmojisOverlay = () => {
           position: fixed;
           top: 0px;
           bottom: 0px;
-          left: 0px;
-          right: 0px;
+          left: 24px;
+          right: 24px;
           overflow: hidden;
           pointer-events: none;
           user-select: none;
@@ -123,7 +124,7 @@ export const FlyingEmojisOverlay = () => {
 
         @keyframes emerge {
           to {
-            bottom: 300px;
+            bottom: 85%;
             opacity: 0;
           }
         }
