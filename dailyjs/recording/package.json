@@ -1,6 +1,6 @@
 {
-  "name": "@dailyjs/cloud-recording",
-  "description": "Basic Call + Cloud Recording",
+  "name": "@dailyjs/recording",
+  "description": "Basic Call + Recording",
   "version": "0.1.0",
   "private": true,
   "scripts": {
