@@ -12,8 +12,8 @@
 
 - Use [startRecording](https://docs.daily.co/reference#%EF%B8%8F-startrecording) to create a video and audio recording of your call. You can read more about Daily call recording (and the different modes and types) [here](https://docs.daily.co/reference#recordings)
 - Supports both `cloud` and `local` recording modes (specified when creating the room or managed using the Daily dashboard)
-- Coming soon: supports different recording layouts and composites
-- Coming soon: use the Daily REST API to retrieve a list of cloud recordings for the current active room
+- Coming soon: support different recording layouts / composites
+- Coming soon: use the Daily REST API to retrieve a list of cloud recordings for the currently active room
 
 **To turn on recording, you need to be on the Scale plan. There is also a per minute recording fee for cloud recording.**
 
