@@ -286,6 +286,9 @@ export const Button = forwardRef(
           .button.dark:focus {
             box-shadow: 0 0 0px 3px rgba(255, 255, 255, 0.15);
           }
+          .button.dark:disabled {
+            opacity: 0.35;
+          }
 
           .button.outline {
             background: transparent;
