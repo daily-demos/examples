@@ -34,6 +34,7 @@ export const CallProvider = ({
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
   const [enableRecording, setEnableRecording] = useState(null);
   const [startCloudRecording, setStartCloudRecording] = useState(false);
+  const [roomExp, setRoomExp] = useState(null);
 
   // Daily CallMachine hook (primarily handles status of the call)
   const { daily, leave, state, setRedirectOnLeave } = useCallMachine({
@@ -50,6 +51,11 @@ export const CallProvider = ({
       const roomConfig = await daily.room();
       if (!('config' in roomConfig)) return;
 
+      if (roomConfig?.config?.exp) {
+        setRoomExp(
+          roomConfig?.config?.exp * 1000 || Date.now() + 1 * 60 * 1000
+        );
+      }
       const browser = Bowser.parse(window.navigator.userAgent);
       const supportsRecording =
         browser.platform.type === 'desktop' && browser.engine.name === 'Blink';
@@ -100,6 +106,7 @@ export const CallProvider = ({
         addFakeParticipant,
         preJoinNonAuthorized,
         leave,
+        roomExp,
         videoQuality,
         enableRecording,
         setVideoQuality,

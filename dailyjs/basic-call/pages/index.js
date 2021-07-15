@@ -6,9 +6,9 @@ import { TracksProvider } from '@dailyjs/shared/contexts/TracksProvider';
 import { UIStateProvider } from '@dailyjs/shared/contexts/UIStateProvider';
 import { WaitingRoomProvider } from '@dailyjs/shared/contexts/WaitingRoomProvider';
 import getDemoProps from '@dailyjs/shared/lib/demoProps';
-
 import PropTypes from 'prop-types';
 import App from '../components/App';
+import { CreatingRoom } from '../components/CreatingRoom';
 import { Intro, NotConfigured } from '../components/Intro';
 
 /**
@@ -25,6 +25,7 @@ export default function Index({
   predefinedRoom = '',
   forceFetchToken = false,
   forceOwner = false,
+  demoMode = false,
   asides,
   modals,
   customTrayComponent,
@@ -74,22 +75,24 @@ export default function Index({
   if (!isReady) {
     return (
       <main>
-        {!isConfigured ? (
-          <NotConfigured />
-        ) : (
-          <Intro
-            forceFetchToken={forceFetchToken}
-            forceOwner={forceOwner}
-            title={process.env.PROJECT_TITLE}
-            room={roomName}
-            error={tokenError}
-            fetching={fetchingToken}
-            domain={domain}
-            onJoin={(room, isOwner, fetchToken) =>
-              fetchToken ? getMeetingToken(room, isOwner) : setRoomName(room)
-            }
-          />
-        )}
+        {(() => {
+          if (!isConfigured) return <NotConfigured />;
+          if (demoMode) return <CreatingRoom onCreated={getMeetingToken} />;
+          return (
+            <Intro
+              forceFetchToken={forceFetchToken}
+              forceOwner={forceOwner}
+              title={process.env.PROJECT_TITLE}
+              room={roomName}
+              error={tokenError}
+              fetching={fetchingToken}
+              domain={domain}
+              onJoin={(room, isOwner, fetchToken) =>
+                fetchToken ? getMeetingToken(room, isOwner) : setRoomName(room)
+              }
+            />
+          );
+        })()}
 
         <style jsx>{`
           height: 100vh;
@@ -136,6 +139,7 @@ Index.propTypes = {
   customAppComponent: PropTypes.node,
   forceFetchToken: PropTypes.bool,
   forceOwner: PropTypes.bool,
+  demoMode: PropTypes.bool,
 };
 
 export async function getStaticProps() {
