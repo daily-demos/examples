@@ -61,11 +61,14 @@ export const TracksProvider = ({ children }) => {
       isLocalId(id) ||
       isScreenId(id) ||
       rtcpeers.getCurrentType() !== 'sfu'
-    )
+    ) {
       return;
+    }
+
     if (!rtcpeers.soup.implementationIsAcceptingCalls) {
       return;
     }
+
     const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
     if (!consumer) {
       rtcpeers.soup.setResumeOnSubscribeForTrack(id, 'cam-video', false);
@@ -169,16 +172,6 @@ export const TracksProvider = ({ children }) => {
         return { ...u, [id]: result };
       }, {});
 
-      // Fast resume already subscribed videos
-      ids
-        .filter((id) => !pausedIds.includes(id))
-        .forEach((id) => {
-          const p = callObject.participants()?.[id];
-          if (p?.tracks?.video?.subscribed) {
-            resumeVideoTrack(id);
-          }
-        });
-
       callObject.updateParticipants(updates);
     },
     [
@@ -227,6 +220,7 @@ export const TracksProvider = ({ children }) => {
         trackStoppedQueue.push([participant, track]);
       }
     };
+
     const handleParticipantLeft = ({ participant }) => {
       dispatch({
         type: REMOVE_TRACKS,
@@ -256,11 +250,9 @@ export const TracksProvider = ({ children }) => {
         }
 
         if (rtcpeers?.getCurrentType?.() === 'peer-to-peer') {
-          result.setSubscribedTracks = {
-            ...result.setSubscribedTracks,
-            video: true,
-          };
+          result.setSubscribedTracks = true;
         }
+
         return { [id]: result };
       }, {});
       callObject.updateParticipants(updates);

@@ -5,12 +5,11 @@ import Modal from '@dailyjs/shared/components/Modal';
 import Well from '@dailyjs/shared/components/Well';
 import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
-import { enable } from 'debug';
+
 import {
   RECORDING_COUNTDOWN_1,
   RECORDING_COUNTDOWN_2,
   RECORDING_COUNTDOWN_3,
-  RECORDING_ERROR,
   RECORDING_IDLE,
   RECORDING_RECORDING,
   RECORDING_SAVED,

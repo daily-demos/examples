@@ -11,6 +11,7 @@ import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
 import { useActiveSpeaker } from '@dailyjs/shared/hooks/useActiveSpeaker';
+import { useCamSubscriptions } from '@dailyjs/shared/hooks/useCamSubscriptions';
 import usePreferredLayer from '@dailyjs/shared/hooks/usePreferredLayer';
 import { ReactComponent as IconArrow } from '@dailyjs/shared/icons/raquo-md.svg';
 import sortByKey from '@dailyjs/shared/lib/sortByKey';
@@ -29,8 +30,6 @@ export const PaginatedVideoGrid = () => {
     swapParticipantPosition,
   } = useParticipants();
   const activeSpeakerId = useActiveSpeaker();
-
-  const { updateCamSubscriptions } = useTracks();
 
   // Memoized participant count (does not include screen shares)
   const displayableParticipantCount = useMemo(
@@ -178,23 +177,10 @@ export const PaginatedVideoGrid = () => {
     };
   }, [page, pageSize, participants, visibleParticipants]);
 
-  // Update subscriptions when array of subscribed or paused participants mutates
-  const debouncedUpdate = useCallback(
-    (subIds, pausedIds) =>
-      debounce(() => updateCamSubscriptions(subIds, pausedIds), 90),
-    [updateCamSubscriptions]
-  );
-
-  useEffect(() => {
-    debouncedUpdate(
-      camSubscriptions?.subscribedIds,
-      camSubscriptions?.pausedIds
-    );
-  }, [
+  useCamSubscriptions(
     camSubscriptions?.subscribedIds,
-    camSubscriptions?.pausedIds,
-    debouncedUpdate,
-  ]);
+    camSubscriptions?.pausedIds
+  );
 
   // Set bandwidth layer based on amount of visible participants
   usePreferredLayer(visibleParticipants);
