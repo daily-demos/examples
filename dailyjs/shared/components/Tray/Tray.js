@@ -9,11 +9,17 @@ export const TrayButton = ({
   onClick,
   bubble = false,
   orange = false,
+  disabled = false,
 }) => {
   const cx = classNames('tray-button', { orange, bubble });
   return (
     <div className={cx}>
-      <Button onClick={() => onClick()} variant="dark" size="large-square">
+      <Button
+        onClick={() => onClick()}
+        variant="dark"
+        size="large-square"
+        disabled={disabled}
+      >
         {children}
       </Button>
       <span>{label}</span>
@@ -57,6 +63,7 @@ TrayButton.propTypes = {
   orange: PropTypes.bool,
   bubble: PropTypes.bool,
   label: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
 };
 
 export const Tray = ({ children }) => (

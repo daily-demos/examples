@@ -10,7 +10,15 @@ Send messages to other participants using sendAppMessage
 
 ### [📺 Live streaming](./live-streaming)
 
-Broadcast call to a custom RTMP endpoint using a variety of difference layout modes
+Broadcast call to a custom RTMP endpoint using a variety of different layout modes
+
+### [⏺️ Recording](./recording)
+
+Record a call video and audio using both cloud and local modes
+
+### [🔥 Flying emojis](./flying-emojis)
+
+Send emoji reactions to all clients using sendAppMessage
 
 ### [📃 Pagination](./pagination)
 

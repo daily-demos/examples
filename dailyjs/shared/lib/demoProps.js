@@ -7,5 +7,7 @@ export default function getDemoProps() {
     predefinedRoom: process.env.DAILY_ROOM || '',
     // Manual or automatic track subscriptions
     subscribeToTracksAutomatically: !process.env.MANUAL_TRACK_SUBS,
+    // Are we running in demo mode? (automatically creates a short-expiry room)
+    demoMode: !!process.env.DAILY_DEMO_MODE,
   };
 }

@@ -160,10 +160,17 @@
     "@babel/helper-validator-identifier" "^7.12.11"
     to-fast-properties "^2.0.0"
 
+<<<<<<< HEAD
 "@daily-co/daily-js@^0.14.0":
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/@daily-co/daily-js/-/daily-js-0.14.0.tgz#29308c77e00886514df7d932d771980d5cdb7618"
   integrity sha512-OD2epVohYraTfOH/ZuO5rP9Ej4Rfu/ufGXX0XJQG+mAu1hJ1610JWunnszTmfhk+uUH4aA9i7+5/PQ2meOXUtQ==
+=======
+"@daily-co/daily-js@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@daily-co/daily-js/-/daily-js-0.15.0.tgz#9dfd5c3ed8855df31c370d5b21a3b5098cce3c4f"
+  integrity sha512-rnivho7yx/yEOtqL81L4daPy9C/FDXf06k06df8vmyUXsE8y+cxSTD7ZvYIJDGJHN6IZRhVxxfbCyPI8CHfwCg==
+>>>>>>> 1068a9f75322d380546319034f8c236029567085
   dependencies:
     "@babel/runtime" "^7.12.5"
     bowser "^2.8.1"
@@ -584,7 +591,7 @@ boolbase@^1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-bowser@^2.8.1:
+bowser@^2.11.0, bowser@^2.8.1:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/bowser/-/bowser-2.11.0.tgz#5ca3c35757a7aa5771500c70a73a9f91ef420a8f"
   integrity sha512-AlcaJBi/pqqJBIQ8U9Mcpc9i8Aqxn88Skv5d+xBX006BY5u8N3mGLHa5Lgppa7L/HfwgwLgZ6NYs+Ag6uUmJRA==

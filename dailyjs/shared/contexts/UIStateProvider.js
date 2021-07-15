@@ -57,6 +57,7 @@ export const UIStateProvider = ({
 
 UIStateProvider.propTypes = {
   children: PropTypes.node,
+  demoMode: PropTypes.bool,
   asides: PropTypes.arrayOf(PropTypes.func),
   modals: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
