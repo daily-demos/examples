@@ -7,7 +7,7 @@ import { debounce } from 'debounce';
  * Convenience hook to play `join.mp3` when participants join the call
  */
 export const useMessageSound = () => {
-  const { load, play } = useSound('message.mp3');
+  const { load, play } = useSound('assets/message.mp3');
 
   useEffect(() => {
     load();

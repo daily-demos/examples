@@ -9,7 +9,7 @@ import { useSound } from './useSound';
  */
 export const useJoinSound = () => {
   const { callObject } = useCallState();
-  const { load, play } = useSound('join.mp3');
+  const { load, play } = useSound('assets/join.mp3');
 
   useEffect(() => {
     load();

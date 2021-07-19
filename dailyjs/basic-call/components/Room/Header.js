@@ -9,7 +9,7 @@ export const Header = () => {
   return useMemo(
     () => (
       <header className="room-header">
-        <img src="images/daily-logo.svg" alt="Daily" className="logo" />
+        <img src="assets/daily-logo.svg" alt="Daily" className="logo" />
         <div className="capsule">Basic call demo</div>
         <div className="capsule">
           {`${participantCount} ${

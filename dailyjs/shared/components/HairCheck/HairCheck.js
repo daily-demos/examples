@@ -128,7 +128,7 @@ export const HairCheck = () => {
     <>
       <main className="haircheck">
         <img
-          src="/images/daily-logo.svg"
+          src="/assets/daily-logo.svg"
           alt="Daily.co"
           width="132"
           height="58"

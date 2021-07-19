@@ -48,7 +48,6 @@ export const useCallUI = ({
         );
       case CALL_STATE_LOBBY:
         return haircheck ? haircheck() : <HairCheck />;
-
       case CALL_STATE_JOINED:
         return room ? (
           room()
