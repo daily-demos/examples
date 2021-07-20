@@ -81,7 +81,7 @@ export const FlyingEmojisOverlay = () => {
   // Remove all event listeners on unmount to prevent console warnings
   useEffect(
     () => () =>
-      overlayRef.current.childNodes.forEach((n) =>
+      overlayRef.current?.childNodes.forEach((n) =>
         n.removeEventListener('animationend', handleRemoveFlyingEmoji)
       ),
     [handleRemoveFlyingEmoji]

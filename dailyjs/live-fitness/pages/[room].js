@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import App from '@dailyjs/basic-call/components/App';
-import Loader from '@dailyjs/shared/components/Loader';
 import { CallProvider } from '@dailyjs/shared/contexts/CallProvider';
 import { MediaDeviceProvider } from '@dailyjs/shared/contexts/MediaDeviceProvider';
 import { ParticipantsProvider } from '@dailyjs/shared/contexts/ParticipantsProvider';
@@ -10,12 +8,19 @@ import { WaitingRoomProvider } from '@dailyjs/shared/contexts/WaitingRoomProvide
 import getDemoProps from '@dailyjs/shared/lib/demoProps';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
+import App from '../components/App';
 
 /**
  * Room page
  * ---
  */
-export default function Room({ room, instructor, domain }) {
+export default function Room({
+  room,
+  instructor,
+  domain,
+  customTrayComponent,
+  asides,
+}) {
   const [token, setToken] = useState();
   const [tokenError, setTokenError] = useState();
 
@@ -65,11 +70,15 @@ export default function Room({ room, instructor, domain }) {
     return <div>Fetching token...</div>;
   }
 
+  if (tokenError) {
+    return <div>Token error</div>;
+  }
+
   /**
    * Main call UI
    */
   return (
-    <UIStateProvider>
+    <UIStateProvider customTrayComponent={customTrayComponent} asides={asides}>
       <CallProvider domain={domain} room={room} token={token}>
         <ParticipantsProvider>
           <TracksProvider>
@@ -89,6 +98,8 @@ Room.propTypes = {
   room: PropTypes.string.isRequired,
   domain: PropTypes.string.isRequired,
   instructor: PropTypes.bool,
+  customTrayComponent: PropTypes.node,
+  asides: PropTypes.arrayOf(PropTypes.func),
 };
 
 export async function getServerSideProps(context) {

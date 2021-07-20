@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import ExpiryTimer from '@dailyjs/shared/components/ExpiryTimer';
 import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useCallUI } from '@dailyjs/shared/hooks/useCallUI';

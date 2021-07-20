@@ -15,6 +15,7 @@ export default async function handler(req, res) {
         properties: {
           exp: Math.round(Date.now() / 1000) + (expiryMinutes || 5) * 60, // expire in x minutes
           eject_at_room_exp: true,
+          enable_knocking: privacy !== 'public',
         },
       }),
     };

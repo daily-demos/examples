@@ -12,6 +12,8 @@
   "dependencies": {
     "@dailyjs/shared": "*",
     "@dailyjs/basic-call": "*",
+    "@dailyjs/flying-emojis": "*",
+    "@dailyjs/text-chat": "*",
     "next": "^11.0.0",
     "pluralize": "^8.0.0",
     "react": "^17.0.2",

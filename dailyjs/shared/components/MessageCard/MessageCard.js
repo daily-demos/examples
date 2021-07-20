@@ -15,7 +15,7 @@ export const MessageCard = ({
   hideBack = false,
   onBack,
 }) => (
-  <Card>
+  <Card className={error && 'error'}>
     {header && <CardHeader>{header}</CardHeader>}
     {children && <CardBody>{children}</CardBody>}
     {!hideBack && (
@@ -27,13 +27,11 @@ export const MessageCard = ({
         )}
       </CardFooter>
     )}
-    {error && (
-      <style jsx>{`
-        .card {
-          border: 3px solid var(--red-default);
-        }
-      `}</style>
-    )}
+    <style jsx>{`
+      :global(.card.error) {
+        border: 3px solid var(--red-default);
+      }
+    `}</style>
   </Card>
 );
 
