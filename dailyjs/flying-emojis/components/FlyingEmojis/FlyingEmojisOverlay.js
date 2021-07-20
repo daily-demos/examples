@@ -94,8 +94,8 @@ export const FlyingEmojisOverlay = () => {
           position: fixed;
           top: 0px;
           bottom: 0px;
-          left: 24px;
-          right: 24px;
+          left: 0px;
+          right: 0px;
           overflow: hidden;
           pointer-events: none;
           user-select: none;

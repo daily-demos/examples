@@ -11,11 +11,18 @@ export const ExpiryTimer = ({ expiry }) => {
     }
     const i = setInterval(() => {
       const timeLeft = Math.round((expiry - Date.now()) / 1000);
+      if (timeLeft < 0) {
+        return setSecs(null);
+      }
       setSecs(`${Math.floor(timeLeft / 60)}:${`0${timeLeft % 60}`.slice(-2)}`);
     }, 1000);
 
     return () => clearInterval(i);
   }, [expiry]);
+
+  if (!secs) {
+    return null;
+  }
 
   return (
     <div className="countdown">

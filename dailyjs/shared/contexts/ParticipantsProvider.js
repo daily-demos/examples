@@ -75,7 +75,10 @@ export const ParticipantsProvider = ({ children }) => {
     [allParticipants]
   );
 
-  const isOwner = useMemo(() => localParticipant?.isOwner, [localParticipant]);
+  const isOwner = useMemo(
+    () => !!localParticipant?.isOwner,
+    [localParticipant]
+  );
 
   /**
    * The participant who should be rendered prominently right now

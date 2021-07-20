@@ -1,29 +1,24 @@
 import React, { useMemo } from 'react';
+import Button from '@dailyjs/shared/components/Button';
 import HeaderCapsule from '@dailyjs/shared/components/HeaderCapsule';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 
 export const Header = () => {
   const { participantCount } = useParticipants();
-  const { customCapsule } = useUIState();
 
   return useMemo(
     () => (
       <header className="room-header">
         <img src="assets/daily-logo.svg" alt="Daily" className="logo" />
 
-        <HeaderCapsule>Basic call demo</HeaderCapsule>
-        <HeaderCapsule>
+        <HeaderCapsule variant="button">
           {`${participantCount} ${
             participantCount === 1 ? 'participant' : 'participants'
           }`}
+          <Button size="tiny" variant="outline-dark">
+            Invite
+          </Button>
         </HeaderCapsule>
-        {customCapsule && (
-          <HeaderCapsule variant={customCapsule.variant}>
-            {customCapsule.variant === 'recording' && <span />}
-            {customCapsule.label}
-          </HeaderCapsule>
-        )}
 
         <style jsx>{`
           .room-header {
@@ -42,7 +37,7 @@ export const Header = () => {
         `}</style>
       </header>
     ),
-    [participantCount, customCapsule]
+    [participantCount]
   );
 };
 

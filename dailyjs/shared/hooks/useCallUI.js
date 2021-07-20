@@ -15,6 +15,7 @@ import {
 } from '@dailyjs/shared/contexts/useCallMachine';
 import { useRouter } from 'next/router';
 import HairCheck from '../components/HairCheck';
+import { useUIState } from '../contexts/UIStateProvider';
 
 export const useCallUI = ({
   state,
@@ -25,6 +26,7 @@ export const useCallUI = ({
   notFoundRedirect = 'not-found',
 }) => {
   const router = useRouter();
+  const { closeAside, closeModal } = useUIState();
 
   useEffect(() => {
     console.log(`%c🔀 App state changed: ${state}`, `color: gray;`);
@@ -35,6 +37,10 @@ export const useCallUI = ({
     if (!state || [CALL_STATE_READY, CALL_STATE_JOINING].includes(state)) {
       return <Loader />;
     }
+
+    // Make sure we hide any active asides or modals when the state changes
+    closeAside();
+    closeModal();
 
     // Update the UI based on the state of our call
     switch (state) {
@@ -80,7 +86,7 @@ export const useCallUI = ({
         return callEnded ? (
           callEnded()
         ) : (
-          <MessageCard onBack={() => window.location.reload()}>
+          <MessageCard>
             You have left the call. We hope you had fun!
           </MessageCard>
         );

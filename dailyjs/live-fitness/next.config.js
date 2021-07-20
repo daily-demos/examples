@@ -4,6 +4,8 @@ const withTM = require('next-transpile-modules')([
   '@dailyjs/basic-call',
   '@dailyjs/flying-emojis',
   '@dailyjs/text-chat',
+  '@dailyjs/live-streaming',
+  '@dailyjs/recording',
 ]);
 
 const packageJson = require('./package.json');

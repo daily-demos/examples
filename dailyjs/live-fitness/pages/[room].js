@@ -20,6 +20,7 @@ export default function Room({
   domain,
   customTrayComponent,
   asides,
+  modals,
 }) {
   const [token, setToken] = useState();
   const [tokenError, setTokenError] = useState();
@@ -78,7 +79,11 @@ export default function Room({
    * Main call UI
    */
   return (
-    <UIStateProvider customTrayComponent={customTrayComponent} asides={asides}>
+    <UIStateProvider
+      customTrayComponent={customTrayComponent}
+      asides={asides}
+      modals={modals}
+    >
       <CallProvider domain={domain} room={room} token={token}>
         <ParticipantsProvider>
           <TracksProvider>
@@ -100,6 +105,7 @@ Room.propTypes = {
   instructor: PropTypes.bool,
   customTrayComponent: PropTypes.node,
   asides: PropTypes.arrayOf(PropTypes.func),
+  modals: PropTypes.arrayOf(PropTypes.func),
 };
 
 export async function getServerSideProps(context) {

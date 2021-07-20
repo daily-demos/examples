@@ -7,8 +7,7 @@ import PropTypes from 'prop-types';
 import WaitingRoom from '../WaitingRoom';
 
 export const RoomContainer = ({ children }) => {
-  const { localParticipant } = useParticipants();
-  const isOwner = !!localParticipant?.isOwner;
+  const { isOwner } = useParticipants();
 
   useJoinSound();
 

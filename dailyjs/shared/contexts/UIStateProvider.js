@@ -22,6 +22,10 @@ export const UIStateProvider = ({
   }, []);
 
   const closeModal = useCallback((modalName) => {
+    if (!modalName) {
+      setActiveModals({});
+    }
+
     setActiveModals((prevState) => ({
       ...prevState,
       [modalName]: false,
@@ -34,6 +38,10 @@ export const UIStateProvider = ({
     setShowAside((p) => (p === newAside ? null : newAside));
   }, []);
 
+  const closeAside = useCallback(() => {
+    setShowAside(null);
+  }, []);
+
   return (
     <UIStateContext.Provider
       value={{
@@ -42,6 +50,7 @@ export const UIStateProvider = ({
         customTrayComponent,
         openModal,
         closeModal,
+        closeAside,
         currentModals,
         toggleAside,
         showAside,
@@ -57,7 +66,6 @@ export const UIStateProvider = ({
 
 UIStateProvider.propTypes = {
   children: PropTypes.node,
-  demoMode: PropTypes.bool,
   asides: PropTypes.arrayOf(PropTypes.func),
   modals: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
