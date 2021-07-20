@@ -28,7 +28,7 @@ export const CallProvider = ({
   domain,
   room,
   token = '',
-  subscribeToTracksAutomatically = false,
+  subscribeToTracksAutomatically = true,
 }) => {
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);

@@ -30,7 +30,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
  * - Set user name and join call / request access
  */
 export const HairCheck = () => {
-  const { callObject } = useCallState();
+  const { callObject, join } = useCallState();
   const { localParticipant } = useParticipants();
   const { deviceState, camError, micError, isCamMuted, isMicMuted } =
     useMediaDevices();

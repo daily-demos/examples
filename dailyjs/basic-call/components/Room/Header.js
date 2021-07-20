@@ -13,7 +13,7 @@ export const Header = () => {
         <div className="capsule">Basic call demo</div>
         <div className="capsule">
           {`${participantCount} ${
-            participantCount > 1 ? 'participants' : 'participant'
+            participantCount === 1 ? 'participant' : 'participants'
           }`}
         </div>
         {customCapsule && (

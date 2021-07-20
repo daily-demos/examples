@@ -8,14 +8,14 @@ import React, {
   useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
-import { useDeepCompareMemo } from 'use-deep-compare';
 
 import { sortByKey } from '../lib/sortByKey';
 
 import { useCallState } from './CallProvider';
 import {
-  ACTIVE_SPEAKER,
   initialParticipantsState,
+  isLocalId,
+  ACTIVE_SPEAKER,
   PARTICIPANT_JOINED,
   PARTICIPANT_LEFT,
   PARTICIPANT_UPDATED,
@@ -26,7 +26,7 @@ import {
 export const ParticipantsContext = createContext();
 
 export const ParticipantsProvider = ({ children }) => {
-  const { broadcast, callObject } = useCallState();
+  const { callObject } = useCallState();
   const [state, dispatch] = useReducer(
     participantsReducer,
     initialParticipantsState
@@ -37,27 +37,21 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * ALL participants (incl. shared screens) in a convenient array
    */
-  const allParticipants = useDeepCompareMemo(
-    () => Object.values(state.participants),
-    [state?.participants]
+  const allParticipants = useMemo(
+    () => [...state.participants, ...state.screens],
+    [state?.participants, state?.screens]
   );
 
   /**
    * Only return participants that should be visible in the call
    */
-  const participants = useDeepCompareMemo(
-    () =>
-      !broadcast
-        ? allParticipants
-        : allParticipants.filter((p) => p?.isOwner || p?.isScreenshare),
-    [broadcast, allParticipants]
-  );
+  const participants = useMemo(() => state.participants, [state.participants]);
 
   /**
    * The number of participants, who are not a shared screen
    * (technically a shared screen counts as a participant, but we shouldn't tell humans)
    */
-  const participantCount = useDeepCompareMemo(
+  const participantCount = useMemo(
     () => participants.filter(({ isScreenshare }) => !isScreenshare).length,
     [participants]
   );
@@ -65,7 +59,7 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * The participant who most recently got mentioned via a `active-speaker-change` event
    */
-  const activeParticipant = useDeepCompareMemo(
+  const activeParticipant = useMemo(
     () => participants.find(({ isActiveSpeaker }) => isActiveSpeaker),
     [participants]
   );
@@ -73,7 +67,7 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * The local participant
    */
-  const localParticipant = useDeepCompareMemo(
+  const localParticipant = useMemo(
     () =>
       allParticipants.find(
         ({ isLocal, isScreenshare }) => isLocal && !isScreenshare
@@ -81,10 +75,7 @@ export const ParticipantsProvider = ({ children }) => {
     [allParticipants]
   );
 
-  const isOwner = useDeepCompareMemo(
-    () => localParticipant?.isOwner,
-    [localParticipant]
-  );
+  const isOwner = useMemo(() => localParticipant?.isOwner, [localParticipant]);
 
   /**
    * The participant who should be rendered prominently right now
@@ -99,6 +90,19 @@ export const ParticipantsProvider = ({ children }) => {
 
     const displayableParticipants = participants.filter((p) => !p?.isLocal);
 
+    if (
+      !isPresent &&
+      displayableParticipants.length > 0 &&
+      displayableParticipants.every((p) => p.isMicMuted && !p.lastActiveDate)
+    ) {
+      // Return first cam on participant in case everybody is muted and nobody ever talked
+      // or first remote participant, in case everybody's cam is muted, too.
+      return (
+        displayableParticipants.find((p) => !p.isCamMuted) ??
+        displayableParticipants?.[0]
+      );
+    }
+
     const sorted = displayableParticipants
       .sort((a, b) => sortByKey(a, b, 'lastActiveDate'))
       .reverse();
@@ -109,7 +113,7 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * Screen shares
    */
-  const screens = useDeepCompareMemo(
+  const screens = useMemo(
     () => allParticipants.filter(({ isScreenshare }) => isScreenshare),
     [allParticipants]
   );
@@ -118,6 +122,25 @@ export const ParticipantsProvider = ({ children }) => {
    * The local participant's name
    */
   const username = callObject?.participants()?.local?.user_name ?? '';
+
+  const [muteNewParticipants, setMuteNewParticipants] = useState(false);
+
+  const muteAll = useCallback(
+    (muteFutureParticipants = false) => {
+      if (!localParticipant.isOwner) return;
+      setMuteNewParticipants(muteFutureParticipants);
+      const unmutedParticipants = participants.filter(
+        (p) => !p.isLocal && !p.isMicMuted
+      );
+      if (!unmutedParticipants.length) return;
+      const result = unmutedParticipants.reduce(
+        (o, p) => ({ ...o[p.id], setAudio: false }),
+        {}
+      );
+      callObject.updateParticipants(result);
+    },
+    [callObject, localParticipant, participants]
+  );
 
   /**
    * Sets the local participant's name in daily-js
@@ -128,6 +151,7 @@ export const ParticipantsProvider = ({ children }) => {
   };
 
   const swapParticipantPosition = (id1, id2) => {
+    if (id1 === id2 || !id1 || !id2 || isLocalId(id1) || isLocalId(id2)) return;
     dispatch({
       type: SWAP_POSITION,
       id1,
@@ -222,6 +246,8 @@ export const ParticipantsProvider = ({ children }) => {
         participantMarkedForRemoval,
         participants,
         screens,
+        muteNewParticipants,
+        muteAll,
         setParticipantMarkedForRemoval,
         setUsername,
         swapParticipantPosition,

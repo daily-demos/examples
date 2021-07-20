@@ -6,7 +6,7 @@ import useJoinSound from '@dailyjs/shared/hooks/useJoinSound';
 import PropTypes from 'prop-types';
 import WaitingRoom from '../WaitingRoom';
 
-const RoomContainer = ({ children }) => {
+export const RoomContainer = ({ children }) => {
   const { localParticipant } = useParticipants();
   const isOwner = !!localParticipant?.isOwner;
 
@@ -17,10 +17,8 @@ const RoomContainer = ({ children }) => {
       <>
         {/* Show waiting room notification & modal if call owner */}
         {isOwner && <WaitingRoom />}
-
         {/* Tray buttons */}
         <BasicTray />
-
         {/* Audio tags */}
         <Audio />
       </>
@@ -59,4 +57,4 @@ RoomContainer.propTypes = {
   children: PropTypes.node,
 };
 
-export default React.memo(RoomContainer, () => true);
+export default RoomContainer;
