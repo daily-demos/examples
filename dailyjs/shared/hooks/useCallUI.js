@@ -10,6 +10,8 @@ import {
   CALL_STATE_NOT_BEFORE,
   CALL_STATE_READY,
   CALL_STATE_REDIRECTING,
+  CALL_STATE_NOT_ALLOWED,
+  CALL_STATE_EXPIRED,
 } from '@dailyjs/shared/contexts/useCallMachine';
 import { useRouter } from 'next/router';
 import HairCheck from '../components/HairCheck';
@@ -39,11 +41,25 @@ export const useCallUI = ({
       case CALL_STATE_NOT_FOUND:
         router.replace(notFoundRedirect);
         return null;
+      case CALL_STATE_NOT_ALLOWED:
+        return (
+          <MessageCard error header="Access denied">
+            You are not allowed to join this meeting. Please make sure you have
+            a valid meeting token.
+          </MessageCard>
+        );
       case CALL_STATE_NOT_BEFORE:
         return (
           <MessageCard error header="Cannot join before owner">
             This room has `nbf` set, meaning you cannot join the call before the
             owner
+          </MessageCard>
+        );
+      case CALL_STATE_EXPIRED:
+        return (
+          <MessageCard error header="Room expired">
+            The room you are trying to join has expired. Please create or join
+            another room.
           </MessageCard>
         );
       case CALL_STATE_LOBBY:

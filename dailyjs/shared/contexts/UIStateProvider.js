@@ -5,8 +5,8 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 export const UIStateContext = createContext();
 
 export const UIStateProvider = ({
-  asides,
-  modals,
+  asides = [],
+  modals = [],
   customTrayComponent,
   children,
 }) => {

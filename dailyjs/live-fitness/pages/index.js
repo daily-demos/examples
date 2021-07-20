@@ -8,25 +8,22 @@ import Splash from '../components/Splash';
  * Index page
  * ---
  */
-export default function Index({ domain, isConfigured = false }) {
+export default function Index({ isConfigured = false }) {
   const router = useRouter();
 
   function joinRoom(room, joinAsInstructor) {
-    // redirect to room....
-    console.log(room);
-    console.log(joinAsInstructor);
-
-    router.replace(`/${room}/`);
+    // Redirect to room page
+    router.replace({
+      pathname: `/${room}`,
+      query: { instructor: !!joinAsInstructor },
+    });
   }
 
-  return (
-    <Splash domain={domain} onJoin={joinRoom} isConfigured={!!isConfigured} />
-  );
+  return <Splash onJoin={joinRoom} isConfigured={!!isConfigured} />;
 }
 
 Index.propTypes = {
   isConfigured: PropTypes.bool.isRequired,
-  domain: PropTypes.string,
 };
 
 export async function getStaticProps() {
