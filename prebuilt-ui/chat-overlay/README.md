@@ -8,7 +8,7 @@
 - Using [`app-message`](https://docs.daily.co/reference#app-message) and [`sendAppMessage()`](https://docs.daily.co/reference#%EF%B8%8F-sendappmessage), send and receive chat messages (with or without `enable_chat` set to `true` in the room) 
 - Allow users to send and receive chat messages while viewing other participants' videos
 
-### Getting started
+## Getting started
 
 - Clone this repository and navigate to this folder (`git clone git@github.com:daily-demos/examples.git && cd prebuilt-ui/chat-overlay`)
 - Set `ROOM_URL` on the first line of `main.js` to a Daily room you have created. Sign up and create a room from the [Daily dashboard](https://dashboard.daily.co/signup), if you haven't already!
