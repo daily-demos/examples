@@ -1,8 +1,18 @@
-import React, { useCallback, createContext, useContext, useState } from 'react';
+import React, {
+  useCallback,
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from 'react';
 import PropTypes from 'prop-types';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 export const UIStateContext = createContext();
+
+export const VIEW_MODE_GRID = 'grid';
+export const VIEW_MODE_SPEAKER = 'speaker';
+export const VIEW_MODE_MOBILE = 'mobile';
 
 export const UIStateProvider = ({
   asides = [],
@@ -10,6 +20,9 @@ export const UIStateProvider = ({
   customTrayComponent,
   children,
 }) => {
+  const [preferredViewMode, setPreferredViewMode] = useState(VIEW_MODE_SPEAKER);
+  const [viewMode, setViewMode] = useState(preferredViewMode);
+  const [isShowingScreenshare, setIsShowingScreenshare] = useState(false);
   const [showAside, setShowAside] = useState();
   const [activeModals, setActiveModals] = useState({});
   const [customCapsule, setCustomCapsule] = useState();
@@ -42,6 +55,13 @@ export const UIStateProvider = ({
     setShowAside(null);
   }, []);
 
+  useEffect(() => {
+    if (isShowingScreenshare) {
+      setViewMode(VIEW_MODE_SPEAKER);
+    }
+    setViewMode(preferredViewMode);
+  }, [isShowingScreenshare, preferredViewMode]);
+
   return (
     <UIStateContext.Provider
       value={{
@@ -55,6 +75,8 @@ export const UIStateProvider = ({
         toggleAside,
         showAside,
         setShowAside,
+        setIsShowingScreenshare,
+        setPreferredViewMode,
         customCapsule,
         setCustomCapsule,
       }}

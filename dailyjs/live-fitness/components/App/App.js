@@ -5,6 +5,7 @@ import FlyingEmojiOverlay from '@dailyjs/flying-emojis/components/FlyingEmojis';
 import { LiveStreamingProvider } from '@dailyjs/live-streaming/contexts/LiveStreamingProvider';
 import { RecordingProvider } from '@dailyjs/recording/contexts/RecordingProvider';
 import { ChatProvider } from '@dailyjs/text-chat/contexts/ChatProvider';
+import { ClassStateProvider } from '../../context/ClassStateProvider';
 import Room from '../Room';
 
 /**
@@ -15,12 +16,14 @@ export const LiveFitnessApp = () => (
   <ChatProvider>
     <LiveStreamingProvider>
       <RecordingProvider>
-        <FlyingEmojiOverlay />
-        <App
-          customComponentForState={{
-            room: () => <Room />,
-          }}
-        />
+        <ClassStateProvider>
+          <FlyingEmojiOverlay />
+          <App
+            customComponentForState={{
+              room: () => <Room />,
+            }}
+          />
+        </ClassStateProvider>
       </RecordingProvider>
     </LiveStreamingProvider>
   </ChatProvider>
