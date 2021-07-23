@@ -208,7 +208,7 @@ export const HairCheck = () => {
             justify-content: center;
             height: 100%;
             width: 100%;
-            background: url('/images/pattern-bg.png') center center no-repeat;
+            background: url('/assets/pattern-bg.png') center center no-repeat;
             background-size: 100%;
           }
 

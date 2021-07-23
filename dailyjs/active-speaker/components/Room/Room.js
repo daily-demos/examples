@@ -1,15 +1,12 @@
 import React from 'react';
+import { RoomContainer } from '@dailyjs/basic-call/components/Room';
 import VideoContainer from '@dailyjs/shared/components/VideoContainer/VideoContainer';
-
-import { VideoGrid } from '../VideoGrid';
-import { Header } from './Header';
-import { RoomContainer } from './RoomContainer';
+import { SpeakerView } from '../SpeakerView';
 
 export const Room = () => (
   <RoomContainer>
-    <Header />
     <VideoContainer>
-      <VideoGrid />
+      <SpeakerView />
     </VideoContainer>
   </RoomContainer>
 );

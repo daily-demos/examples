@@ -68,6 +68,7 @@ export const UIStateProvider = ({
         asides,
         modals,
         customTrayComponent,
+        viewMode,
         openModal,
         closeModal,
         closeAside,

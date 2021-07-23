@@ -37,16 +37,6 @@ export const RoomContainer = ({ children }) => {
           height: 100%;
           display: flex;
         }
-
-        .room > :global(main) {
-          flex: 1 1 auto;
-          position: relative;
-          overflow: hidden;
-          min-height: 0px;
-          height: 100%;
-          padding: var(--spacing-xxxs);
-          box-sizing: border-box;
-        }
       `}</style>
     </div>
   );

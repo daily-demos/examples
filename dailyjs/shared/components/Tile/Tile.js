@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useVideoTrack from '@dailyjs/shared/hooks/useVideoTrack';
 import { ReactComponent as IconMicMute } from '@dailyjs/shared/icons/mic-off-sm.svg';
 import classNames from 'classnames';
@@ -14,12 +14,45 @@ export const Tile = React.memo(
     showName = true,
     showAvatar = true,
     aspectRatio = DEFAULT_ASPECT_RATIO,
+    onVideoResize,
+    videoFit = 'contain',
     ...props
   }) => {
     const videoTrack = useVideoTrack(participant);
     const videoEl = useRef(null);
+    const [tileAspectRatio, setTileAspectRatio] = useState(aspectRatio);
 
-    const cx = classNames('tile', {
+    /**
+     * Add optional event listener for resize event so the parent component
+     * can know the video's native aspect ratio.
+     */
+    useEffect(() => {
+      const video = videoEl.current;
+      if (!onVideoResize || !video) return false;
+
+      const handleResize = () => {
+        if (!video) return;
+        const width = video?.videoWidth;
+        const height = video?.videoHeight;
+        if (width && height) {
+          // Return the video's aspect ratio to the parent's handler
+          onVideoResize(width / height);
+        }
+      };
+
+      handleResize();
+
+      video?.addEventListener('resize', handleResize);
+
+      return () => video?.removeEventListener('resize', handleResize);
+    }, [onVideoResize, videoEl, participant]);
+
+    useEffect(() => {
+      if (aspectRatio === tileAspectRatio) return;
+      setTileAspectRatio(aspectRatio);
+    }, [aspectRatio, tileAspectRatio]);
+
+    const cx = classNames('tile', videoFit, {
       mirrored,
       avatar: showAvatar && !videoTrack,
       active: participant.isActiveSpeaker,
@@ -46,19 +79,14 @@ export const Tile = React.memo(
         </div>
         <style jsx>{`
           .tile .content {
-            padding-bottom: ${100 / aspectRatio}%;
-          }
-          @supports (aspect-ratio: 1 / 1) {
-            .tile .content {
-              aspect-ratio: ${aspectRatio};
-              padding-bottom: 0;
-            }
+            padding-bottom: ${100 / tileAspectRatio}%;
           }
         `}</style>
         <style jsx>{`
           .tile {
             background: var(--blue-dark);
             min-width: 1px;
+            overflow: hidden;
             position: relative;
             width: 100%;
             box-sizing: border-box;
@@ -66,10 +94,6 @@ export const Tile = React.memo(
 
           .tile.active {
             border: 2px solid var(--primary-default);
-          }
-
-          .tile.mirrored :global(video) {
-            transform: scale(-1, 1);
           }
 
           .tile .name {
@@ -92,14 +116,25 @@ export const Tile = React.memo(
           }
 
           .tile :global(video) {
+            height: calc(100% + 4px);
+            left: -2px;
             object-position: center;
-            object-fit: cover;
             position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
+            top: -2px;
+            width: calc(100% + 4px);
             z-index: 1;
+          }
+
+          .tile.contain :global(video) {
+            object-fit: contain;
+          }
+
+          .tile.cover :global(video) {
+            object-fit: cover;
+          }
+
+          .tile.mirrored :global(video) {
+            transform: scale(-1, 1);
           }
 
           .tile .avatar {
@@ -122,6 +157,8 @@ Tile.propTypes = {
   showName: PropTypes.bool,
   showAvatar: PropTypes.bool,
   aspectRatio: PropTypes.number,
+  onVideoResize: PropTypes.func,
+  videoFit: PropTypes.string,
 };
 
 export default Tile;
