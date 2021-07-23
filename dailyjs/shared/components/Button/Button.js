@@ -290,6 +290,24 @@ export const Button = forwardRef(
             opacity: 0.35;
           }
 
+          .button.white {
+            background: white;
+            border: 0px;
+          }
+          .button.white:hover,
+          .button.white:focus,
+          .button.white:active {
+            background: var(--gray-wash);
+            border: 0px;
+            color: var(--primary-default);
+          }
+          .button.white:focus {
+            box-shadow: 0 0 0px 3px rgba(0, 0, 0, 0.15);
+          }
+          .button.white:disabled {
+            opacity: 0.35;
+          }
+
           .button.outline {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.15);

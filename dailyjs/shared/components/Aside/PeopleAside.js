@@ -58,6 +58,7 @@ const PersonRow = ({ participant, isOwner = false }) => (
         margin-bottom: var(--spacing-xxxs);
         justify-content: space-between;
         align-items: center;
+        flex: 1;
       }
 
       .person-row .name {
@@ -104,49 +105,57 @@ export const PeopleAside = () => {
 
   return (
     <Aside onClose={() => setShowAside(false)}>
-      {isOwner && (
-        <div className="owner-actions">
-          <Button
-            fullWidth
-            size="tiny"
-            variant="outline-gray"
-            onClick={() =>
-              callObject.updateParticipants({ '*': { setAudio: false } })
-            }
-          >
-            Mute all mics
-          </Button>
-          <Button
-            fullWidth
-            size="tiny"
-            variant="outline-gray"
-            onClick={() =>
-              callObject.updateParticipants({ '*': { setVideo: false } })
-            }
-          >
-            Mute all cams
-          </Button>
+      <div className="people-aside">
+        {isOwner && (
+          <div className="owner-actions">
+            <Button
+              fullWidth
+              size="tiny"
+              variant="outline-gray"
+              onClick={() =>
+                callObject.updateParticipants({ '*': { setAudio: false } })
+              }
+            >
+              Mute all mics
+            </Button>
+            <Button
+              fullWidth
+              size="tiny"
+              variant="outline-gray"
+              onClick={() =>
+                callObject.updateParticipants({ '*': { setVideo: false } })
+              }
+            >
+              Mute all cams
+            </Button>
+          </div>
+        )}
+        <div className="rows">
+          {allParticipants.map((p) => (
+            <PersonRow participant={p} key={p.id} isOwner={isOwner} />
+          ))}
         </div>
-      )}
-      <div className="rows">
-        {allParticipants.map((p) => (
-          <PersonRow participant={p} key={p.id} isOwner={isOwner} />
-        ))}
-      </div>
-      <style jsx>
-        {`
-          .owner-actions {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xxxs);
-            margin: var(--spacing-xs) var(--spacing-xxs);
-          }
+        <style jsx>
+          {`
+            .people-aside {
+              display: block;
+            }
 
-          .rows {
-            margin: var(--spacing-xxs);
-          }
-        `}
-      </style>
+            .owner-actions {
+              display: flex;
+              align-items: center;
+              gap: var(--spacing-xxxs);
+              margin: var(--spacing-xs) var(--spacing-xxs);
+              flex: 1;
+            }
+
+            .rows {
+              margin: var(--spacing-xxs);
+              flex: 1;
+            }
+          `}
+        </style>
+      </div>
     </Aside>
   );
 };

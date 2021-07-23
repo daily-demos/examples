@@ -37,7 +37,7 @@ const SUBSCRIBE_ALL_VIDEO_THRESHOLD = 9;
 const TracksContext = createContext(null);
 
 export const TracksProvider = ({ children }) => {
-  const { callObject } = useCallState();
+  const { callObject, subscribeToTracksAutomatically } = useCallState();
   const { participants } = useParticipants();
   const [state, dispatch] = useReducer(tracksReducer, initialTracksState);
 
@@ -52,37 +52,42 @@ export const TracksProvider = ({ children }) => {
     [participants]
   );
 
-  const pauseVideoTrack = useCallback((id) => {
-    /**
-     * Ignore undefined, local or screenshare.
-     */
-    if (
-      !id ||
-      isLocalId(id) ||
-      isScreenId(id) ||
-      rtcpeers.getCurrentType() !== 'sfu'
-    ) {
-      return;
-    }
+  const pauseVideoTrack = useCallback(
+    (id) => {
+      /**
+       * Ignore undefined, local or screenshare.
+       */
+      if (
+        !id ||
+        subscribeToTracksAutomatically ||
+        isLocalId(id) ||
+        isScreenId(id) ||
+        rtcpeers.getCurrentType() !== 'sfu'
+      ) {
+        return;
+      }
 
-    if (!rtcpeers.soup.implementationIsAcceptingCalls) {
-      return;
-    }
+      if (!rtcpeers.soup.implementationIsAcceptingCalls) {
+        return;
+      }
 
-    const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
-    if (!consumer) {
-      rtcpeers.soup.setResumeOnSubscribeForTrack(id, 'cam-video', false);
-    } else {
-      rtcpeers.soup.pauseConsumer(consumer);
-    }
-  }, []);
+      rtcpeers.soup.pauseTrack(id, 'cam-video');
+    },
+    [subscribeToTracksAutomatically]
+  );
 
   const resumeVideoTrack = useCallback(
     (id) => {
       /**
        * Ignore undefined, local or screenshare.
        */
-      if (!id || isLocalId(id) || isScreenId(id)) return;
+      if (
+        !id ||
+        subscribeToTracksAutomatically ||
+        isLocalId(id) ||
+        isScreenId(id)
+      )
+        return;
       const videoTrack = callObject.participants()?.[id]?.tracks?.video;
 
       const subscribe = () => {
@@ -98,20 +103,14 @@ export const TracksProvider = ({ children }) => {
           break;
         case 'sfu': {
           if (!rtcpeers.soup.implementationIsAcceptingCalls) return;
-          const consumer = rtcpeers.soup?.findConsumerForTrack(id, 'cam-video');
-          if (!(consumer && consumer.appData)) {
-            rtcpeers.soup.setResumeOnSubscribeForTrack(id, 'cam-video', true);
-            subscribe();
-          } else {
-            rtcpeers.soup.resumeConsumer(consumer);
-          }
+          rtcpeers.soup.resumeTrack(id, 'cam-video');
           break;
         }
         default:
           break;
       }
     },
-    [callObject]
+    [callObject, subscribeToTracksAutomatically]
   );
 
   const remoteParticipantIds = useMemo(
@@ -127,7 +126,7 @@ export const TracksProvider = ({ children }) => {
    */
   const updateCamSubscriptions = useCallback(
     (ids, pausedIds = []) => {
-      if (!callObject) return;
+      if (!callObject || subscribeToTracksAutomatically) return;
       const subscribedIds =
         remoteParticipantIds.length <= SUBSCRIBE_ALL_VIDEO_THRESHOLD
           ? [...remoteParticipantIds]
@@ -176,6 +175,7 @@ export const TracksProvider = ({ children }) => {
     },
     [
       callObject,
+      subscribeToTracksAutomatically,
       remoteParticipantIds,
       recentSpeakerIds,
       pauseVideoTrack,
@@ -255,7 +255,10 @@ export const TracksProvider = ({ children }) => {
 
         return { [id]: result };
       }, {});
-      callObject.updateParticipants(updates);
+
+      if (!subscribeToTracksAutomatically) {
+        callObject.updateParticipants(updates);
+      }
     }, 100);
 
     callObject.on('track-started', handleTrackStarted);
@@ -270,7 +273,7 @@ export const TracksProvider = ({ children }) => {
       callObject.off('participant-joined', handleParticipantJoined);
       callObject.off('participant-left', handleParticipantLeft);
     };
-  }, [callObject, pauseVideoTrack]);
+  }, [callObject, subscribeToTracksAutomatically, pauseVideoTrack]);
 
   return (
     <TracksContext.Provider

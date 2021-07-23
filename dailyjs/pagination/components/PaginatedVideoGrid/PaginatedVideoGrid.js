@@ -9,13 +9,11 @@ import { Button } from '@dailyjs/shared/components/Button';
 import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
 import { useActiveSpeaker } from '@dailyjs/shared/hooks/useActiveSpeaker';
 import { useCamSubscriptions } from '@dailyjs/shared/hooks/useCamSubscriptions';
 import usePreferredLayer from '@dailyjs/shared/hooks/usePreferredLayer';
 import { ReactComponent as IconArrow } from '@dailyjs/shared/icons/raquo-md.svg';
 import sortByKey from '@dailyjs/shared/lib/sortByKey';
-import { debounce } from 'debounce';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 // --- Constants

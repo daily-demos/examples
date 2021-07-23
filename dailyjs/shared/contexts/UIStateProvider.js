@@ -20,9 +20,11 @@ export const UIStateProvider = ({
   customTrayComponent,
   children,
 }) => {
+  const [pinnedId, setPinnedId] = useState(null);
   const [preferredViewMode, setPreferredViewMode] = useState(VIEW_MODE_SPEAKER);
   const [viewMode, setViewMode] = useState(preferredViewMode);
   const [isShowingScreenshare, setIsShowingScreenshare] = useState(false);
+  const [showParticipantsBar, setShowParticipantsBar] = useState(true);
   const [showAside, setShowAside] = useState();
   const [activeModals, setActiveModals] = useState({});
   const [customCapsule, setCustomCapsule] = useState();
@@ -56,11 +58,12 @@ export const UIStateProvider = ({
   }, []);
 
   useEffect(() => {
-    if (isShowingScreenshare) {
+    if (pinnedId || isShowingScreenshare) {
       setViewMode(VIEW_MODE_SPEAKER);
+    } else {
+      setViewMode(preferredViewMode);
     }
-    setViewMode(preferredViewMode);
-  }, [isShowingScreenshare, preferredViewMode]);
+  }, [isShowingScreenshare, pinnedId, preferredViewMode]);
 
   return (
     <UIStateContext.Provider
@@ -72,12 +75,16 @@ export const UIStateProvider = ({
         openModal,
         closeModal,
         closeAside,
+        showParticipantsBar,
         currentModals,
         toggleAside,
+        pinnedId,
         showAside,
         setShowAside,
         setIsShowingScreenshare,
         setPreferredViewMode,
+        setPinnedId,
+        setShowParticipantsBar,
         customCapsule,
         setCustomCapsule,
       }}
