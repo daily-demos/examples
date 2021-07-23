@@ -13,6 +13,7 @@ export const Tile = React.memo(
     mirrored = true,
     showName = true,
     showAvatar = true,
+    showActiveSpeaker = true,
     aspectRatio = DEFAULT_ASPECT_RATIO,
     onVideoResize,
     videoFit = 'contain',
@@ -21,6 +22,8 @@ export const Tile = React.memo(
     const videoTrack = useVideoTrack(participant);
     const videoEl = useRef(null);
     const [tileAspectRatio, setTileAspectRatio] = useState(aspectRatio);
+
+    const [layer, setLayer] = useState();
 
     /**
      * Add optional event listener for resize event so the parent component
@@ -52,10 +55,26 @@ export const Tile = React.memo(
       setTileAspectRatio(aspectRatio);
     }, [aspectRatio, tileAspectRatio]);
 
+    useEffect(() => {
+      if (
+        typeof rtcpeers === 'undefined' ||
+        rtcpeers?.getCurrentType() !== 'sfu'
+      )
+        return false;
+
+      const i = setInterval(() => {
+        setLayer(
+          rtcpeers.sfu.consumers[`${participant.id}/cam-video`]?._preferredLayer
+        );
+      }, 1500);
+
+      return () => clearInterval(i);
+    }, [participant]);
+
     const cx = classNames('tile', videoFit, {
       mirrored,
       avatar: showAvatar && !videoTrack,
-      active: participant.isActiveSpeaker,
+      active: showActiveSpeaker && participant.isActiveSpeaker,
     });
 
     return (
@@ -64,7 +83,7 @@ export const Tile = React.memo(
           {showName && (
             <div className="name">
               {participant.isMicMuted && <IconMicMute />}
-              {participant.name}
+              {participant.name} - {layer}
             </div>
           )}
           {videoTrack ? (
@@ -92,8 +111,17 @@ export const Tile = React.memo(
             box-sizing: border-box;
           }
 
-          .tile.active {
+          .tile.active:before {
+            content: '';
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            left: 0px;
+            bottom: 0px;
             border: 2px solid var(--primary-default);
+            box-sizing: border-box;
+            pointer-events: none;
+            z-index: 2;
           }
 
           .tile .name {
@@ -104,10 +132,11 @@ export const Tile = React.memo(
             left: 0px;
             z-index: 2;
             line-height: 1;
+            font-size: 0.875rem;
             color: white;
             font-weight: var(--weight-medium);
             padding: var(--spacing-xxs);
-            text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.35);
+            text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.45);
             gap: var(--spacing-xxs);
           }
 
@@ -159,6 +188,7 @@ Tile.propTypes = {
   aspectRatio: PropTypes.number,
   onVideoResize: PropTypes.func,
   videoFit: PropTypes.string,
+  showActiveSpeaker: PropTypes.bool,
 };
 
 export default Tile;

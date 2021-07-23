@@ -1,3 +1,5 @@
+/* global rtcpeers */
+
 import React, {
   createContext,
   useCallback,
@@ -7,11 +9,16 @@ import React, {
   useState,
   useMemo,
 } from 'react';
+import {
+  useUIState,
+  VIEW_MODE_SPEAKER,
+} from '@dailyjs/shared/contexts/UIStateProvider';
 import PropTypes from 'prop-types';
 
 import { sortByKey } from '../lib/sortByKey';
 
 import { useCallState } from './CallProvider';
+
 import {
   initialParticipantsState,
   isLocalId,
@@ -31,6 +38,7 @@ export const ParticipantsProvider = ({ children }) => {
     participantsReducer,
     initialParticipantsState
   );
+  const { viewMode } = useUIState();
   const [participantMarkedForRemoval, setParticipantMarkedForRemoval] =
     useState(null);
 
@@ -46,6 +54,14 @@ export const ParticipantsProvider = ({ children }) => {
    * Only return participants that should be visible in the call
    */
   const participants = useMemo(() => state.participants, [state.participants]);
+
+  /**
+   * Array of participant IDs
+   */
+  const participantIds = useMemo(
+    () => participants.map((p) => p.id).join(','),
+    [participants]
+  );
 
   /**
    * The number of participants, who are not a shared screen
@@ -217,6 +233,40 @@ export const ParticipantsProvider = ({ children }) => {
         callObject.off(event, handleNewParticipantsState)
       );
   }, [callObject, handleNewParticipantsState]);
+
+  /**
+   * Adjust video quality from the 3 simulcast layers based
+   * on active speaker status. Note: this currently uses
+   * undocumented internal methods (we'll be adding support
+   * for this into our API soon!)
+   */
+  const setBandWidthControls = useCallback(() => {
+    if (typeof rtcpeers === 'undefined') return;
+    const sfu = rtcpeers?.soup;
+    const isSFU = rtcpeers?.currentlyPreferred?.typeName?.() === 'sfu';
+    if (!isSFU) return;
+
+    const ids = participantIds.split(',');
+
+    ids.forEach((id) => {
+      if (isLocalId(id)) return;
+
+      // Speaker view settings based on speaker status or pinned user
+      if (viewMode === VIEW_MODE_SPEAKER) {
+        if (currentSpeaker?.id === id) {
+          sfu.setPreferredLayerForTrack(id, 'cam-video', 2);
+        } else {
+          sfu.setPreferredLayerForTrack(id, 'cam-video', 0);
+        }
+      }
+
+      // Note: grid view settings are handled by the grid view component
+    });
+  }, [currentSpeaker?.id, participantIds, viewMode]);
+
+  useEffect(() => {
+    setBandWidthControls();
+  }, [setBandWidthControls]);
 
   useEffect(() => {
     if (!callObject) return false;

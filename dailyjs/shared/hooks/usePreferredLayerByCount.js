@@ -14,7 +14,7 @@ import { useEffect } from 'react';
  *
  * Note: this will have no effect when not in SFU mode
  */
-export const usePreferredLayer = (participants) => {
+export const usePreferredLayerByCount = (participants) => {
   /**
    * Set bandwidth layer based on amount of visible participants
    */
@@ -40,4 +40,4 @@ export const usePreferredLayer = (participants) => {
   }, [participants]);
 };
 
-export default usePreferredLayer;
+export default usePreferredLayerByCount;

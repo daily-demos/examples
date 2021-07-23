@@ -11,7 +11,7 @@ import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useActiveSpeaker } from '@dailyjs/shared/hooks/useActiveSpeaker';
 import { useCamSubscriptions } from '@dailyjs/shared/hooks/useCamSubscriptions';
-import usePreferredLayer from '@dailyjs/shared/hooks/usePreferredLayer';
+import usePreferredLayerByCount from '@dailyjs/shared/hooks/usePreferredLayerByCount';
 import { ReactComponent as IconArrow } from '@dailyjs/shared/icons/raquo-md.svg';
 import sortByKey from '@dailyjs/shared/lib/sortByKey';
 import { useDeepCompareMemo } from 'use-deep-compare';
@@ -181,7 +181,7 @@ export const PaginatedVideoGrid = () => {
   );
 
   // Set bandwidth layer based on amount of visible participants
-  usePreferredLayer(visibleParticipants);
+  usePreferredLayerByCount(visibleParticipants);
 
   /**
    * Handle position updates based on active speaker events

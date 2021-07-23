@@ -59,6 +59,7 @@ export const SpeakerTile = ({ participant, screenRef }) => {
       participant={participant}
       style={style}
       videoFit={videoFit}
+      showActiveSpeaker={false}
       onVideoResize={handleNativeAspectRatio}
     />
   );
