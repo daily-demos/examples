@@ -37,7 +37,6 @@ export const SpeakerTile = ({ participant, screenRef }) => {
   const { height, finalRatio, videoFit } = useMemo(
     () =>
       // Avoid cropping mobile videos, which have the nativeAspectRatio set
-
       ({
         height: (nativeAspectRatio ?? ratio) >= MIN_RATIO ? '100%' : null,
         finalRatio:

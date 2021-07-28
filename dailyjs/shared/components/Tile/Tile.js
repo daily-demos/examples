@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useState, useRef } from 'react';
 import useVideoTrack from '@dailyjs/shared/hooks/useVideoTrack';
 import { ReactComponent as IconMicMute } from '@dailyjs/shared/icons/mic-off-sm.svg';
 import classNames from 'classnames';
@@ -7,30 +7,33 @@ import { DEFAULT_ASPECT_RATIO } from '../../constants';
 import { Video } from './Video';
 import { ReactComponent as Avatar } from './avatar.svg';
 
-export const Tile = React.memo(
+const SM_TILE_MAX_WIDTH = 300;
+
+export const Tile = memo(
   ({
     participant,
     mirrored = true,
     showName = true,
     showAvatar = true,
     showActiveSpeaker = true,
+    videoFit = 'contain',
     aspectRatio = DEFAULT_ASPECT_RATIO,
     onVideoResize,
-    videoFit = 'contain',
     ...props
   }) => {
     const videoTrack = useVideoTrack(participant);
-    const videoEl = useRef(null);
-    const [tileAspectRatio, setTileAspectRatio] = useState(aspectRatio);
-
-    const [layer, setLayer] = useState();
+    const videoRef = useRef(null);
+    const tileRef = useRef(null);
+    const [tileWidth, setTileWidth] = useState(0);
 
     /**
+     * Effect: Resize
+     *
      * Add optional event listener for resize event so the parent component
      * can know the video's native aspect ratio.
      */
     useEffect(() => {
-      const video = videoEl.current;
+      const video = videoRef.current;
       if (!onVideoResize || !video) return false;
 
       const handleResize = () => {
@@ -44,50 +47,61 @@ export const Tile = React.memo(
       };
 
       handleResize();
-
       video?.addEventListener('resize', handleResize);
 
       return () => video?.removeEventListener('resize', handleResize);
-    }, [onVideoResize, videoEl, participant]);
+    }, [onVideoResize, videoRef, participant]);
 
+    /**
+     * Effect: Resize Observer
+     *
+     * Adjust size of text overlay based on tile size
+     */
     useEffect(() => {
-      if (aspectRatio === tileAspectRatio) return;
-      setTileAspectRatio(aspectRatio);
-    }, [aspectRatio, tileAspectRatio]);
-
-    useEffect(() => {
-      if (
-        typeof rtcpeers === 'undefined' ||
-        rtcpeers?.getCurrentType() !== 'sfu'
-      )
-        return false;
-
-      const i = setInterval(() => {
-        setLayer(
-          rtcpeers.sfu.consumers[`${participant.id}/cam-video`]?._preferredLayer
-        );
-      }, 1500);
-
-      return () => clearInterval(i);
-    }, [participant]);
+      const tile = tileRef.current;
+      if (!tile || typeof ResizeObserver === 'undefined') return false;
+      let frame;
+      const resizeObserver = new ResizeObserver(() => {
+        if (frame) cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          if (!tile) return;
+          const dimensions = tile?.getBoundingClientRect();
+          const { width } = dimensions;
+          setTileWidth(width);
+        });
+      });
+      resizeObserver.observe(tile);
+      return () => {
+        if (frame) cancelAnimationFrame(frame);
+        resizeObserver.disconnect();
+      };
+    }, [tileRef]);
 
     const cx = classNames('tile', videoFit, {
       mirrored,
       avatar: showAvatar && !videoTrack,
+      screenShare: participant.isScreenShare,
       active: showActiveSpeaker && participant.isActiveSpeaker,
+      small: tileWidth < SM_TILE_MAX_WIDTH,
     });
 
     return (
-      <div className={cx} {...props}>
+      <div ref={tileRef} className={cx} {...props}>
         <div className="content">
           {showName && (
             <div className="name">
-              {participant.isMicMuted && <IconMicMute />}
-              {participant.name} - {layer}
+              {participant.isMicMuted && !participant.isScreenShare && (
+                <IconMicMute />
+              )}
+              {participant.name}
             </div>
           )}
           {videoTrack ? (
-            <Video ref={videoEl} videoTrack={videoTrack} />
+            <Video
+              ref={videoRef}
+              participantId={participant?.id}
+              videoTrack={videoTrack}
+            />
           ) : (
             showAvatar && (
               <div className="avatar">
@@ -98,7 +112,7 @@ export const Tile = React.memo(
         </div>
         <style jsx>{`
           .tile .content {
-            padding-bottom: ${100 / tileAspectRatio}%;
+            padding-bottom: ${100 / aspectRatio}%;
           }
         `}</style>
         <style jsx>{`
@@ -144,6 +158,10 @@ export const Tile = React.memo(
             color: var(--red-default);
           }
 
+          .tile.small .name {
+            font-size: 12px;
+          }
+
           .tile :global(video) {
             height: calc(100% + 4px);
             left: -2px;
@@ -187,8 +205,8 @@ Tile.propTypes = {
   showAvatar: PropTypes.bool,
   aspectRatio: PropTypes.number,
   onVideoResize: PropTypes.func,
-  videoFit: PropTypes.string,
   showActiveSpeaker: PropTypes.bool,
+  videoFit: PropTypes.string,
 };
 
 export default Tile;
