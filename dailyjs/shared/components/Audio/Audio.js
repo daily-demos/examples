@@ -1,5 +1,11 @@
 /**
  * Audio
+ * ---
+ * When working with audio elements it's very important to avoid mutating
+ * the DOM elements as much as possible to avoid audio pops and crackles.
+ * This component addresses to known browser quirks; Safari autoplay
+ * and Chrome's maximum media elements. On Chrome we add all audio tracks
+ * into into a single audio node using the CombinedAudioTrack component
  */
 import React, { useEffect, useMemo } from 'react';
 import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
