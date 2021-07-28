@@ -35,16 +35,16 @@ yarn workspace @dailyjs/basic-call dev
 
 This demo puts to work the following [shared libraries](../shared):
 
-**[MediaProvider.js](../shared/contexts/MediaProvider.js)**
+**[MediaDeviceProvider.js](../shared/contexts/MediaDeviceProvider.js)**
 Convenience context that provides an interface to media devices throughout app
 
-**[useDevices.js](../shared/hooks/useDevices.js)**
+**[useDevices.js](../shared/contexts/useDevices.js)**
 Hook for managing the enumeration and status of client media devices)
 
 **[CallProvider.js](../shared/contexts/CallProvider.js)**
 Primary call context that manages Daily call state, participant state and call object interaction
 
-**[useCallMachine.js](../shared/hooks/useCallMachine.js)**
+**[useCallMachine.js](../shared/contexts/useCallMachine.js)**
 Abstraction hook that manages Daily call state and error handling
 
 **[ParticipantProvider.js](../shared/contexts/ParticipantProvider.js)**
