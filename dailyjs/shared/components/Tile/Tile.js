@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useVideoTrack from '@dailyjs/shared/hooks/useVideoTrack';
 import { ReactComponent as IconMicMute } from '@dailyjs/shared/icons/mic-off-sm.svg';
 import classNames from 'classnames';
@@ -14,10 +14,35 @@ export const Tile = React.memo(
     showName = true,
     showAvatar = true,
     aspectRatio = DEFAULT_ASPECT_RATIO,
+    onVideoResize,
     ...props
   }) => {
     const videoTrack = useVideoTrack(participant);
     const videoEl = useRef(null);
+
+    /**
+     * Add optional event listener for resize event so the parent component
+     * can know the video's native aspect ratio.
+     */
+    useEffect(() => {
+      const video = videoEl.current;
+      if (!onVideoResize || !video) return false;
+
+      const handleResize = () => {
+        if (!video) return;
+        const width = video?.videoWidth;
+        const height = video?.videoHeight;
+        if (width && height) {
+          // Return the video's aspect ratio to the parent's handler
+          onVideoResize(width / height);
+        }
+      };
+
+      handleResize();
+      video?.addEventListener('resize', handleResize);
+
+      return () => video?.removeEventListener('resize', handleResize);
+    }, [onVideoResize, videoEl, participant]);
 
     const cx = classNames('tile', {
       mirrored,
@@ -35,7 +60,11 @@ export const Tile = React.memo(
             </div>
           )}
           {videoTrack ? (
-            <Video ref={videoEl} videoTrack={videoTrack} />
+            <Video
+              ref={videoEl}
+              participantId={participant?.id}
+              videoTrack={videoTrack}
+            />
           ) : (
             showAvatar && (
               <div className="avatar">
@@ -122,6 +151,7 @@ Tile.propTypes = {
   showName: PropTypes.bool,
   showAvatar: PropTypes.bool,
   aspectRatio: PropTypes.number,
+  onVideoResize: PropTypes.func,
 };
 
 export default Tile;
