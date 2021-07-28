@@ -20,8 +20,5 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "next-compose-plugins": "^2.2.1",
     "next-transpile-modules": "^8.0.0"
-  },
-  "engines": {
-    "node": ">=0.12"
   }
 }
