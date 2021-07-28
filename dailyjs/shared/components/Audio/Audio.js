@@ -1,79 +1,70 @@
 /**
  * Audio
- * ---
- * Renders audio tags for each audible participant / screen share in the call
- * Note: it's very important to minimise DOM mutates for audio components
- * as iOS / Safari do a lot of browser 'magic' that may result in muted
- * tracks. We heavily memoize this component to avoid unnecassary re-renders.
  */
-import React, { useRef, useEffect } from 'react';
-import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import useAudioTrack from '@dailyjs/shared/hooks/useAudioTrack';
-import PropTypes from 'prop-types';
+import React, { useEffect, useMemo } from 'react';
+import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
+import Bowser from 'bowser';
+import { Portal } from 'react-portal';
+import AudioTrack from './AudioTrack';
+import CombinedAudioTrack from './CombinedAudioTrack';
 
-const AudioItem = React.memo(
-  ({ participant }) => {
-    const audioRef = useRef(null);
-    const audioTrack = useAudioTrack(participant);
+export const Audio = () => {
+  const { audioTracks } = useTracks();
 
-    useEffect(() => {
-      if (!audioTrack || !audioRef.current) return;
+  const renderedTracks = useMemo(
+    () =>
+      Object.entries(audioTracks).reduce(
+        (tracks, [id, track]) => ({ ...tracks, [id]: track }),
+        {}
+      ),
+    [audioTracks]
+  );
 
-      // quick sanity to check to make sure this is an audio track...
-      if (audioTrack.kind !== 'audio') return;
+  // On iOS safari, when headphones are disconnected, all audio elements are paused.
+  // This means that when a user disconnects their headphones, that user will not
+  // be able to hear any other users until they mute/unmute their mics.
+  // To fix that, we call `play` on each audio track on all devicechange events.
+  useEffect(() => {
+    const playTracks = () => {
+      document.querySelectorAll('.audioTracks audio').forEach(async (audio) => {
+        try {
+          if (audio.paused && audio.readyState === audio.HAVE_ENOUGH_DATA) {
+            await audio?.play();
+          }
+        } catch (e) {
+          // Auto play failed
+        }
+      });
+    };
+    navigator.mediaDevices.addEventListener('devicechange', playTracks);
+    return () => {
+      navigator.mediaDevices.removeEventListener('devicechange', playTracks);
+    };
+  }, []);
 
-      audioRef.current.srcObject = new MediaStream([audioTrack]);
-    }, [audioTrack]);
-
-    useEffect(() => {
-      // On iOS safari, when headphones are disconnected, all audio elements are paused.
-      // This means that when a user disconnects their headphones, that user will not
-      // be able to hear any other users until they mute/unmute their mics.
-      // To fix that, we call `play` on each audio track on all devicechange events.
-      if (audioRef.currenet) {
-        return false;
-      }
-      const startPlayingTrack = () => {
-        audioRef.current?.play();
-      };
-
-      navigator.mediaDevices.addEventListener(
-        'devicechange',
-        startPlayingTrack
-      );
-
-      return () =>
-        navigator.mediaDevices.removeEventListener(
-          'devicechange',
-          startPlayingTrack
-        );
-    }, [audioRef]);
-
-    return (
-      <>
-        <audio autoPlay playsInline ref={audioRef}>
-          <track kind="captions" />
-        </audio>
-      </>
-    );
-  },
-  () => true
-);
-
-AudioItem.propTypes = {
-  participant: PropTypes.object,
-};
-
-export const Audio = React.memo(() => {
-  const { allParticipants } = useParticipants();
+  const tracksComponent = useMemo(() => {
+    const { browser } = Bowser.parse(navigator.userAgent);
+    if (browser.name === 'Chrome' && parseInt(browser.version, 10) >= 92) {
+      return <CombinedAudioTrack tracks={renderedTracks} />;
+    }
+    return Object.entries(renderedTracks).map(([id, track]) => (
+      <AudioTrack key={id} track={track.persistentTrack} />
+    ));
+  }, [renderedTracks]);
 
   return (
-    <>
-      {allParticipants.map(
-        (p) => !p.isLocal && <AudioItem participant={p} key={p.id} />
-      )}
-    </>
+    <Portal key="AudioTracks">
+      <div className="audioTracks">
+        {tracksComponent}
+        <style jsx>{`
+          .audioTracks {
+            position: absolute;
+            visibility: hidden;
+          }
+        `}</style>
+      </div>
+    </Portal>
   );
-});
+};
 
 export default Audio;
