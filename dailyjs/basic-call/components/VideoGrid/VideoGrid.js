@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import usePreferredLayerByCount from '@dailyjs/shared/hooks/usePreferredLayerByCount';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 /**
@@ -19,7 +18,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { participants, allParticipants } = useParticipants();
+    const { participants } = useParticipants();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -103,10 +102,6 @@ export const VideoGrid = React.memo(
         )),
       [layout, participants]
     );
-
-    // Optimise performance by reducing video quality
-    // when more participants join (if in SFU mode)
-    usePreferredLayerByCount(allParticipants);
 
     if (!participants.length) {
       return null;

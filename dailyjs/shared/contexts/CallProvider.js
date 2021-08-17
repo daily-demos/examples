@@ -19,6 +19,7 @@ import {
   ACCESS_STATE_UNKNOWN,
   VIDEO_QUALITY_AUTO,
 } from '../constants';
+import { useNetworkState } from '../hooks/useNetworkState';
 import { useCallMachine } from './useCallMachine';
 
 export const CallContext = createContext();
@@ -44,6 +45,7 @@ export const CallProvider = ({
     token,
     subscribeToTracksAutomatically,
   });
+  const networkState = useNetworkState(daily, videoQuality);
 
   // Feature detection taken from daily room object and client browser support
   useEffect(() => {
@@ -107,6 +109,7 @@ export const CallProvider = ({
         addFakeParticipant,
         preJoinNonAuthorized,
         leave,
+        networkState,
         showLocalVideo,
         roomExp,
         videoQuality,
@@ -115,8 +118,10 @@ export const CallProvider = ({
         setBandwidth,
         setRedirectOnLeave,
         setShowLocalVideo,
+        setVideoQuality,
         startCloudRecording,
         subscribeToTracksAutomatically,
+        videoQuality,
       }}
     >
       {children}

@@ -32,7 +32,7 @@ const MAX_RECENT_SPEAKER_COUNT = 6;
  * If the remote participant count passes this threshold,
  * cam subscriptions are defined by UI view modes.
  */
-const SUBSCRIBE_ALL_VIDEO_THRESHOLD = 9;
+const SUBSCRIBE_OR_STAGE_ALL_VIDEO_THRESHOLD = 9;
 
 const TracksContext = createContext(null);
 
@@ -52,135 +52,81 @@ export const TracksProvider = ({ children }) => {
     [participants]
   );
 
-  const pauseVideoTrack = useCallback(
-    (id) => {
-      /**
-       * Ignore undefined, local or screenshare.
-       */
-      if (
-        !id ||
-        subscribeToTracksAutomatically ||
-        isLocalId(id) ||
-        isScreenId(id) ||
-        rtcpeers.getCurrentType() !== 'sfu'
-      ) {
-        return;
-      }
-
-      if (!rtcpeers.soup.implementationIsAcceptingCalls) {
-        return;
-      }
-
-      rtcpeers.soup.pauseTrack(id, 'cam-video');
-    },
-    [subscribeToTracksAutomatically]
-  );
-
-  const resumeVideoTrack = useCallback(
-    (id) => {
-      /**
-       * Ignore undefined, local or screenshare.
-       */
-      if (
-        !id ||
-        subscribeToTracksAutomatically ||
-        isLocalId(id) ||
-        isScreenId(id)
-      )
-        return;
-      const videoTrack = callObject.participants()?.[id]?.tracks?.video;
-
-      const subscribe = () => {
-        if (videoTrack?.subscribed) return;
-        callObject.updateParticipant(id, {
-          setSubscribedTracks: true,
-        });
-      };
-
-      switch (rtcpeers.getCurrentType()) {
-        case 'peer-to-peer':
-          subscribe();
-          break;
-        case 'sfu': {
-          if (!rtcpeers.soup.implementationIsAcceptingCalls) return;
-          rtcpeers.soup.resumeTrack(id, 'cam-video');
-          break;
-        }
-        default:
-          break;
-      }
-    },
-    [callObject, subscribeToTracksAutomatically]
-  );
-
   const remoteParticipantIds = useMemo(
     () => participants.filter((p) => !p.isLocal).map((p) => p.id),
     [participants]
   );
 
+  const subscribeToCam = useCallback(
+    (id) => {
+      // Ignore undefined, local or screenshare.
+      if (!id || isLocalId(id) || isScreenId(id)) return;
+      callObject.updateParticipant(id, {
+        setSubscribedTracks: { video: true },
+      });
+    },
+    [callObject]
+  );
+
   /**
-   * Updates cam subscriptions based on passed ids.
-   *
-   * @param ids Array of ids to subscribe to, all others will be unsubscribed.
-   * @param pausedIds Array of ids that should be subscribed, but paused.
+   * Updates cam subscriptions based on passed subscribedIds and stagedIds.
+   * For ids not provided, cam tracks will be unsubscribed from
    */
   const updateCamSubscriptions = useCallback(
-    (ids, pausedIds = []) => {
-      if (!callObject || subscribeToTracksAutomatically) return;
-      const subscribedIds =
-        remoteParticipantIds.length <= SUBSCRIBE_ALL_VIDEO_THRESHOLD
-          ? [...remoteParticipantIds]
-          : [...ids, ...recentSpeakerIds];
+    (subscribedIds, stagedIds = []) => {
+      if (!callObject) return;
 
+      // If total number of remote participants is less than a threshold, simply
+      // stage all remote cams that aren't already marked for subscription.
+      // Otherwise, honor the provided stagedIds, with recent speakers appended
+      // who aren't already marked for subscription.
+      const stagedIdsFiltered =
+        remoteParticipantIds.length <= SUBSCRIBE_OR_STAGE_ALL_VIDEO_THRESHOLD
+          ? remoteParticipantIds.filter((id) => !subscribedIds.includes(id))
+          : [
+              ...stagedIds,
+              ...recentSpeakerIds.filter((id) => !subscribedIds.includes(id)),
+            ];
+
+      // Assemble updates to get to desired cam subscriptions
       const updates = remoteParticipantIds.reduce((u, id) => {
-        const shouldSubscribe = subscribedIds.includes(id);
-        const shouldPause = pausedIds.includes(id);
-        const isSubscribed =
+        let desiredSubscription;
+        const currentSubscription =
           callObject.participants()?.[id]?.tracks?.video?.subscribed;
 
-        /**
-         * Pause already subscribed tracks.
-         */
-        if (shouldSubscribe && shouldPause) {
-          pauseVideoTrack(id);
+        // Ignore undefined, local or screenshare participant ids
+        if (!id || isLocalId(id) || isScreenId(id)) return u;
+
+        // Decide on desired cam subscription for this participant:
+        // subscribed, staged, or unsubscribed
+        if (subscribedIds.includes(id)) {
+          desiredSubscription = true;
+        } else if (stagedIdsFiltered.includes(id)) {
+          desiredSubscription = 'staged';
+        } else {
+          desiredSubscription = false;
         }
 
-        /**
-         * Fast resume tracks.
-         */
-        if (shouldSubscribe && !shouldPause) {
-          resumeVideoTrack(id);
-        }
+        // Skip if we already have the desired subscription to this
+        // participant's cam
+        if (desiredSubscription === currentSubscription) return u;
 
-        if (
-          isLocalId(id) ||
-          isScreenId(id) ||
-          (shouldSubscribe && isSubscribed)
-        ) {
-          return u;
-        }
-
-        const result = {
-          setSubscribedTracks: {
-            audio: true,
-            screenAudio: true,
-            screenVideo: true,
-            video: shouldSubscribe,
+        return {
+          ...u,
+          [id]: {
+            setSubscribedTracks: {
+              audio: true,
+              screenAudio: true,
+              screenVideo: true,
+              video: desiredSubscription,
+            },
           },
         };
-        return { ...u, [id]: result };
       }, {});
 
       callObject.updateParticipants(updates);
     },
-    [
-      callObject,
-      subscribeToTracksAutomatically,
-      remoteParticipantIds,
-      recentSpeakerIds,
-      pauseVideoTrack,
-      resumeVideoTrack,
-    ]
+    [callObject, remoteParticipantIds, recentSpeakerIds]
   );
 
   useEffect(() => {
@@ -273,15 +219,14 @@ export const TracksProvider = ({ children }) => {
       callObject.off('participant-joined', handleParticipantJoined);
       callObject.off('participant-left', handleParticipantLeft);
     };
-  }, [callObject, subscribeToTracksAutomatically, pauseVideoTrack]);
+  }, [callObject, subscribeToTracksAutomatically]);
 
   return (
     <TracksContext.Provider
       value={{
         audioTracks: state.audioTracks,
         videoTracks: state.videoTracks,
-        pauseVideoTrack,
-        resumeVideoTrack,
+        subscribeToCam,
         updateCamSubscriptions,
         remoteParticipantIds,
         recentSpeakerIds,

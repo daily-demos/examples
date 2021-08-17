@@ -52,10 +52,6 @@ export const BasicTray = () => {
         <IconPeople />
       </TrayButton>
 
-      <TrayButton label="Fake" onClick={() => callObject.addFakeParticipant()}>
-        +
-      </TrayButton>
-
       {customTrayComponent}
 
       <span className="divider" />

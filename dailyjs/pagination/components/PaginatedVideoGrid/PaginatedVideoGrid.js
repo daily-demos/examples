@@ -8,10 +8,11 @@ import React, {
 import { Button } from '@dailyjs/shared/components/Button';
 import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
+import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
+import { isLocalId } from '@dailyjs/shared/contexts/participantsState';
 import { useActiveSpeaker } from '@dailyjs/shared/hooks/useActiveSpeaker';
 import { useCamSubscriptions } from '@dailyjs/shared/hooks/useCamSubscriptions';
-import usePreferredLayerByCount from '@dailyjs/shared/hooks/usePreferredLayerByCount';
 import { ReactComponent as IconArrow } from '@dailyjs/shared/icons/raquo-md.svg';
 import sortByKey from '@dailyjs/shared/lib/sortByKey';
 import { useDeepCompareMemo } from 'use-deep-compare';
@@ -21,6 +22,7 @@ const MIN_TILE_WIDTH = 280;
 const MAX_TILES_PER_PAGE = 12;
 
 export const PaginatedVideoGrid = () => {
+  const { callObject } = useCallState();
   const {
     activeParticipant,
     participantCount,
@@ -45,6 +47,8 @@ export const PaginatedVideoGrid = () => {
   const [maxTilesPerPage] = useState(MAX_TILES_PER_PAGE);
 
   const gridRef = useRef(null);
+
+  // -- Layout / UI
 
   // Update width and height of grid when window is resized
   useEffect(() => {
@@ -131,26 +135,27 @@ export const PaginatedVideoGrid = () => {
     [page, pageSize, participants]
   );
 
+  // -- Track subscriptions
+
   /**
    * Play / pause tracks based on pagination
    * Note: we pause adjacent page tracks and unsubscribe from everything else
-   * Please refer to project README for more information
    */
   const camSubscriptions = useMemo(() => {
     const maxSubs = 3 * pageSize;
 
-    // Determine participant ids to subscribe to, based on page.
-    let subscribedIds = [];
+    // Determine participant ids to subscribe to or stage, based on page
+    let renderedOrBufferedIds = [];
     switch (page) {
       // First page
       case 1:
-        subscribedIds = participants
+        renderedOrBufferedIds = participants
           .slice(0, Math.min(maxSubs, 2 * pageSize))
           .map((p) => p.id);
         break;
       // Last page
       case Math.ceil(participants.length / pageSize):
-        subscribedIds = participants
+        renderedOrBufferedIds = participants
           .slice(-Math.min(maxSubs, 2 * pageSize))
           .map((p) => p.id);
         break;
@@ -160,18 +165,29 @@ export const PaginatedVideoGrid = () => {
           const buffer = (maxSubs - pageSize) / 2;
           const min = (page - 1) * pageSize - buffer;
           const max = page * pageSize + buffer;
-          subscribedIds = participants.slice(min, max).map((p) => p.id);
+          renderedOrBufferedIds = participants.slice(min, max).map((p) => p.id);
         }
         break;
     }
 
-    // Determine subscribed, but invisible (= paused) video tracks
-    const invisibleSubscribedIds = subscribedIds.filter(
-      (id) => id !== 'local' && !visibleParticipants.some((vp) => vp.id === id)
-    );
+    const subscribedIds = [];
+    const stagedIds = [];
+
+    // Decide whether to subscribe to or stage participants'
+    // track based on isibility
+    renderedOrBufferedIds.forEach((id) => {
+      if (id !== isLocalId()) {
+        if (visibleParticipants.some((vp) => vp.id === id)) {
+          subscribedIds.push(id);
+        } else {
+          stagedIds.push(id);
+        }
+      }
+    });
+
     return {
-      subscribedIds: subscribedIds.filter((id) => id !== 'local'),
-      pausedIds: invisibleSubscribedIds,
+      subscribedIds,
+      stagedIds,
     };
   }, [page, pageSize, participants, visibleParticipants]);
 
@@ -180,8 +196,36 @@ export const PaginatedVideoGrid = () => {
     camSubscriptions?.pausedIds
   );
 
-  // Set bandwidth layer based on amount of visible participants
-  usePreferredLayerByCount(visibleParticipants);
+  /**
+   * Set bandwidth layer based on amount of visible participants
+   */
+  useEffect(() => {
+    if (!(callObject && callObject.meetingState() === 'joined-meeting')) return;
+    const count = visibleParticipants.length;
+
+    let layer;
+    if (count < 5) {
+      // highest quality layer
+      layer = 2;
+    } else if (count < 10) {
+      // mid quality layer
+      layer = 1;
+    } else {
+      // low qualtiy layer
+      layer = 0;
+    }
+
+    const receiveSettings = visibleParticipants.reduce(
+      (settings, participant) => {
+        if (isLocalId(participant.id)) return settings;
+        return { ...settings, [participant.id]: { video: { layer } } };
+      },
+      {}
+    );
+    callObject.updateReceiveSettings(receiveSettings);
+  }, [visibleParticipants, callObject]);
+
+  // -- Active speaker
 
   /**
    * Handle position updates based on active speaker events
@@ -255,7 +299,9 @@ export const PaginatedVideoGrid = () => {
       >
         <IconArrow />
       </Button>
+
       <div className="tiles">{tiles}</div>
+
       <Button
         className="page-button next"
         disabled={!(pages > 1 && page < pages)}
@@ -264,6 +310,7 @@ export const PaginatedVideoGrid = () => {
       >
         <IconArrow />
       </Button>
+
       <style jsx>{`
         .grid {
           align-items: center;

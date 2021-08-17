@@ -15,6 +15,12 @@ import {
 } from '@dailyjs/shared/contexts/UIStateProvider';
 import PropTypes from 'prop-types';
 
+import {
+  VIDEO_QUALITY_AUTO,
+  VIDEO_QUALITY_BANDWIDTH_SAVER,
+  VIDEO_QUALITY_LOW,
+  VIDEO_QUALITY_VERY_LOW,
+} from '../constants';
 import { sortByKey } from '../lib/sortByKey';
 
 import { useCallState } from './CallProvider';
@@ -33,7 +39,7 @@ import {
 export const ParticipantsContext = createContext();
 
 export const ParticipantsProvider = ({ children }) => {
-  const { callObject } = useCallState();
+  const { callObject, videoQuality, networkState } = useCallState();
   const [state, dispatch] = useReducer(
     participantsReducer,
     initialParticipantsState
@@ -235,34 +241,50 @@ export const ParticipantsProvider = ({ children }) => {
   }, [callObject, handleNewParticipantsState]);
 
   /**
-   * Adjust video quality from the 3 simulcast layers based
-   * on active speaker status. Note: this currently uses
-   * undocumented internal methods (we'll be adding support
-   * for this into our API soon!)
+   * Change between the simulcast layers based on view / available bandwidth
    */
   const setBandWidthControls = useCallback(() => {
-    if (typeof rtcpeers === 'undefined') return;
-    const sfu = rtcpeers?.soup;
-    const isSFU = rtcpeers?.currentlyPreferred?.typeName?.() === 'sfu';
-    if (!isSFU) return;
+    if (!(callObject && callObject.meetingState() === 'joined-meeting')) return;
 
     const ids = participantIds.split(',');
+    const receiveSettings = {};
 
     ids.forEach((id) => {
       if (isLocalId(id)) return;
 
+      if (
+        // weak or bad network
+        ([VIDEO_QUALITY_LOW, VIDEO_QUALITY_VERY_LOW].includes(networkState) &&
+          videoQuality === VIDEO_QUALITY_AUTO) ||
+        // Low quality or Bandwidth saver mode enabled
+        [VIDEO_QUALITY_BANDWIDTH_SAVER, VIDEO_QUALITY_LOW].includes(
+          videoQuality
+        )
+      ) {
+        receiveSettings[id] = { video: { layer: 0 } };
+        return;
+      }
+
       // Speaker view settings based on speaker status or pinned user
       if (viewMode === VIEW_MODE_SPEAKER) {
         if (currentSpeaker?.id === id) {
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 2);
+          receiveSettings[id] = { video: { layer: 2 } };
         } else {
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 0);
+          receiveSettings[id] = { video: { layer: 0 } };
         }
       }
 
-      // Note: grid view settings are handled by the grid view component
+      // Grid view settings are handled separately in GridView
     });
-  }, [currentSpeaker?.id, participantIds, viewMode]);
+    callObject.updateReceiveSettings(receiveSettings);
+  }, [
+    currentSpeaker?.id,
+    callObject,
+    networkState,
+    participantIds,
+    videoQuality,
+    viewMode,
+  ]);
 
   useEffect(() => {
     setBandWidthControls();

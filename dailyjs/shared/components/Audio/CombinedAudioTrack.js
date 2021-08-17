@@ -34,16 +34,23 @@ const CombinedAudioTrack = ({ tracks }) => {
       }
     });
 
-    audio.load();
+    const playAudio = async () => {
+      try {
+        if (
+          stream
+            .getAudioTracks()
+            .some((t) => t.enabled && t.readyState === 'live') &&
+          audio.paused
+        ) {
+          await audio.play();
+        }
+      } catch {
+        // ...
+      }
+    };
 
-    if (
-      stream
-        .getAudioTracks()
-        .some((t) => t.enabled && t.readyState === 'live') &&
-      audio.paused
-    ) {
-      audio.play();
-    }
+    audio.load();
+    playAudio();
   }, [tracks, trackIds]);
 
   return (
