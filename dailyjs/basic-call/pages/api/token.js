@@ -19,6 +19,7 @@ export default async function handler(req, res) {
         properties: { room_name: roomName, is_owner: isOwner },
       }),
     };
+    console.log(options);
 
     const dailyRes = await fetch(
       `${
