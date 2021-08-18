@@ -1,4 +1,4 @@
-![Daily Examples](./logo.png)
+![Daily Examples](./YARD-1.png)
 
 # [Daily](https://daily.co) | Examples
 
