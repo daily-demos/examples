@@ -4,23 +4,16 @@
  * custom user authentication, etc.
  */
 
-import { Logger } from 'aws-amplify';
-
-const logger = new Logger('foo');
-
 export default async function handler(req, res) {
   const { roomName, isOwner } = req.body;
-  const key = process.env.DAILY_API_KEY;
-  logger.info(key);
 
   if (req.method === 'POST' && roomName) {
     console.log(`Getting token for room '${roomName}' as owner: ${isOwner}`);
-    logger.info(`FLASHING KEY: ${key}`);
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${key}`,
+        Authorization: `Bearer ${process.env.DAILY_API_KEY}`,
       },
       body: JSON.stringify({
         properties: { room_name: roomName, is_owner: isOwner },
