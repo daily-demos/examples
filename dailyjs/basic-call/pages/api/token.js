@@ -14,7 +14,6 @@ export default async function handler(req, res) {
   logger.info(key);
 
   if (req.method === 'POST' && roomName) {
-    debugger;
     console.log(`Getting token for room '${roomName}' as owner: ${isOwner}`);
     logger.info(`FLASHING KEY: ${key}`);
     const options = {
