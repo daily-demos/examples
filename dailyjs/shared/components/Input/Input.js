@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import theme from '../../styles/defaultTheme';
+import theme from '../../styles/yardTheme';
 import { hexa } from '../../styles/global';
 
 const InputContainer = ({ children, prefix, className }) => (

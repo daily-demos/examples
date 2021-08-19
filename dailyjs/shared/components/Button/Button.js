@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import classnames from 'classnames';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
-import theme from '../../styles/defaultTheme';
+import theme from '../../styles/yardTheme';
 import { hexa } from '../../styles/global';
 
 export const Button = forwardRef(

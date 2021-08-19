@@ -9,8 +9,8 @@ export const Header = () => {
   return useMemo(
     () => (
       <header className="room-header">
-        <img src="images/daily-logo.svg" alt="Daily" className="logo" />
-        <div className="capsule">Basic call demo</div>
+        <img src="images/YARD-2.svg" alt="Yard" className="logo" />
+        <div className="capsule">Rebuild Local</div>
         <div className="capsule">
           {`${participantCount} ${
             participantCount > 1 ? 'participants' : 'participant'

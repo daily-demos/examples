@@ -1,5 +1,5 @@
 import React from 'react';
-import theme from '../../styles/defaultTheme';
+import theme from '../../styles/yardTheme';
 import { hexa } from '../../styles/global';
 
 export const GlobalStyle = () => (
