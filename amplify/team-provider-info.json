@@ -1,0 +1,26 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-amplify7c477dc902df4-staging-200402-authRole",
+      "UnauthRoleArn": "arn:aws:iam::844165518118:role/amplify-amplify7c477dc902df4-staging-200402-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::844165518118:role/amplify-amplify7c477dc902df4-staging-200402-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-amplify7c477dc902df4-staging-200402-deployment",
+      "UnauthRoleName": "amplify-amplify7c477dc902df4-staging-200402-unauthRole",
+      "StackName": "amplify-amplify7c477dc902df4-staging-200402",
+      "StackId": "arn:aws:cloudformation:us-east-1:844165518118:stack/amplify-amplify7c477dc902df4-staging-200402/6d716490-0516-11ec-8746-0a254022de5b",
+      "AmplifyAppId": "d205d7m7fg67tb"
+    },
+    "categories": {
+      "function": {
+        "DailyApiHandler": {
+          "dailyApiKey": "c47cb935a4af209d7982e7478021b62ce7a6ce0a2f7247fdd7a0e07c7feb0c36",
+          "dailyDomain": "ouryard",
+          "dailyRestDomain": "https://api.daily.co/v1",
+          "deploymentBucketName": "amplify-amplify7c477dc902df4-staging-200402-deployment",
+          "s3Key": "amplify-builds/DailyApiHandler-47746c69666b5872316d-build.zip"
+        }
+      }
+    }
+  }
+}

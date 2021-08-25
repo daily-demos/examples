@@ -1,0 +1,17 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "dailyApiKey",
+      "environmentVariableName": "DAILY_API_KEY"
+    },
+    {
+      "cloudFormationParameterName": "dailyDomain",
+      "environmentVariableName": "DAILY_DOMAIN"
+    },
+    {
+      "cloudFormationParameterName": "dailyRestDomain",
+      "environmentVariableName": "DAILY_REST_DOMAIN"
+    }
+  ]
+}

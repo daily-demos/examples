@@ -1,0 +1,35 @@
+{
+  "paths": [
+    {
+      "name": "/video",
+      "lambdaFunction": "DailyApiHandler",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/video"
+    }
+  ],
+  "resourceName": "rlvideoapi",
+  "apiName": "rlvideoapi",
+  "functionArns": [
+    {
+      "lambdaFunction": "DailyApiHandler"
+    }
+  ],
+  "privacy": {
+    "auth": 0,
+    "unauth": 0,
+    "authRoleName": "amplify-amplify7c477dc902df4-staging-200402-authRole",
+    "unAuthRoleName": "amplify-amplify7c477dc902df4-staging-200402-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "DailyApiHandler",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}
