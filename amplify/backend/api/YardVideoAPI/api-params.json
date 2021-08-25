@@ -1,0 +1,46 @@
+{
+  "paths": [
+    {
+      "name": "/video/api",
+      "lambdaFunction": "YardVideoAPIHandler",
+      "privacy": {
+        "protected": true,
+        "auth": [
+          "/POST",
+          "/GET",
+          "/PUT",
+          "/PATCH",
+          "/DELETE"
+        ],
+        "unauth": [
+          "/POST",
+          "/GET"
+        ]
+      },
+      "policyResourceName": "/video/api"
+    }
+  ],
+  "resourceName": "YardVideoAPI",
+  "apiName": "YardVideoAPI",
+  "functionArns": [
+    {
+      "lambdaFunction": "YardVideoAPIHandler"
+    }
+  ],
+  "privacy": {
+    "auth": 1,
+    "unauth": 1,
+    "authRoleName": "amplify-amplify7c477dc902df4-staging-200402-authRole",
+    "unAuthRoleName": "amplify-amplify7c477dc902df4-staging-200402-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "YardVideoAPIHandler",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}

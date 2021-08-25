@@ -31,6 +31,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# YARD
+amplify/team-provider-info.json
+
 # vercel
 .vercel
 amplify/\#current-cloud-backend
