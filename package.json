@@ -11,6 +11,11 @@
   "engines": {
     "node": ">=0.12"
   },
+  "scripts": {
+      "run:livestream:dev": "yarn workspace @dailyjs/live-streaming dev",
+      "run:livestream:build": "yarn workspace @dailyjs/live-streaming dev"
+      
+  },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "babel-plugin-inline-react-svg": "^2.0.1",
