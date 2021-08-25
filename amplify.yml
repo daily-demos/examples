@@ -7,7 +7,7 @@ applications:
             - yarn install
         build:
           commands:
-            - yarn config set workspaces-experimental false
+            - yarn config set workspaces-experimental true
             - yarn workspace @dailyjs/live-streaming build
       artifacts:
         baseDirectory: .next
