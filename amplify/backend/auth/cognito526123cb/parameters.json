@@ -1,6 +1,6 @@
 {
     "identityPoolName": "rlstandalonedailyjsl_identitypool_526123cb",
-    "allowUnauthenticatedIdentities": true,
+    "allowUnauthenticatedIdentities": false,
     "resourceNameTruncated": "rlstan526123cb",
     "userPoolName": "rlstandalonedailyjsl_userpool_526123cb",
     "autoVerifiedAttributes": [
@@ -45,5 +45,11 @@
             "UnauthRole",
             "Arn"
         ]
-    }
+    },
+    "hostedUI": false,
+    "useDefault": "default",
+    "userPoolGroupList": [],
+    "serviceName": "Cognito",
+    "dependsOn": [],
+    "authProviders": []
 }

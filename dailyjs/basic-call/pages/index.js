@@ -44,7 +44,7 @@ export default function Index({
     setFetchingToken(true);
 
     // Fetch token from serverside method (provided by Next)
-    const res = await fetch('/api/token', {
+    const res = await fetch('/video/api/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
