@@ -1,7 +1,7 @@
 import React from 'react';
 import App from '@dailyjs/basic-call/components/App';
 import Amplify from 'aws-amplify';
-import awsconfig from '../../../../src/aws-exports';
+import awsconfig from 'src/aws-exports';
 import { LiveStreamingProvider } from '../../contexts/LiveStreamingProvider';
 
 Amplify.configure(awsconfig);
