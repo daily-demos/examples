@@ -1,5 +1,5 @@
 import React from 'react';
-import Amplify, { API } from 'aws-amplify';
+import Amplify from 'aws-amplify';
 import awsconfig from '../../../../src/aws-exports';
 
 Amplify.configure(awsconfig);
