@@ -10,6 +10,8 @@ import PropTypes from 'prop-types';
 import App from '../components/App';
 import { CreatingRoom } from '../components/CreatingRoom';
 import { Intro, NotConfigured } from '../components/Intro';
+import Amplify, { API } from 'aws-amplify';
+import awsconfig from './../../../src/aws-exports';
 
 /**
  * Index page
@@ -43,17 +45,33 @@ export default function Index({
 
     setFetchingToken(true);
 
-    // Fetch token from serverside method (provided by Next)
-    const res = await fetch('/video/api/token', {
-      method: 'POST',
+    /*
+    Fetching with Amplify
+    */  
+   
+    const apiName = 'YardVideoAPI';
+    const path = '/video/api/token';
+    const myInit = { // OPTIONAL
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ roomName: room, isOwner }),
-    });
+      body: JSON.stringify({ roomName: room, isOwner })
+    } // OPTIONAL
+    const res = await API.get(apiName, path, myInit);
     const resJson = await res.json();
 
+    // // Fetch token from serverside method (provided by Next)
+    // const res = await fetch('/video/api/token', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ roomName: room, isOwner }),
+    // });
+    // const resJson = await res.json();
+
     if (!resJson?.token) {
+      console.log(`😔 NO Token received`);
       setTokenError(resJson?.error || true);
       setFetchingToken(false);
       return false;
