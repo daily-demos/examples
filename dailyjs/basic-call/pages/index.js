@@ -10,9 +10,6 @@ import PropTypes from 'prop-types';
 import App from '../components/App';
 import { CreatingRoom } from '../components/CreatingRoom';
 import { Intro, NotConfigured } from '../components/Intro';
-import Amplify, { API } from 'aws-amplify';
-import awsconfig from './../../../src/aws-exports';
-
 /**
  * Index page
  * ---
