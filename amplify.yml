@@ -8,8 +8,6 @@ applications:
         build:
           commands:
             - yarn config set workspaces-experimental true
-            - echo "Let's see the files firts"
-            - ls ./src
             - yarn workspace @dailyjs/live-streaming build
       artifacts:
         baseDirectory: .next
