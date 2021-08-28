@@ -8,7 +8,7 @@ applications:
         build:
           commands:
             - amplify pull
-            - pwd && ls
+            - pwd && ls ../../
             - yarn config set workspaces-experimental true
             - yarn workspace @dailyjs/live-streaming build
       artifacts:
