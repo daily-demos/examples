@@ -10,6 +10,8 @@ import PropTypes from 'prop-types';
 import App from '../components/App';
 import { CreatingRoom } from '../components/CreatingRoom';
 import { Intro, NotConfigured } from '../components/Intro';
+import { API } from 'aws-amplify';
+
 /**
  * Index page
  * ---
