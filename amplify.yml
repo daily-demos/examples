@@ -8,7 +8,7 @@ applications:
         build:
           commands:
             - yarn config set workspaces-experimental true
-            - cp ./src/aws-exports.js ./dailyjs/live-streaming/src/
+            - cp ./src/aws-exports.js ./dailyjs/live-streaming/aws-exports.js
             - yarn workspace @dailyjs/live-streaming build
       artifacts:
         baseDirectory: .next
