@@ -27,8 +27,8 @@ Amplify.configure({
   API: {
       endpoints: [
           {
-              name: `${process.env.API_NAME}`,
-              endpoint: `${process.env.API_ENDPOINT}`
+              name: `${process.env.API_NAME || 'YardVideoAPI'}`,
+              endpoint: `${process.env.API_ENDPOINT || 'https://uzv48ep62j.execute-api.us-east-1.amazonaws.com'}`
           }
       ]
   }
@@ -77,7 +77,7 @@ export default function Index({
       },
       body: JSON.stringify({ roomName: room, isOwner })
     } // OPTIONAL
-    const res = await API.get(apiName, path, myInit);
+    const res = await API.post(apiName, path, myInit);
     const resJson = await res.json();
 
     // // Fetch token from serverside method (provided by Next)
