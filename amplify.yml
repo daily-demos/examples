@@ -7,8 +7,6 @@ applications:
             - yarn install
         build:
           commands:
-            - amplify pull
-            - cat ./src/aws-exports.js
             - yarn config set workspaces-experimental true
             - yarn workspace @dailyjs/live-streaming build
       artifacts:
