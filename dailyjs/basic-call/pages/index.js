@@ -28,7 +28,7 @@ Amplify.configure({
       endpoints: [
           {
               name: `${process.env.API_NAME || 'YardVideoAPI'}`,
-              endpoint: `${process.env.API_ENDPOINT || 'https://uzv48ep62j.execute-api.us-east-1.amazonaws.com'}`
+              endpoint: `${process.env.API_ENDPOINT || 'https://uzv48ep62j.execute-api.us-east-1.amazonaws.com/production'}`
           }
       ]
   }
