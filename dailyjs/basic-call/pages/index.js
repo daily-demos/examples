@@ -77,8 +77,11 @@ export default function Index({
       },
       body: JSON.stringify({ roomName: room, isOwner })
     } // OPTIONAL
-    const res = await API.post(apiName, path, myInit);
-    const resJson = await res.json();
+    //const res = await API.post(apiName, path, myInit);
+    //const resJson = await res.json();
+    const resJson = {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkIjoiOWUxMWVmY2UtYTM1My00MTk2LTkwNjYtNThjNzk2MzBlMzY5IiwiaWF0IjoxNjMwNDE5MTY3fQ.tsJHyOCV8AMmW1Y7NLInVMEkyfe8YZxZ16M77tZ3fy8"
+    }
 
     // // Fetch token from serverside method (provided by Next)
     // const res = await fetch('/video/api/token', {
