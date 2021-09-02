@@ -1,0 +1,54 @@
+{
+  "paths": [
+    {
+      "name": "/token",
+      "lambdaFunction": "RemoveThis",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/token"
+    },
+    {
+      "name": "/",
+      "lambdaFunction": "YardVideoRestHandler",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/"
+    }
+  ],
+  "resourceName": "YardVideoRestAPI",
+  "apiName": "YardVideoRestAPI",
+  "functionArns": [
+    {
+      "lambdaFunction": "RemoveThis"
+    },
+    {
+      "lambdaFunction": "YardVideoRestHandler"
+    }
+  ],
+  "privacy": {
+    "auth": 0,
+    "unauth": 0,
+    "authRoleName": "amplify-amplify3cd57ca2c6da4-staging-115034-authRole",
+    "unAuthRoleName": "amplify-amplify3cd57ca2c6da4-staging-115034-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "RemoveThis",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    },
+    {
+      "category": "function",
+      "resourceName": "YardVideoRestHandler",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}

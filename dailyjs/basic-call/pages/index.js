@@ -44,7 +44,7 @@ Amplify.configure({
 export default function Index({
   domain,
   isConfigured = false,
-  predefinedRoom = '',
+  predefinedRoom = 'livestreaming-staging',
   forceFetchToken = false,
   forceOwner = false,
   demoMode = false,

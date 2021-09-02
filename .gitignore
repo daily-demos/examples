@@ -39,6 +39,9 @@ node_modules/
 aws-exports.js
 awsconfiguration.json
 
+# local env files
+**/**env.local
+
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
@@ -50,7 +53,7 @@ amplify/backend/.temp
 build/
 dist/
 node_modules/
-# aws-exports.js
+aws-exports.js
 awsconfiguration.json
 amplifyconfiguration.json
 amplifyconfiguration.dart
@@ -59,5 +62,3 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 #amplify-do-not-edit-end
-# local env files
-**/**env.local

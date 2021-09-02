@@ -1,0 +1,17 @@
+{
+  "providers": [
+    "awscloudformation"
+  ],
+  "projectName": "RebuildLocalStandalo",
+  "version": "3.1",
+  "frontend": "javascript",
+  "javascript": {
+    "framework": "react",
+    "config": {
+      "SourceDir": "dailyjs/live-streaming",
+      "DistributionDir": "dailyjs/live-streaming/.next",
+      "BuildCommand": "yarn workspace @dailyjs/live-streaming build",
+      "StartCommand": "next start"
+    }
+  }
+}
