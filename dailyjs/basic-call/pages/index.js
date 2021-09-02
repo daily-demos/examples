@@ -13,26 +13,16 @@ import { Intro, NotConfigured } from '../components/Intro';
 import Amplify, { API } from 'aws-amplify';
 
 Amplify.configure({
-  // OPTIONAL - if your API requires authentication 
-  // Auth: {
-  //     // REQUIRED - Amazon Cognito Identity Pool ID
-  //     identityPoolId: 'XX-XXXX-X:XXXXXXXX-XXXX-1234-abcd-1234567890ab',
-  //     // REQUIRED - Amazon Cognito Region
-  //     region: 'XX-XXXX-X', 
-  //     // OPTIONAL - Amazon Cognito User Pool ID
-  //     userPoolId: 'XX-XXXX-X_abcd1234', 
-  //     // OPTIONAL - Amazon Cognito Web Client ID (26-char alphanumeric string)
-  //     userPoolWebClientId: 'a1b2c3d4e5f6g7h8i9j0k1l2m3',
-  // },
   API: {
       endpoints: [
           {
-              name: `${process.env.API_NAME || 'YardVideoAPI'}`,
-              endpoint: `${process.env.API_ENDPOINT || 'https://uzv48ep62j.execute-api.us-east-1.amazonaws.com/production'}`
+              name: `${process.env.API_NAME || 'YardVideoRestAPI'}`,
+              endpoint: `${process.env.API_ENDPOINT || `https://4nn58fuzsi.execute-api.us-east-1.amazonaws.com/staging`}`
           }
       ]
   }
 });
+const api_endpoint = `${process.env.API_ENDPOINT || 'https://4nn58fuzsi.execute-api.us-east-1.amazonaws.com/staging'}`
 /**
  * Index page
  * ---
@@ -44,7 +34,7 @@ Amplify.configure({
 export default function Index({
   domain,
   isConfigured = false,
-  predefinedRoom = 'livestreaming-staging',
+  predefinedRoom = '',
   forceFetchToken = false,
   forceOwner = false,
   demoMode = false,
@@ -65,30 +55,14 @@ export default function Index({
 
     setFetchingToken(true);
 
-    /*
-    Fetching with Amplify
-    */  
-   
-    const apiName = 'YardVideoAPI';
-    const path = '/video/api/token';
-    const myInit = { // OPTIONAL
+    const res = await fetch(`${api_endpoint}/video/api/token`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ roomName: room, isOwner })
-    } // OPTIONAL
-    const res = await API.post(apiName, path, myInit);
+      body: JSON.stringify({ roomName: room, isOwner }),
+    });
     const resJson = await res.json();
-
-    // // Fetch token from serverside method (provided by Next)
-    // const res = await fetch('/video/api/token', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ roomName: room, isOwner }),
-    // });
-    // const resJson = await res.json();
 
     if (!resJson?.token) {
       console.log(`😔 NO Token received`);
