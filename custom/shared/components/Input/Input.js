@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import theme from '../../styles/defaultTheme';
@@ -136,15 +136,17 @@ InputContainer.propTypes = {
   prefix: PropTypes.string,
 };
 
-export const TextInput = ({ onChange, prefix, variant, ...rest }) => {
-  const cx = classNames('input-container', variant, { prefix });
+export const TextInput = forwardRef(
+  ({ onChange, prefix, variant, ...rest }, ref) => {
+    const cx = classNames('input-container', variant, { prefix });
 
-  return (
-    <InputContainer className={cx} prefix={prefix}>
-      <input type="text" onChange={onChange} {...rest} />
-    </InputContainer>
-  );
-};
+    return (
+      <InputContainer className={cx} prefix={prefix}>
+        <input type="text" onChange={onChange} ref={ref} {...rest} />
+      </InputContainer>
+    );
+  }
+);
 
 TextInput.propTypes = {
   onChange: PropTypes.func,
