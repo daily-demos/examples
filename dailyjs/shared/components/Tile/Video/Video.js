@@ -5,7 +5,10 @@ import { shallowEqualObjects } from 'shallow-equal';
 
 export const Video = memo(
   forwardRef(({ participantId, videoTrack, ...rest }, videoEl) => {
-    // See: https://bugs.chromium.org/p/chromium/issues/detail?id=1232649
+    /**
+     * Memo: Chrome >= 92?
+     * See: https://bugs.chromium.org/p/chromium/issues/detail?id=1232649
+     */
     const isChrome92 = useMemo(() => {
       const { browser, platform, os } = Bowser.parse(navigator.userAgent);
       return (
@@ -33,7 +36,7 @@ export const Video = memo(
     }, [videoEl, isChrome92, participantId]);
 
     /**
-     * Effect: mount source
+     * Effect: mount source (and force load on Chrome)
      */
     useEffect(() => {
       const video = videoEl.current;

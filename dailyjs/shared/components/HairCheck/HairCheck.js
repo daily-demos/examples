@@ -30,7 +30,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
  * - Set user name and join call / request access
  */
 export const HairCheck = () => {
-  const { callObject } = useCallState();
+  const { callObject, join } = useCallState();
   const { localParticipant } = useParticipants();
   const { deviceState, camError, micError, isCamMuted, isMicMuted } =
     useMediaDevices();
@@ -128,7 +128,7 @@ export const HairCheck = () => {
     <>
       <main className="haircheck">
         <img
-          src="/images/daily-logo.svg"
+          src="/assets/daily-logo.svg"
           alt="Daily.co"
           width="132"
           height="58"
@@ -208,12 +208,12 @@ export const HairCheck = () => {
             justify-content: center;
             height: 100%;
             width: 100%;
-            background: url('/images/pattern-bg.png') center center no-repeat;
+            background: url('/assets/pattern-bg.png') center center no-repeat;
             background-size: 100%;
           }
 
           .haircheck .panel {
-            width: 720px;
+            width: 580px;
             text-align: center;
           }
 
@@ -228,7 +228,7 @@ export const HairCheck = () => {
             position: relative;
             color: white;
             border: 3px solid rgba(255, 255, 255, 0.1);
-            max-width: 520px;
+            max-width: 480px;
             margin: 0 auto;
             border-radius: var(--radius-md) var(--radius-md) 0 0;
             border-bottom: 0px;
@@ -279,7 +279,7 @@ export const HairCheck = () => {
             left: 0px;
             right: 0px;
             z-index: 99;
-            padding: var(--spacing-sm);
+            padding: var(--spacing-xs);
             box-sizing: border-box;
             display: flex;
             align-items: center;
@@ -289,8 +289,8 @@ export const HairCheck = () => {
 
           .haircheck .content :global(.device-button) {
             position: absolute;
-            top: var(--spacing-sm);
-            right: var(--spacing-sm);
+            top: var(--spacing-xxs);
+            right: var(--spacing-xxs);
           }
 
           .haircheck .overlay-message {
@@ -303,7 +303,7 @@ export const HairCheck = () => {
           .haircheck footer {
             position: relative;
             border: 3px solid rgba(255, 255, 255, 0.1);
-            max-width: 520px;
+            max-width: 480px;
             margin: 0 auto;
             border-radius: 0 0 var(--radius-md) var(--radius-md);
             padding: calc(6px + var(--spacing-md)) var(--spacing-sm)
@@ -312,7 +312,7 @@ export const HairCheck = () => {
 
             display: grid;
             grid-template-columns: 1fr auto;
-            grid-column-gap: var(--spacing-sm);
+            grid-column-gap: var(--spacing-xs);
           }
 
           .waiting {

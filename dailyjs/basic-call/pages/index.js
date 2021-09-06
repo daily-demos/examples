@@ -25,6 +25,7 @@ export default function Index({
   predefinedRoom = '',
   forceFetchToken = false,
   forceOwner = false,
+  subscribeToTracksAutomatically = true,
   demoMode = false,
   asides,
   modals,
@@ -114,7 +115,12 @@ export default function Index({
       modals={modals}
       customTrayComponent={customTrayComponent}
     >
-      <CallProvider domain={domain} room={roomName} token={token}>
+      <CallProvider
+        domain={domain}
+        room={roomName}
+        token={token}
+        subscribeToTracksAutomatically={subscribeToTracksAutomatically}
+      >
         <ParticipantsProvider>
           <TracksProvider>
             <MediaDeviceProvider>
@@ -139,12 +145,12 @@ Index.propTypes = {
   customAppComponent: PropTypes.node,
   forceFetchToken: PropTypes.bool,
   forceOwner: PropTypes.bool,
+  subscribeToTracksAutomatically: PropTypes.bool,
   demoMode: PropTypes.bool,
 };
 
 export async function getStaticProps() {
   const defaultProps = getDemoProps();
-
   return {
     props: defaultProps,
   };

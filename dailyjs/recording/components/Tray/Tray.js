@@ -32,15 +32,13 @@ export const Tray = () => {
   ].includes(recordingState);
 
   return (
-    <>
-      <TrayButton
-        label={isRecording ? 'Recording' : 'Record'}
-        orange={isRecording}
-        onClick={() => openModal(RECORDING_MODAL)}
-      >
-        <IconRecord />
-      </TrayButton>
-    </>
+    <TrayButton
+      label={isRecording ? 'Recording' : 'Record'}
+      orange={isRecording}
+      onClick={() => openModal(RECORDING_MODAL)}
+    >
+      <IconRecord />
+    </TrayButton>
   );
 };
 

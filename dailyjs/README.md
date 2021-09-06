@@ -20,6 +20,10 @@ Record a call video and audio using both cloud and local modes
 
 Send emoji reactions to all clients using sendAppMessage
 
+### [📃 Pagination](./pagination)
+
+Demonstrates using manual track management to support larger call sizes
+
 ---
 
 ## Getting started

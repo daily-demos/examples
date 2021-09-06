@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import HeaderCapsule from '@dailyjs/shared/components/HeaderCapsule';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 
@@ -9,18 +10,19 @@ export const Header = () => {
   return useMemo(
     () => (
       <header className="room-header">
-        <img src="images/daily-logo.svg" alt="Daily" className="logo" />
-        <div className="capsule">Basic call demo</div>
-        <div className="capsule">
+        <img src="assets/daily-logo.svg" alt="Daily" className="logo" />
+
+        <HeaderCapsule>Basic call demo</HeaderCapsule>
+        <HeaderCapsule>
           {`${participantCount} ${
-            participantCount > 1 ? 'participants' : 'participant'
+            participantCount === 1 ? 'participant' : 'participants'
           }`}
-        </div>
+        </HeaderCapsule>
         {customCapsule && (
-          <div className={`capsule ${customCapsule.variant}`}>
+          <HeaderCapsule variant={customCapsule.variant}>
             {customCapsule.variant === 'recording' && <span />}
             {customCapsule.label}
-          </div>
+          </HeaderCapsule>
         )}
 
         <style jsx>{`
@@ -36,44 +38,6 @@ export const Header = () => {
 
           .logo {
             margin-right: var(--spacing-xs);
-          }
-
-          .capsule {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xxxs);
-            background-color: var(--blue-dark);
-            border-radius: var(--radius-sm);
-            padding: var(--spacing-xxs) var(--spacing-xs);
-            box-sizing: border-box;
-            line-height: 1;
-            font-weight: var(--weight-medium);
-            user-select: none;
-          }
-
-          .capsule.recording {
-            background: var(--secondary-default);
-          }
-
-          .capsule.recording span {
-            display: block;
-            width: 12px;
-            height: 12px;
-            background: white;
-            border-radius: 12px;
-            animation: capsulePulse 2s infinite linear;
-          }
-
-          @keyframes capsulePulse {
-            0% {
-              opacity: 1;
-            }
-            50% {
-              opacity: 0.25;
-            }
-            100% {
-              opacity: 1;
-            }
           }
         `}</style>
       </header>

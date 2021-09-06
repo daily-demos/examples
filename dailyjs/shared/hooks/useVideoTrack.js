@@ -15,7 +15,7 @@ export const useVideoTrack = (participant) => {
         !participant.isScreenshare)
     )
       return null;
-    return videoTrack?.track;
+    return videoTrack?.persistentTrack;
   }, [participant?.id, videoTracks]);
 };
 

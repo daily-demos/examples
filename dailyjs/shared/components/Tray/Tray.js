@@ -72,7 +72,8 @@ export const Tray = ({ children }) => (
     <style jsx>{`
       footer {
         flex: 0 0 auto;
-        padding: var(--spacing-xs);
+        padding: var(--spacing-xxs) var(--spacing-xs) var(--spacing-xs)
+          var(--spacing-xs);
         box-sizing: border-box;
         width: 100%;
         display: flex;

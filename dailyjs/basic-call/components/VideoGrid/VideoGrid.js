@@ -2,19 +2,29 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Tile from '@dailyjs/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
+/**
+ * Basic unpaginated video tile grid, scaled by aspect ratio
+ *
+ * Note: this component is designed to work with automated track subscriptions
+ * and is only suitable for small call sizes as it will show all participants
+ * and not paginate.
+ *
+ * Note: this grid does not show screenshares (just participant cams)
+ *
+ * Note: this grid does not sort participants
+ */
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { allParticipants } = useParticipants();
-    const { resumeVideoTrack } = useTracks();
+    const { participants } = useParticipants();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
     });
 
+    // Keep a reference to the width and height of the page, so we can repack
     useEffect(() => {
       let frame;
       const handleResize = () => {
@@ -35,9 +45,10 @@ export const VideoGrid = React.memo(
       };
     }, []);
 
+    // Basic brute-force packing algo
     const layout = useMemo(() => {
       const aspectRatio = DEFAULT_ASPECT_RATIO;
-      const tileCount = allParticipants.length || 0;
+      const tileCount = participants.length || 0;
       const w = dimensions.width;
       const h = dimensions.height;
 
@@ -76,11 +87,12 @@ export const VideoGrid = React.memo(
       }
 
       return bestLayout;
-    }, [dimensions, allParticipants]);
+    }, [dimensions, participants]);
 
+    // Memoize our tile list to avoid unnecassary re-renders
     const tiles = useDeepCompareMemo(
       () =>
-        allParticipants.map((p) => (
+        participants.map((p) => (
           <Tile
             participant={p}
             key={p.id}
@@ -88,45 +100,10 @@ export const VideoGrid = React.memo(
             style={{ maxWidth: layout.width, maxHeight: layout.height }}
           />
         )),
-      [layout, allParticipants]
+      [layout, participants]
     );
 
-    /**
-     * Set bandwidth layer based on amount of visible participants
-     */
-    useEffect(() => {
-      if (
-        typeof rtcpeers === 'undefined' ||
-        // eslint-disable-next-line no-undef
-        rtcpeers?.getCurrentType() !== 'sfu'
-      )
-        return;
-
-      // eslint-disable-next-line no-undef
-      const sfu = rtcpeers.soup;
-      const count = allParticipants.length;
-
-      allParticipants.forEach(({ id }) => {
-        if (count < 5) {
-          // High quality video for calls with < 5 people per page
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 2);
-        } else if (count < 10) {
-          // Medium quality video for calls with < 10 people per page
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 1);
-        } else {
-          // Low quality video for calls with 10 or more people per page
-          sfu.setPreferredLayerForTrack(id, 'cam-video', 0);
-        }
-      });
-    }, [allParticipants]);
-
-    useEffect(() => {
-      allParticipants.forEach(
-        (p) => p.id !== 'local' && resumeVideoTrack(p.id)
-      );
-    }, [allParticipants, resumeVideoTrack]);
-
-    if (!allParticipants.length) {
+    if (!participants.length) {
       return null;
     }
 
