@@ -11,17 +11,15 @@ export const Tray = () => {
   const { hasNewMessages } = useChat();
 
   return (
-    <>
-      <TrayButton
-        label="Chat"
-        bubble={hasNewMessages}
-        onClick={() => {
-          toggleAside(CHAT_ASIDE);
-        }}
-      >
-        <IconChat />
-      </TrayButton>
-    </>
+    <TrayButton
+      label="Chat"
+      bubble={hasNewMessages}
+      onClick={() => {
+        toggleAside(CHAT_ASIDE);
+      }}
+    >
+      <IconChat />
+    </TrayButton>
   );
 };
 

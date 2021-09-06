@@ -11,7 +11,7 @@ export const Aside = ({ onClose, children }) => (
     <div className="close">
       <Button
         size="small-square"
-        variant="dark"
+        variant="white"
         className="closeButton"
         onClick={onClose}
       >
@@ -42,8 +42,14 @@ export const Aside = ({ onClose, children }) => (
       .call-aside .close {
         position: absolute;
         top: var(--spacing-xxs);
-        left: calc(-48px - var(--spacing-xxs));
+        left: calc(-43px);
+        border-right: 1px solid var(--gray-wash);
         z-index: 99;
+      }
+
+      .call-aside :global(.closeButton) {
+        border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+        height: 48px;
       }
     `}</style>
   </aside>

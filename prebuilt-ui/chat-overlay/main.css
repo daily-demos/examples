@@ -1,0 +1,61 @@
+#chatBox {
+    position: fixed;
+    bottom: 0;
+    z-index: 1000;
+    padding-left: 1.75em;
+    margin-bottom: 7.5em;
+  }
+
+  @media (min-width: 701px) {
+    #chatBox {
+      padding-left: 0;
+    }
+  }
+
+  @media (min-width: 801px) {
+    #chatBox {
+      margin-bottom: 4em;
+    }
+  }
+
+  #chatBox > input {
+    border: 1px solid #c8d1dc;
+    border-radius: 5px;
+    width: 74vw;
+    max-width: 22em;
+    background-color: rgba(255, 255, 255)
+  }
+
+  #chatBoxButton {
+    border: 1px solid #c8d1dc;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255);
+  }
+
+  #chatBoxTexts > p {
+    background-color: #121a2478;
+    display: table;
+    padding: 0.1em;
+    margin: 0;
+    color: white;
+    font-family: monospace;
+    font-size: 1.25em;
+    border-radius: 0.5em;
+    word-wrap: break-word;
+    animation: fadeIn .5s cubic-bezier(.95,.05,.8,.04) forwards, fadeOut 15s cubic-bezier(.95,.05,.8,.04) forwards;
+  }
+
+  .hidden {
+    visibility: hidden;
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }

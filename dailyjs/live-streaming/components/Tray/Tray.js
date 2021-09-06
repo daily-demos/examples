@@ -12,15 +12,13 @@ export const Tray = () => {
   const { isStreaming } = useLiveStreaming();
 
   return (
-    <>
-      <TrayButton
-        label={isStreaming ? 'Live' : 'Stream'}
-        orange={isStreaming}
-        onClick={() => openModal(LIVE_STREAMING_MODAL)}
-      >
-        <IconStream />
-      </TrayButton>
-    </>
+    <TrayButton
+      label={isStreaming ? 'Live' : 'Stream'}
+      orange={isStreaming}
+      onClick={() => openModal(LIVE_STREAMING_MODAL)}
+    >
+      <IconStream />
+    </TrayButton>
   );
 };
 

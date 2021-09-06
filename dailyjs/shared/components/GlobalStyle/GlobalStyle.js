@@ -109,6 +109,13 @@ export const GlobalStyle = () => (
       line-height: 1.6;
     }
 
+    hr {
+      border: none;
+      height: 1px;
+      background-color: var(--gray-light);
+      margin: var(--spacing-sm) 0;
+    }
+
     code {
       display: inline;
       color: var(--text-pre);

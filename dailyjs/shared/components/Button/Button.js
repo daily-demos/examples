@@ -195,7 +195,7 @@ export const Button = forwardRef(
           }
 
           .button.tiny {
-            height: 32px;
+            height: 28px;
             font-size: 11px;
             border-radius: var(--radius-xs);
             text-transform: uppercase;
@@ -290,6 +290,24 @@ export const Button = forwardRef(
             opacity: 0.35;
           }
 
+          .button.white {
+            background: white;
+            border: 0px;
+          }
+          .button.white:hover,
+          .button.white:focus,
+          .button.white:active {
+            background: var(--gray-wash);
+            border: 0px;
+            color: var(--primary-default);
+          }
+          .button.white:focus {
+            box-shadow: 0 0 0px 3px rgba(0, 0, 0, 0.15);
+          }
+          .button.white:disabled {
+            opacity: 0.35;
+          }
+
           .button.outline {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -318,6 +336,22 @@ export const Button = forwardRef(
           }
           .button.outline-gray:focus {
             box-shadow: 0 0 0px 3px rgba(0, 0, 0, 0.05);
+          }
+
+          .button.outline-dark {
+            background: transparent;
+            border: 1px solid var(--blue-light);
+            color: var(--text-light);
+          }
+
+          .button.outline-dark:hover,
+          .button.outline-dark:focus,
+          .button.outline-dark:active {
+            border: 1px solid var(--primary-default);
+            box-shadow: none;
+          }
+          .button.outline-dark:focus {
+            box-shadow: 0 0 0px 3px ${hexa(theme.primary.default, 0.35)};
           }
 
           .button.muted {

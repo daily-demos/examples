@@ -1,5 +1,3 @@
-import equal from 'fast-deep-equal';
-
 /**
  * Call State
  * ---
@@ -16,10 +14,6 @@ export const initialCallState = {
   callItems: {},
   fatalError: false,
 };
-
-function getId(participant) {
-  return participant.local ? 'local' : participant.user_id;
-}
 
 export function isLocal(id) {
   return id === 'local';

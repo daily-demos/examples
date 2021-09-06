@@ -8,24 +8,30 @@ import {
 } from '@dailyjs/shared/components/Card';
 import PropTypes from 'prop-types';
 
-export const MessageCard = ({ header, children, error = false, onBack }) => (
-  <Card>
+export const MessageCard = ({
+  header,
+  children,
+  error = false,
+  hideBack = false,
+  onBack,
+}) => (
+  <Card className={error && 'error'}>
     {header && <CardHeader>{header}</CardHeader>}
     {children && <CardBody>{children}</CardBody>}
-    <CardFooter>
-      {onBack ? (
-        <Button onClick={() => onBack()}>Go back</Button>
-      ) : (
-        <Button href="/">Go back</Button>
-      )}
-    </CardFooter>
-    {error && (
-      <style jsx>{`
-        .card {
-          border: 3px solid var(--red-default);
-        }
-      `}</style>
+    {!hideBack && (
+      <CardFooter>
+        {onBack ? (
+          <Button onClick={() => onBack()}>Go back</Button>
+        ) : (
+          <Button href="/">Go back</Button>
+        )}
+      </CardFooter>
     )}
+    <style jsx>{`
+      :global(.card.error) {
+        border: 3px solid var(--red-default);
+      }
+    `}</style>
   </Card>
 );
 
@@ -34,6 +40,7 @@ MessageCard.propTypes = {
   children: PropTypes.node,
   error: PropTypes.bool,
   onBack: PropTypes.func,
+  hideBack: PropTypes.bool,
 };
 
 export default MessageCard;
