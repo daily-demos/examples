@@ -2,10 +2,6 @@
 
 ![Recording](./image.png)
 
-### Live example
-
-**[See it in action here ➡️](https://dailyjs-recording.vercel.app)**
-
 ---
 
 ## What does this demo do?
