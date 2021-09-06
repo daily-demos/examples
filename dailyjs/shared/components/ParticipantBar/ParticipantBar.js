@@ -192,7 +192,7 @@ export const ParticipantBar = ({
 
   useResize(() => {
     const scrollEl = scrollRef.current;
-    if (!showParticipantsBar || !scrollEl) return;
+    if (!scrollEl) return;
     setIsSidebarScrollable(scrollEl?.scrollHeight > scrollEl?.clientHeight);
     const r = updateVisibleRange(scrollEl.scrollTop);
     updateCamSubscriptions(r);

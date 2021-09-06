@@ -1,5 +1,3 @@
-/* global rtcpeers */
-
 import React, {
   createContext,
   useCallback,

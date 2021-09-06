@@ -124,6 +124,7 @@ export const TracksProvider = ({ children }) => {
         };
       }, {});
 
+      if (Object.keys(updates).length === 0) return;
       callObject.updateParticipants(updates);
     },
     [callObject, remoteParticipantIds, recentSpeakerIds]
@@ -202,7 +203,7 @@ export const TracksProvider = ({ children }) => {
         return { [id]: result };
       }, {});
 
-      if (!subscribeToTracksAutomatically) {
+      if (!subscribeToTracksAutomatically && Object.keys(updates).length0) {
         callObject.updateParticipants(updates);
       }
     }, 100);

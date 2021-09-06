@@ -29,7 +29,7 @@ Note: this example uses an additional env `MANUAL_TRACK_SUBS=1` that will disabl
 
 ## How does this example work?
 
-When call sizes exceed a certain volume (~12 or more particpants) it's important to start optimising for both bandwidth and CPU. Using manual track subscriptions allows each client to specify which participants they want to receive video and/or audio from, reducing how much data needs to be downloaded as well as the number of connections our servers maintain (subsequently supporting increased participant counts.)
+When call sizes exceed a certain volume (~12 or more participants) it's important to start optimising for both bandwidth and CPU. Using manual track subscriptions allows each client to specify which participants they want to receive video and/or audio from, reducing how much data needs to be downloaded as well as the number of connections our servers maintain (subsequently supporting increased participant counts.)
 
 This demo introduces a new paginated grid component that subscribes to any tiles that are in view. Our subscription API allows for the subscribing, pausing, resuming and unsubscribing of tracks. The grid component will:
 

@@ -112,16 +112,14 @@ export const CallProvider = ({
         networkState,
         showLocalVideo,
         roomExp,
-        videoQuality,
         enableRecording,
+        videoQuality,
         setVideoQuality,
         setBandwidth,
         setRedirectOnLeave,
         setShowLocalVideo,
-        setVideoQuality,
         startCloudRecording,
         subscribeToTracksAutomatically,
-        videoQuality,
       }}
     >
       {children}

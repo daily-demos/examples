@@ -1,13 +1,16 @@
 import React, {
+  useRef,
   useCallback,
   useMemo,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 import { Button } from '@dailyjs/shared/components/Button';
 import Tile from '@dailyjs/shared/components/Tile';
-import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
+import {
+  DEFAULT_ASPECT_RATIO,
+  MEETING_STATE_JOINED,
+} from '@dailyjs/shared/constants';
 import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import { isLocalId } from '@dailyjs/shared/contexts/participantsState';
@@ -15,13 +18,17 @@ import { useActiveSpeaker } from '@dailyjs/shared/hooks/useActiveSpeaker';
 import { useCamSubscriptions } from '@dailyjs/shared/hooks/useCamSubscriptions';
 import { ReactComponent as IconArrow } from '@dailyjs/shared/icons/raquo-md.svg';
 import sortByKey from '@dailyjs/shared/lib/sortByKey';
+import PropTypes from 'prop-types';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 // --- Constants
+
 const MIN_TILE_WIDTH = 280;
 const MAX_TILES_PER_PAGE = 12;
 
-export const PaginatedVideoGrid = () => {
+export const PaginatedVideoGrid = ({
+  maxTilesPerPage = MAX_TILES_PER_PAGE,
+}) => {
   const { callObject } = useCallState();
   const {
     activeParticipant,
@@ -44,7 +51,6 @@ export const PaginatedVideoGrid = () => {
   });
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
-  const [maxTilesPerPage] = useState(MAX_TILES_PER_PAGE);
 
   const gridRef = useRef(null);
 
@@ -58,10 +64,7 @@ export const PaginatedVideoGrid = () => {
       frame = requestAnimationFrame(() => {
         const width = gridRef.current?.clientWidth;
         const height = gridRef.current?.clientHeight;
-        setDimensions({
-          width,
-          height,
-        });
+        setDimensions({ width, height });
       });
     };
     handleResize();
@@ -126,6 +129,8 @@ export const PaginatedVideoGrid = () => {
     );
   }, [dimensions, pageSize, displayableParticipantCount]);
 
+  // -- Track subscriptions
+
   // Memoized array of participants on the current page (those we can see)
   const visibleParticipants = useMemo(
     () =>
@@ -134,8 +139,6 @@ export const PaginatedVideoGrid = () => {
         : participants.slice(-pageSize),
     [page, pageSize, participants]
   );
-
-  // -- Track subscriptions
 
   /**
    * Play / pause tracks based on pagination
@@ -174,7 +177,7 @@ export const PaginatedVideoGrid = () => {
     const stagedIds = [];
 
     // Decide whether to subscribe to or stage participants'
-    // track based on isibility
+    // track based on visibility
     renderedOrBufferedIds.forEach((id) => {
       if (id !== isLocalId()) {
         if (visibleParticipants.some((vp) => vp.id === id)) {
@@ -200,7 +203,8 @@ export const PaginatedVideoGrid = () => {
    * Set bandwidth layer based on amount of visible participants
    */
   useEffect(() => {
-    if (!(callObject && callObject.meetingState() === 'joined-meeting')) return;
+    if (!(callObject && callObject.meetingState() === MEETING_STATE_JOINED))
+      return;
     const count = visibleParticipants.length;
 
     let layer;
@@ -354,6 +358,10 @@ export const PaginatedVideoGrid = () => {
       `}</style>
     </div>
   );
+};
+
+PaginatedVideoGrid.propTypes = {
+  maxTilesPerPage: PropTypes.number,
 };
 
 export default PaginatedVideoGrid;
