@@ -17,7 +17,6 @@ import {
 import Field from '@dailyjs/shared/components/Field';
 import { TextInput } from '@dailyjs/shared/components/Input';
 import { Well } from '@dailyjs/shared/components/Well';
-import getDemoProps from '@dailyjs/shared/lib/demoProps';
 import { Header } from '../components/Header';
 
 export default function PrebuiltCall() {
@@ -248,10 +247,11 @@ export default function PrebuiltCall() {
   );
 }
 
-export async function getStaticProps() {
-  const defaultProps = getDemoProps();
-
-  return {
-    props: defaultProps,
-  };
-}
+// export async function getStaticProps() {
+//   return {
+//     props: {
+//       domain: process.env.DAILY_DOMAIN,
+//       key: process.env.DAILY_API_KEY,
+//     },
+//   };
+// }

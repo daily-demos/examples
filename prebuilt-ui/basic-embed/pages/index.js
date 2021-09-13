@@ -1,5 +1,4 @@
 import PrebuiltCall from '../components/PrebuiltCall';
-import Header from '../components/Header';
 
 export default function Home() {
   return (
