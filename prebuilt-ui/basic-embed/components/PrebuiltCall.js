@@ -17,8 +17,10 @@ import {
 import Field from '@dailyjs/shared/components/Field';
 import { TextInput } from '@dailyjs/shared/components/Input';
 import { Well } from '@dailyjs/shared/components/Well';
+import getDemoProps from '@dailyjs/shared/lib/demoProps';
+import { Header } from '../components/Header';
 
-export const PrebuiltCall = () => {
+export default function PrebuiltCall() {
   const [demoState, setDemoState] = useState('home');
   const [isError, setIsError] = useState(false);
   const [roomURL, setRoomURL] = useState('');
@@ -139,18 +141,18 @@ export const PrebuiltCall = () => {
         return (
           <Card>
             <CardHeader>
-              Start demo with a new unique room or paste in your own room URL.
+              Start demo with a new unique room, or paste in your own room URL.
             </CardHeader>
             <CardBody>
               {isError && (
                 <Well variant="error">
-                  Failed to obtain token <p>{error}</p>
+                  Error creating the room. Please try again.
                 </Well>
               )}
               <Button onClick={() => createRoom()} disabled={roomValidity}>
                 Create room and start
               </Button>
-              <Field label="Or enter room to join">
+              <Field label="Or enter room to join" className="roomField">
                 <TextInput
                   ref={roomURLRef}
                   type="text"
@@ -204,6 +206,7 @@ export const PrebuiltCall = () => {
 
   return (
     <div className="container">
+      <Header />
       {content}
       <style jsx>{`
         .container {
@@ -227,6 +230,14 @@ export const PrebuiltCall = () => {
           color: var(--blue-dark);
         }
 
+        :global(.field) {
+          margin-top: var(--spacing-sm);
+        }
+
+        :global(.card) {
+          margin: 8px;
+        }
+
         @media only screen and (max-width: 750px) {
           .container {
             flex-direction: column;
@@ -235,6 +246,12 @@ export const PrebuiltCall = () => {
       `}</style>
     </div>
   );
-};
+}
 
-export default PrebuiltCall;
+export async function getStaticProps() {
+  const defaultProps = getDemoProps();
+
+  return {
+    props: defaultProps,
+  };
+}

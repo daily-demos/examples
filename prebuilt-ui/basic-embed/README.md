@@ -1,6 +1,6 @@
 # Daily Prebuilt: Next.js demo 
 
-[Clicking create room button starts a call](/public/basic-embed.gif)
+![Clicking create room button starts a call](./basic-embed.gif)
 
 ## How the demo works 
 

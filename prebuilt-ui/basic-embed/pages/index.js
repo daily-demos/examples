@@ -4,8 +4,6 @@ import Header from '../components/Header';
 export default function Home() {
   return (
     <>
-      <Header />
-
       <PrebuiltCall />
       <style jsx>{`
         display: flex;
