@@ -1,9 +1,10 @@
 import PrebuiltCall from '../components/PrebuiltCall';
+import getDemoProps from '@dailyjs/shared/lib/demoProps';
 
-export default function Home() {
+export default function Index({ isConfigured = false }) {
   return (
     <>
-      <PrebuiltCall />
+      <PrebuiltCall configured={isConfigured} />
       <style jsx>{`
         display: flex;
         align-items: center;
@@ -12,4 +13,12 @@ export default function Home() {
       `}</style>
     </>
   );
+}
+
+export async function getStaticProps() {
+  const defaultProps = getDemoProps();
+
+  return {
+    props: defaultProps,
+  };
 }

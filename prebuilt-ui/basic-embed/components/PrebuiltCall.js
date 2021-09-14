@@ -19,7 +19,7 @@ import { TextInput } from '@dailyjs/shared/components/Input';
 import { Well } from '@dailyjs/shared/components/Well';
 import { Header } from '../components/Header';
 
-export default function PrebuiltCall() {
+export default function PrebuiltCall(props) {
   const [demoState, setDemoState] = useState('home');
   const [isError, setIsError] = useState(false);
   const [roomURL, setRoomURL] = useState('');
@@ -143,6 +143,12 @@ export default function PrebuiltCall() {
               Start demo with a new unique room, or paste in your own room URL.
             </CardHeader>
             <CardBody>
+              {!props.configured && (
+                <Well variant="error">
+                  You must configure env variables to create rooms (see README
+                  instructions).
+                </Well>
+              )}
               {isError && (
                 <Well variant="error">
                   Error creating the room. Please try again.
@@ -246,12 +252,3 @@ export default function PrebuiltCall() {
     </div>
   );
 }
-
-// export async function getStaticProps() {
-//   return {
-//     props: {
-//       domain: process.env.DAILY_DOMAIN,
-//       key: process.env.DAILY_API_KEY,
-//     },
-//   };
-// }
