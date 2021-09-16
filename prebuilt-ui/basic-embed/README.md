@@ -4,7 +4,7 @@
 
 ## How the demo works 
 
-This demo embeds [Daily Prebuilt](https://www.daily.co/prebuilt), a ready-to-use video chat interface, into a Next.js site. It makes use of [Next API routes](https://nextjs.org/docs/api-routes/introduction) to create a Daily room server-side.  
+This demo embeds [Daily Prebuilt](https://www.daily.co/prebuilt), a ready-to-use video chat interface, into a Next.js site. It makes use of [Next API routes](https://nextjs.org/docs/api-routes/introduction) to create Daily rooms server-side.  
 
 ## Requirements
 
@@ -15,7 +15,8 @@ You can also paste an existing Daily room into the input. The room URL should be
 # Running locally
 1. Copy .env.example and change it to an .env.local with your own DAILY_API_KEY and DAILY_DOMAIN 
 2. `cd basic-embed`
-3. yarn dev 
+3. yarn 
+4. yarn workspace @prebuilt-ui/basic-embed dev
 
 Or...
 

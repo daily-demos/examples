@@ -3,8 +3,6 @@
  */
 
 export default async function handler(req, res) {
-  const { roomExp } = req.body.properties;
-
   if (req.method === 'POST') {
     const options = {
       method: 'POST',
@@ -19,7 +17,7 @@ export default async function handler(req, res) {
           enable_network_ui: true,
           enable_screenshare: true,
           enable_chat: true,
-          exp: roomExp,
+          exp: Math.round(Date.now() / 1000) + 5 * 60,
           eject_at_room_exp: true,
         },
       }),
