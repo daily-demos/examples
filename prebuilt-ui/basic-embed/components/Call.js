@@ -1,15 +1,15 @@
 import DailyIframe from '@daily-co/daily-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { writeText } from 'clipboard-polyfill';
-import { Button } from '@dailyjs/shared/components/Button';
+import Button from '@dailyjs/shared/components/Button';
 import {
   Card,
   CardBody,
   CardHeader,
   CardFooter,
 } from '@dailyjs/shared/components/Card';
-import { ExpiryTimer } from '@dailyjs/shared/components/ExpiryTimer';
-import { TextInput } from '@dailyjs/shared/components/Input';
+import ExpiryTimer from '@dailyjs/shared/components/ExpiryTimer';
+import TextInput from '@dailyjs/shared/components/Input';
 
 const CALL_OPTIONS = {
   showLeaveButton: true,
@@ -24,13 +24,7 @@ const CALL_OPTIONS = {
   },
 };
 
-export default function Call({
-  room,
-  setRoom,
-  callFrame,
-  setCallFrame,
-  expiry,
-}) {
+export const Call = ({ room, setRoom, callFrame, setCallFrame, expiry }) => {
   const callRef = useRef(null);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
@@ -69,51 +63,67 @@ export default function Call({
   }, [callFrame, createAndJoinCall]);
 
   return (
-    <div className="call-container">
-      {/* Daily iframe container */}
-      <div ref={callRef} className="call" />
-      <Card>
-        <CardHeader>Copy and share the URL to invite others</CardHeader>
-        <CardBody>
-          <label htmlFor="copy-url"></label>
-          <TextInput
-            type="text"
-            id="copy-url"
-            placeholder="Copy this room URL"
-            value={room}
-            pattern="^(https:\/\/)?[\w.-]+(\.(daily\.(co)))+[\/\/]+[\w.-]+$"
-          />
-          <Button onClick={handleCopyClick}>
-            {isLinkCopied ? 'Copied!' : `Copy room URL`}
-          </Button>
-        </CardBody>
-        <CardFooter>{expiry && <ExpiryTimer expiry={expiry} />}</CardFooter>
-      </Card>
-      <style jsx>{`
-        .call-container {
-          display: flex;
-          align-items: center;
-          gap: var(--spacing-md);
-        }
-        .call-container :global(.call) {
-          width: 100%;
-        }
-
-        .call-container :global(.button) {
-          margin-top: var(--spacing-md);
-        }
-
-        .call-container :global(.card) {
-          max-width: 300px;
-          max-height: 300px;
-        }
-
-        @media only screen and (max-width: 750px) {
+    <div>
+      <div className="call-container">
+        {/* Daily iframe container */}
+        <div ref={callRef} className="call" />
+        <Card>
+          <CardHeader>Copy and share the URL to invite others</CardHeader>
+          <CardBody>
+            <label htmlFor="copy-url"></label>
+            <TextInput
+              type="text"
+              id="copy-url"
+              placeholder="Copy this room URL"
+              value={room}
+              pattern="^(https:\/\/)?[\w.-]+(\.(daily\.(co)))+[\/\/]+[\w.-]+$"
+            />
+            <Button onClick={handleCopyClick}>
+              {isLinkCopied ? 'Copied!' : `Copy room URL`}
+            </Button>
+          </CardBody>
+          <CardFooter>
+            {expiry && (
+              <CardFooter>
+                Room expires in:
+                <ExpiryTimer expiry={expiry} />
+              </CardFooter>
+            )}
+          </CardFooter>
+        </Card>
+        <style jsx>{`
           .call-container {
-            flex-direction: column;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
           }
-        }
-      `}</style>
+          .call-container :global(.call) {
+            width: 100%;
+          }
+          .call-container :global(.button) {
+            margin-top: var(--spacing-md);
+          }
+          .call-container :global(.card) {
+            max-width: 300px;
+            max-height: 400px;
+          }
+          .call-container :global(.card-footer) {
+            align-items: center;
+            gap: var(--spacing-xxs);
+          }
+          .call-container :global(.countdown) {
+            position: static;
+            border-radius: var(--radius-sm);
+          }
+          @media only screen and (max-width: 750px) {
+            .call-container {
+              flex-direction: column;
+            }
+          }
+        `}</style>
+      </div>
     </div>
   );
-}
+};
+
+export default Call;

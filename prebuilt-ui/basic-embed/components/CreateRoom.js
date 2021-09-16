@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Well } from '@dailyjs/shared/components/Well';
-import { Button } from '@dailyjs/shared/components/Button';
+import Well from '@dailyjs/shared/components/Well';
+import Button from '@dailyjs/shared/components/Button';
 
 export function CreateRoom({ isConfigured, isValidRoom, setRoom, setExpiry }) {
   const [isError, setIsError] = useState(false);
