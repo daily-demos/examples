@@ -34,7 +34,7 @@ In this example we extend the [basic call demo](../basic-call) with live streami
 
 We pass a custom tray object, a custom app object (wrapping the original in a new `LiveStreamingProvider`) and a custom modal. We also symlink both the `public` and `pages/api` folders from the basic call.
 
-Single live streaming is only available to call owners, you must create a token when joining the call (for simplicity, we have disabled the abiltiy to join the call as a guest.)
+Single live streaming is only available to call owners, you must create a token when joining the call (for simplicity, we have disabled the ability to join the call as a guest.)
 
 ## Deploy your own on Vercel
 

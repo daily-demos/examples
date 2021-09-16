@@ -1,6 +1,6 @@
 {
-  "name": "@dailyjs/basic-call",
-  "description": "Basic Call Example",
+  "name": "@dailyjs/live-fitness",
+  "description": "Live Fitness",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@dailyjs/shared": "*",
-    "next": "^11.1.2",
-    "pluralize": "^8.0.0"
+    "@dailyjs/basic-call": "*",
+    "next": "^11.0.0",
+    "pluralize": "^8.0.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
     "babel-plugin-module-resolver": "^4.1.0",

@@ -1,5 +1,4 @@
 import React from 'react';
-import GlobalHead from '@dailyjs/shared/components/GlobalHead';
 import GlobalStyle from '@dailyjs/shared/components/GlobalStyle';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
@@ -10,7 +9,6 @@ function App({ Component, pageProps }) {
       <Head>
         <title>Daily - {process.env.PROJECT_TITLE}</title>
       </Head>
-      <GlobalHead />
       <GlobalStyle />
       <Component
         asides={App.asides}

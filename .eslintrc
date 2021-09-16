@@ -1,18 +1,13 @@
 {
-  "extends": ["airbnb", "airbnb/hooks", "prettier"],
-  "parser": "babel-eslint",
+  "extends": ["next/core-web-vitals", "prettier"],
   "env": {
     "browser": true,
     "node": true,
     "es6": true
   },
   "rules": {
-    "no-console": 0,
-    "react/jsx-props-no-spreading": 0,
-    "react/forbid-prop-types": 0,
-    "react/require-default-props": 0,
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "import/no-extraneous-dependencies": 0,
+    "@next/next/no-img-element": 0,
     "import/order": [
       "error",
       {

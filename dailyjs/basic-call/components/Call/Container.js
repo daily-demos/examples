@@ -4,9 +4,9 @@ import { BasicTray } from '@dailyjs/shared/components/Tray';
 import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
 import useJoinSound from '@dailyjs/shared/hooks/useJoinSound';
 import PropTypes from 'prop-types';
-import WaitingRoom from '../WaitingRoom';
+import { WaitingRoom } from './WaitingRoom';
 
-export const RoomContainer = ({ children }) => {
+export const Container = ({ children }) => {
   const { isOwner } = useParticipants();
 
   useJoinSound();
@@ -42,8 +42,8 @@ export const RoomContainer = ({ children }) => {
   );
 };
 
-RoomContainer.propTypes = {
+Container.propTypes = {
   children: PropTypes.node,
 };
 
-export default RoomContainer;
+export default Container;

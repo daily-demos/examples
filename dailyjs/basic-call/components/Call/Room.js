@@ -1,17 +1,17 @@
 import React from 'react';
 import VideoContainer from '@dailyjs/shared/components/VideoContainer/VideoContainer';
 
-import { VideoGrid } from '../VideoGrid';
+import { Container } from './Container';
 import { Header } from './Header';
-import { RoomContainer } from './RoomContainer';
+import { VideoGrid } from './VideoGrid';
 
 export const Room = () => (
-  <RoomContainer>
+  <Container>
     <Header />
     <VideoContainer>
       <VideoGrid />
     </VideoContainer>
-  </RoomContainer>
+  </Container>
 );
 
 export default Room;

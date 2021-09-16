@@ -1,15 +1,15 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import { useCallState } from './CallProvider';
+import { useParticipants } from './ParticipantsProvider';
 import { useDevices } from './useDevices';
 
 export const MediaDeviceContext = createContext();
 
 export const MediaDeviceProvider = ({ children }) => {
   const { callObject } = useCallState();
-  const [isCamMuted, setIsCamMuted] = useState(false);
-  const [isMicMuted, setIsMicMuted] = useState(false);
+  const { localParticipant } = useParticipants();
 
   const {
     cams,
@@ -24,20 +24,6 @@ export const MediaDeviceProvider = ({ children }) => {
     setSpeakersDevice,
   } = useDevices(callObject);
 
-  useEffect(() => {
-    if (!callObject) return false;
-
-    const handleNewDeviceState = () => {
-      setIsCamMuted(!callObject.participants()?.local?.video);
-      setIsMicMuted(!callObject.participants()?.local?.audio);
-    };
-
-    callObject.on('participant-updated', handleNewDeviceState);
-    return () => {
-      callObject.off('participant-updated', handleNewDeviceState);
-    };
-  }, [callObject]);
-
   return (
     <MediaDeviceContext.Provider
       value={{
@@ -48,8 +34,8 @@ export const MediaDeviceProvider = ({ children }) => {
         micError,
         currentDevices,
         deviceState,
-        isCamMuted,
-        isMicMuted,
+        isCamMuted: localParticipant.isCamMuted,
+        isMicMuted: localParticipant.isMicMuted,
         setMicDevice,
         setCamDevice,
         setSpeakersDevice,

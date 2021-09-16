@@ -8,20 +8,22 @@
 
 import { getId, getScreenId } from './participantsState';
 
-const initialTracksState = {
+export const initialTracksState = {
   audioTracks: {},
   videoTracks: {},
 };
 
 // --- Actions ---
 
-const TRACK_STARTED = 'TRACK_STARTED';
-const TRACK_STOPPED = 'TRACK_STOPPED';
-const REMOVE_TRACKS = 'REMOVE_TRACKS';
+export const TRACK_STARTED = 'TRACK_STARTED';
+export const TRACK_STOPPED = 'TRACK_STOPPED';
+export const TRACK_VIDEO_UPDATED = 'TRACK_VIDEO_UPDATED';
+export const TRACK_AUDIO_UPDATED = 'TRACK_AUDIO_UPDATED';
+export const REMOVE_TRACKS = 'REMOVE_TRACKS';
 
 // --- Reducer and helpers --
 
-function tracksReducer(prevState, action) {
+export function tracksReducer(prevState, action) {
   switch (action.type) {
     case TRACK_STARTED: {
       const id = getId(action.participant);
@@ -94,6 +96,34 @@ function tracksReducer(prevState, action) {
       };
     }
 
+    case TRACK_VIDEO_UPDATED: {
+      const id = getId(action.participant);
+      if (action.participant?.local) {
+        // Ignore local audio from mic and screen share
+        return prevState;
+      }
+      const newAudioTracks = {
+        ...prevState.audioTracks,
+        [id]: action.participant.tracks.audio,
+      };
+      return {
+        ...prevState,
+        audioTracks: newAudioTracks,
+      };
+    }
+
+    case TRACK_AUDIO_UPDATED: {
+      const id = getId(action.participant);
+      const newVideoTracks = {
+        ...prevState.videoTracks,
+        [id]: action.participant.tracks.video,
+      };
+      return {
+        ...prevState,
+        videoTracks: newVideoTracks,
+      };
+    }
+
     case REMOVE_TRACKS: {
       const { audioTracks, videoTracks } = prevState;
       const id = getId(action.participant);
@@ -114,11 +144,3 @@ function tracksReducer(prevState, action) {
       throw new Error();
   }
 }
-
-export {
-  initialTracksState,
-  tracksReducer,
-  REMOVE_TRACKS,
-  TRACK_STARTED,
-  TRACK_STOPPED,
-};

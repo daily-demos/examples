@@ -53,6 +53,7 @@ export const useCallMachine = ({
    */
   const prejoinUIEnabled = async (co) => {
     const dailyRoomInfo = await co.room();
+    const { access } = co.accessState();
 
     const prejoinEnabled =
       dailyRoomInfo?.config?.enable_prejoin_ui === null
@@ -61,7 +62,12 @@ export const useCallMachine = ({
 
     const knockingEnabled = !!dailyRoomInfo?.config?.enable_knocking;
 
-    return prejoinEnabled || knockingEnabled;
+    return (
+      prejoinEnabled ||
+      (access !== ACCESS_STATE_UNKNOWN &&
+        access?.level === ACCESS_STATE_LOBBY &&
+        knockingEnabled)
+    );
   };
 
   // --- Callbacks ---

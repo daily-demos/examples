@@ -11,6 +11,7 @@ import React, {
 
 import PropTypes from 'prop-types';
 
+import { useDeepCompareEffect } from 'use-deep-compare';
 import { sortByKey } from '../lib/sortByKey';
 import { useCallState } from './CallProvider';
 import { useParticipants } from './ParticipantsProvider';
@@ -20,6 +21,8 @@ import {
   REMOVE_TRACKS,
   TRACK_STARTED,
   TRACK_STOPPED,
+  TRACK_VIDEO_UPDATED,
+  TRACK_AUDIO_UPDATED,
   tracksReducer,
 } from './tracksState';
 
@@ -111,17 +114,15 @@ export const TracksProvider = ({ children }) => {
         // participant's cam
         if (desiredSubscription === currentSubscription) return u;
 
-        return {
-          ...u,
-          [id]: {
-            setSubscribedTracks: {
-              audio: true,
-              screenAudio: true,
-              screenVideo: true,
-              video: desiredSubscription,
-            },
+        u[id] = {
+          setSubscribedTracks: {
+            audio: true,
+            screenAudio: true,
+            screenVideo: true,
+            video: desiredSubscription,
           },
         };
+        return u;
       }, {});
 
       if (Object.keys(updates).length === 0) return;
@@ -181,26 +182,25 @@ export const TracksProvider = ({ children }) => {
       joinedSubscriptionQueue.push(participant.session_id);
     };
 
-    const joinBatchInterval = setInterval(() => {
+    const joinBatchInterval = setInterval(async () => {
       if (!joinedSubscriptionQueue.length) return;
       const ids = joinedSubscriptionQueue.splice(0);
-      const callParticipants = callObject.participants();
+      const participants = callObject.participants();
+      const topology = (await callObject.getNetworkTopology())?.topology;
       const updates = ids.reduce((o, id) => {
-        const { subscribed } = callParticipants?.[id]?.tracks?.audio;
-        const result = { ...o[id] };
-        if (!subscribed) {
-          result.setSubscribedTracks = {
-            audio: true,
-            screenAudio: true,
-            screenVideo: true,
+        if (!participants?.[id]?.tracks?.audio?.subscribed) {
+          o[id] = {
+            setSubscribedTracks: {
+              audio: true,
+              screenAudio: true,
+              screenVideo: true,
+            },
           };
         }
-
-        if (rtcpeers?.getCurrentType?.() === 'peer-to-peer') {
-          result.setSubscribedTracks = true;
+        if (topology === 'peer') {
+          o[id] = { setSubscribedTracks: true };
         }
-
-        return { [id]: result };
+        return o;
       }, {});
 
       if (!subscribeToTracksAutomatically && Object.keys(updates).length0) {
@@ -221,6 +221,62 @@ export const TracksProvider = ({ children }) => {
       callObject.off('participant-left', handleParticipantLeft);
     };
   }, [callObject, subscribeToTracksAutomatically]);
+
+  useDeepCompareEffect(() => {
+    if (!callObject) return;
+
+    const handleParticipantUpdated = ({ participant }) => {
+      const hasAudioChanged =
+        // State changed
+        participant.tracks.audio.state !==
+          state.audioTracks?.[participant.user_id]?.state ||
+        // Off/blocked reason changed
+        !deepEqual(
+          {
+            ...(participant.tracks.audio?.blocked ?? {}),
+            ...(participant.tracks.audio?.off ?? {}),
+          },
+          {
+            ...(state.audioTracks?.[participant.user_id].blocked ?? {}),
+            ...(state.audioTracks?.[participant.user_id].off ?? {}),
+          }
+        );
+      const hasVideoChanged =
+        // State changed
+        participant.tracks.video.state !==
+          state.videoTracks?.[participant.user_id]?.state ||
+        // Off/blocked reason changed
+        !deepEqual(
+          {
+            ...(participant.tracks.video?.blocked ?? {}),
+            ...(participant.tracks.video?.off ?? {}),
+          },
+          {
+            ...(state.videoTracks?.[participant.user_id].blocked ?? {}),
+            ...(state.videoTracks?.[participant.user_id].off ?? {}),
+          }
+        );
+      if (hasAudioChanged) {
+        // Update audio track state
+        dispatch({
+          type: TRACK_AUDIO_UPDATED,
+          participant,
+        });
+      }
+      if (hasVideoChanged) {
+        // Update video track state
+        dispatch({
+          type: TRACK_VIDEO_UPDATED,
+          participant,
+        });
+      }
+    };
+
+    callObject.on('participant-updated', handleParticipantUpdated);
+    return () => {
+      callObject.off('participant-updated', handleParticipantUpdated);
+    };
+  }, [callObject, state.audioTracks, state.videoTracks]);
 
   return (
     <TracksContext.Provider
