@@ -10,11 +10,11 @@
 
 ## What does this demo do?
 
-- Use [sendAppMessage](https://docs.daily.co/reference#%EF%B8%8F-sendappmessage) to send messages
-- Listen for incoming messages using the call object `app-message` event
-- Extend the basic call demo with a chat provider and aside
-- Show a notification bubble on chat tray button when a new message is received
-- Demonstrate how to play a sound whenever a message is received
+- Use `startTranscription()` and `stopTranscription()` methods to create a transcript of a call 
+- Integrates Deepgram transcription service into Daily calls
+- Listen for incoming transcription messages using the call object `app-message` event
+- Extend the basic call demo with a transcription provider and aside
+- Show a notification bubble on transcript tray button when a new message is received
 
 Please note: this demo is not currently mobile optimised
 
@@ -27,6 +27,12 @@ mv env.example .env.local
 yarn
 yarn workspace @dailyjs/live-transcription dev
 ```
+
+### Setting up transcription
+
+For testing the transcription service, you will have to register for a Deepgram API key and configure your Daily domain with that key.
+
+TODO: Add more instructions here, or point to docs when ready.
 
 ## How does this example work?
 
