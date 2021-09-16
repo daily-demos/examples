@@ -2,7 +2,7 @@ import React from 'react';
 import Modal from '@dailyjs/shared/components/Modal';
 import { useWaitingRoom } from '@dailyjs/shared/contexts/WaitingRoomProvider';
 import PropTypes from 'prop-types';
-import { Button } from '../Button';
+import Button from '../Button';
 import { WaitingParticipantRow } from './WaitingParticipantRow';
 
 export const WaitingRoomModal = ({ onClose }) => {

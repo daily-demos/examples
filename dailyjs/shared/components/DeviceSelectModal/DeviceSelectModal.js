@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from '@dailyjs/shared/components/Modal';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
-import { Button } from '../Button';
-import { DeviceSelect } from '../DeviceSelect';
+import Button from '../Button';
+import DeviceSelect from '../DeviceSelect';
 
 export const DEVICE_MODAL = 'device';
 

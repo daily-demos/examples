@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button } from '@dailyjs/shared/components/Button';
+import Button from '@dailyjs/shared/components/Button';
 import { CardBody } from '@dailyjs/shared/components/Card';
 import Modal from '@dailyjs/shared/components/Modal';
 import Well from '@dailyjs/shared/components/Well';

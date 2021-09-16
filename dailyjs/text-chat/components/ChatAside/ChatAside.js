@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Aside from '@dailyjs/shared/components/Aside';
-import { Button } from '@dailyjs/shared/components/Button';
+import { Aside } from '@dailyjs/shared/components/Aside';
+import Button from '@dailyjs/shared/components/Button';
 import { TextInput } from '@dailyjs/shared/components/Input';
 import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
 import { useChat } from '../../contexts/ChatProvider';

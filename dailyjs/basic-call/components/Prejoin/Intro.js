@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@dailyjs/shared/components/Button';
+import Button from '@dailyjs/shared/components/Button';
 import {
   Card,
   CardBody,
@@ -8,7 +8,7 @@ import {
 } from '@dailyjs/shared/components/Card';
 import Field from '@dailyjs/shared/components/Field';
 import { TextInput, BooleanInput } from '@dailyjs/shared/components/Input';
-import { Well } from '@dailyjs/shared/components/Well';
+import Well from '@dailyjs/shared/components/Well';
 import PropTypes from 'prop-types';
 
 /**

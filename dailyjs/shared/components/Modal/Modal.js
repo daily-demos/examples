@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import noScroll from 'no-scroll';
 import { createPortal } from 'react-dom';
 import { ReactComponent as IconClose } from '../../icons/close-sm.svg';
-import { Button } from '../Button';
+import Button from '../Button';
 import { Card, CardBody, CardFooter, CardHeader } from '../Card';
 
 const transitionMs = 350;

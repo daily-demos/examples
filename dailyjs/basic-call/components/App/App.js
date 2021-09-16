@@ -4,7 +4,7 @@ import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
 import { useCallUI } from '@dailyjs/shared/hooks/useCallUI';
 
 import PropTypes from 'prop-types';
-import { Room } from '../Call/Room';
+import Room from '../Call/Room';
 import { Asides } from './Asides';
 import { Modals } from './Modals';
 

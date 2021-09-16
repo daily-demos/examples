@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMediaDevices } from '@dailyjs/shared/contexts/MediaDeviceProvider';
-import { Field } from '../Field';
+import Field from '../Field';
 import { SelectInput } from '../Input';
 
 export const DeviceSelect = () => {

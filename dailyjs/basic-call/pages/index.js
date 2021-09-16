@@ -8,8 +8,9 @@ import { WaitingRoomProvider } from '@dailyjs/shared/contexts/WaitingRoomProvide
 import getDemoProps from '@dailyjs/shared/lib/demoProps';
 import PropTypes from 'prop-types';
 import App from '../components/App';
-import { CreatingRoom } from '../components/Prejoin/CreatingRoom';
-import { Intro, NotConfigured } from '../components/Prejoin/Intro';
+import CreatingRoom from '../components/Prejoin/CreatingRoom';
+import Intro from '../components/Prejoin/Intro';
+import NotConfigured from '../components/Prejoin/NotConfigured';
 
 /**
  * Index page

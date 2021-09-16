@@ -1,5 +1,5 @@
 import React from 'react';
-import Aside from '@dailyjs/shared/components/Aside';
+import { Aside } from '@dailyjs/shared/components/Aside';
 import { ReactComponent as IconCamOff } from '@dailyjs/shared/icons/camera-off-sm.svg';
 import { ReactComponent as IconCamOn } from '@dailyjs/shared/icons/camera-on-sm.svg';
 import { ReactComponent as IconMicOff } from '@dailyjs/shared/icons/mic-off-sm.svg';
@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { useCallState } from '../../contexts/CallProvider';
 import { useParticipants } from '../../contexts/ParticipantsProvider';
 import { useUIState } from '../../contexts/UIStateProvider';
-import { Button } from '../Button';
+import Button from '../Button';
 
 export const PEOPLE_ASIDE = 'people';
 

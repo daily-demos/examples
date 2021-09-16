@@ -6,7 +6,7 @@ import { ReactComponent as IconMicOn } from '@dailyjs/shared/icons/mic-on-md.svg
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { useCallState } from '../../contexts/CallProvider';
-import { Button } from '../Button';
+import Button from '../Button';
 
 export const MuteButton = ({ isMuted, mic = false, className, ...props }) => {
   const { callObject } = useCallState();

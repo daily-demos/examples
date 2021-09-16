@@ -4,7 +4,7 @@ import { ReactComponent as IconMicMute } from '@dailyjs/shared/icons/mic-off-sm.
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { DEFAULT_ASPECT_RATIO } from '../../constants';
-import { Video } from './Video';
+import Video from './Video';
 import { ReactComponent as Avatar } from './avatar.svg';
 
 const SM_TILE_MAX_WIDTH = 300;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ReactComponent as IconClose } from '../../icons/close-sm.svg';
-import { Button } from '../Button';
+import Button from '../Button';
 
 export const ASIDE_WIDTH = 380;
 
