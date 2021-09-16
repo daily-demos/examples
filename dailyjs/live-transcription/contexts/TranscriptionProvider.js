@@ -15,16 +15,19 @@ export const TranscriptionProvider = ({ children }) => {
   const { callObject } = useCallState();
   const [transcriptionHistory, setTranscriptionHistory] = useState([]);
   const [hasNewMessages, setHasNewMessages] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
 
   const handleNewMessage = useCallback(
     (e) => {
+      const participants = callObject.participants();
+      // Collect only transcription messages, and gather enough
+      // words to be able to post messages at sentence intervals
       if (e.fromId === 'transcription' && e.data?.is_final) {
-        console.log(`${JSON.stringify(e.data)}: ${JSON.stringify(callObject.participants())}`)
 
-      const sender = e.data.user_name 
-        ? e.data.user_name
-        : 'Guest';
-
+      // Get the sender's current display name or the local name
+      const sender = e.data?.session_id !== participants.local.session_id
+        ? participants[e.data.session_id].user_name
+        : participants.local.user_name;
         
         setTranscriptionHistory((oldState) => [
           ...oldState,
@@ -37,6 +40,16 @@ export const TranscriptionProvider = ({ children }) => {
     [callObject]
   );
 
+  const handleTranscriptionStarted = useCallback(() => {
+    console.log('💬 Live stream started');
+    setIsTranscribing(true);
+  }, []);
+
+  const handleTranscriptionStopped = useCallback(() => {
+    console.log('💬 Live stream stopped');
+    setIsTranscribing(false);
+  }, []);
+
   useEffect(() => {
     if (!callObject) {
       return false;
@@ -46,12 +59,16 @@ export const TranscriptionProvider = ({ children }) => {
 
     callObject.on('app-message', handleNewMessage);
 
+    callObject.on('transcription-started', handleTranscriptionStarted);
+    callObject.on('transcription-stopped', handleTranscriptionStopped);
+
     return () => callObject.off('app-message', handleNewMessage);
-  }, [callObject, handleNewMessage]);
+  }, [callObject, handleNewMessage, handleTranscriptionStarted, handleTranscriptionStopped]);
 
   return (
     <TranscriptionContext.Provider
       value={{
+        isTranscribing,
         transcriptionHistory,
         hasNewMessages,
         setHasNewMessages,

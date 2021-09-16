@@ -11,8 +11,9 @@ export const TRANSCRIPTION_ASIDE = 'transcription';
 export const TranscriptionAside = () => {
   const { callObject } = useCallState();
   const { showAside, setShowAside } = useUIState();
-  const { _sendMessage, transcriptionHistory } = useTranscription();
-  const { _allParticipants, isOwner } = useParticipants();
+  const { transcriptionHistory } = useTranscription();
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const { isOwner } = useParticipants();
 
   const msgWindowRef = useRef();
 
@@ -27,30 +28,35 @@ export const TranscriptionAside = () => {
     return null;
   }
 
-  function startTranscription() {
-    callObject.startTranscription();
+  async function startTranscription() {
+    setIsTranscribing(true);
+    await callObject.startTranscription();
   }
 
-  function stopTranscription() {
-    callObject.stopTranscription();
+  async function stopTranscription() {
+    setIsTranscribing(false);
+    await callObject.stopTranscription();
   }
 
   return (
     <Aside onClose={() => setShowAside(false)}>
         {isOwner && (
           <div className="owner-actions">
+
             <Button
               fullWidth
               size="tiny"
+              disabled={isTranscribing}
               onClick={() =>
                 startTranscription()
               }
             >
-              Start transcribing
+              {isTranscribing ? 'Transcribing' : 'Start transcribing'}
             </Button>
             <Button
               fullWidth
               size="tiny"
+              disabled={!isTranscribing}
               onClick={() =>
                 stopTranscription()
               }
