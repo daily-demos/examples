@@ -16,7 +16,7 @@ You can also paste an existing Daily room into the input. The room URL should be
 1. Copy .env.example and change it to an .env.local with your own DAILY_API_KEY and DAILY_DOMAIN 
 2. `cd basic-embed`
 3. yarn 
-4. yarn workspace @prebuilt-ui/basic-embed dev
+4. yarn workspace @prebuilt/basic-embed dev
 
 Or...
 

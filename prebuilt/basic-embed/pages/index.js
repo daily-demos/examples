@@ -15,7 +15,7 @@ export default function Index({ isConfigured = false }) {
       <Header
         demoTitle={'Daily Prebuilt demo'}
         repoLink={
-          'https://github.com/daily-demos/examples/tree/main/prebuilt-ui/basic-embed'
+          'https://github.com/daily-demos/examples/tree/main/prebuilt/basic-embed'
         }
       />
       <main>
