@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardFooter,
 } from '@dailyjs/shared/components/Card';
-import ExpiryTimer from '@dailyjs/shared/components/ExpiryTimer';
 import TextInput from '@dailyjs/shared/components/Input';
+import ExpiryTimer from '../components/ExpiryTimer';
 
 const CALL_OPTIONS = {
   showLeaveButton: true,
