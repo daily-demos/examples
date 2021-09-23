@@ -51,7 +51,7 @@ export const Call = ({ room, setRoom, callFrame, setCallFrame, expiry }) => {
     };
 
     newCallFrame.on('left-meeting', leaveCall);
-  });
+  }, [room, setCallFrame]);
 
   /**
    * Initiate Daily iframe creation on component render if it doesn't already exist
