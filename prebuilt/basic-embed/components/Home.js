@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@dailyjs/shared/components/Card';
-import { CreateRoom } from '../components/CreateRoom';
+import { CreateRoomButton } from './CreateRoomButton';
 import Field from '@dailyjs/shared/components/Field';
 import TextInput from '@dailyjs/shared/components/Input';
 
@@ -40,7 +40,7 @@ export default function Home({ setRoom, setExpiry, isConfigured }) {
         Start demo with a new unique room, or paste in your own room URL
       </CardHeader>
       <CardBody>
-        <CreateRoom
+        <CreateRoomButton
           isConfigured={isConfigured}
           isValidRoom={isValidRoom}
           setRoom={setRoom}
