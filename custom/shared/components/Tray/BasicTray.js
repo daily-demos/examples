@@ -1,4 +1,5 @@
 import React from 'react';
+import { NETWORK_ASIDE } from '@custom/shared/components/Aside/NetworkAside';
 import { PEOPLE_ASIDE } from '@custom/shared/components/Aside/PeopleAside';
 import { DEVICE_MODAL } from '@custom/shared/components/DeviceSelectModal';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
@@ -9,6 +10,7 @@ import { ReactComponent as IconCameraOn } from '@custom/shared/icons/camera-on-m
 import { ReactComponent as IconLeave } from '@custom/shared/icons/leave-md.svg';
 import { ReactComponent as IconMicOff } from '@custom/shared/icons/mic-off-md.svg';
 import { ReactComponent as IconMicOn } from '@custom/shared/icons/mic-on-md.svg';
+import { ReactComponent as IconNetwork } from '@custom/shared/icons/network-md.svg';
 import { ReactComponent as IconPeople } from '@custom/shared/icons/people-md.svg';
 import { ReactComponent as IconSettings } from '@custom/shared/icons/settings-md.svg';
 import { Tray, TrayButton } from './Tray';
@@ -47,7 +49,9 @@ export const BasicTray = () => {
       <TrayButton label="Settings" onClick={() => openModal(DEVICE_MODAL)}>
         <IconSettings />
       </TrayButton>
-
+      <TrayButton label="Network" onClick={() => toggleAside(NETWORK_ASIDE)}>
+        <IconNetwork />
+      </TrayButton>
       <TrayButton label="People" onClick={() => toggleAside(PEOPLE_ASIDE)}>
         <IconPeople />
       </TrayButton>

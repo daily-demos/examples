@@ -15,7 +15,7 @@ export const MessageCard = ({
   hideBack = false,
   onBack,
 }) => (
-  <Card className={error && 'error'}>
+  <Card className={error ? 'error' : ''}>
     {header && <CardHeader>{header}</CardHeader>}
     {children && <CardBody>{children}</CardBody>}
     {!hideBack && (
@@ -23,7 +23,7 @@ export const MessageCard = ({
         {onBack ? (
           <Button onClick={() => onBack()}>Go back</Button>
         ) : (
-          <Button href="/">Go back</Button>
+          <Button onClick={() => window.location.reload()}>Go back</Button>
         )}
       </CardFooter>
     )}

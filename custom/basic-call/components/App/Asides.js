@@ -1,5 +1,6 @@
 import React from 'react';
-import { PeopleAside } from '@custom/shared/components/Aside/PeopleAside';
+import { NetworkAside } from '@custom/shared/components/Aside';
+import { PeopleAside } from '@custom/shared/components/Aside';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 
 export const Asides = () => {
@@ -8,6 +9,7 @@ export const Asides = () => {
   return (
     <>
       <PeopleAside />
+      <NetworkAside />
       {asides.map((AsideComponent) => (
         <AsideComponent key={AsideComponent.name} />
       ))}

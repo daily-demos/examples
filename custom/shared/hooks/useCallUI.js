@@ -81,7 +81,8 @@ export const useCallUI = ({
           callEnded()
         ) : (
           <MessageCard>
-            You have left the call. We hope you had fun!
+            You have left the call (either manually or because the room
+            expired). We hope you had fun!
           </MessageCard>
         );
       default:
@@ -89,11 +90,7 @@ export const useCallUI = ({
     }
 
     return (
-      <MessageCard
-        error
-        header="An unknown error occured"
-        onBack={() => window.location.reload()}
-      >
+      <MessageCard error header="An unknown error occured">
         A fatal error occured in the call loop. Please check you have entered a
         valid <code>DAILY_DOMAIN</code> and <code>DAILY_API_KEY</code>{' '}
         environmental variables.
