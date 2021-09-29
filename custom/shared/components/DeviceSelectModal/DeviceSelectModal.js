@@ -15,10 +15,12 @@ export const DeviceSelectModal = () => {
       isOpen={currentModals[DEVICE_MODAL]}
       onClose={() => closeModal(DEVICE_MODAL)}
       actions={[
-        <Button fullWidth variant="outline">
+        <Button key="close" fullWidth variant="outline">
           Cancel
         </Button>,
-        <Button fullWidth>Update</Button>,
+        <Button key="update" fullWidth>
+          Update
+        </Button>,
       ]}
     >
       <DeviceSelect />

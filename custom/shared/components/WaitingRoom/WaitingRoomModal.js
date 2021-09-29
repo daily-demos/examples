@@ -23,10 +23,20 @@ export const WaitingRoomModal = ({ onClose }) => {
       isOpen
       onClose={() => onClose()}
       actions={[
-        <Button fullWidth onClick={handleAllowAllClick} variant="success">
+        <Button
+          key="allow-all"
+          fullWidth
+          onClick={handleAllowAllClick}
+          variant="success"
+        >
           Allow all
         </Button>,
-        <Button fullWidth onClick={handleDenyAllClick} variant="warning">
+        <Button
+          key="deny-all"
+          fullWidth
+          onClick={handleDenyAllClick}
+          variant="warning"
+        >
           Deny all
         </Button>,
       ]}

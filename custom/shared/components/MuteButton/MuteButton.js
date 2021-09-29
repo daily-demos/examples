@@ -23,8 +23,8 @@ export const MuteButton = ({ isMuted, mic = false, className, ...props }) => {
   };
 
   const Icon = mic
-    ? [<IconMicOff />, <IconMicOn />]
-    : [<IconCameraOff />, <IconCameraOn />];
+    ? [<IconMicOff key="mic-off" />, <IconMicOn key="mic-on" />]
+    : [<IconCameraOff key="cam-off" />, <IconCameraOn key="cam-on" />];
 
   if (!callObject) return null;
 

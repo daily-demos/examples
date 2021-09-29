@@ -50,6 +50,8 @@ export const Video = memo(
   (p, n) => shallowEqualObjects(p, n)
 );
 
+Video.displayName = 'Video';
+
 Video.propTypes = {
   videoTrack: PropTypes.any,
   mirrored: PropTypes.bool,
