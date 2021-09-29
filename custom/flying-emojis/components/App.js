@@ -1,6 +1,6 @@
 import React from 'react';
 import App from '@custom/basic-call/components/App';
-import FlyingEmojiOverlay from '../FlyingEmojis/FlyingEmojisOverlay';
+import FlyingEmojiOverlay from './FlyingEmojisOverlay';
 
 export const AppWithEmojis = () => (
   <>

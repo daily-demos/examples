@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardBody } from '@custom/shared/components/Card';
 import Loader from '@custom/shared/components/Loader';
-import { Well } from '@custom/shared/components/Well';
+import Well from '@custom/shared/components/Well';
 import PropTypes from 'prop-types';
 
 export const CreatingRoom = ({ onCreated }) => {

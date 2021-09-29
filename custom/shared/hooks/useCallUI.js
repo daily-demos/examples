@@ -66,7 +66,7 @@ export const useCallUI = ({
         return haircheck ? haircheck() : <HairCheck />;
       case CALL_STATE_JOINED:
         return room ? (
-          room()
+          room
         ) : (
           <MessageCard error header="No room component declared" />
         );

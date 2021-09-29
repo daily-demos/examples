@@ -37,7 +37,8 @@ export const Header = () => {
             flex: 0 0 auto;
             column-gap: var(--spacing-xxs);
             box-sizing: border-box;
-            padding: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-xxs)
+              var(--spacing-sm);
             align-items: center;
             width: 100%;
           }

@@ -10,8 +10,8 @@ import {
   RECORDING_SAVED,
   RECORDING_UPLOADING,
   useRecording,
-} from '../../contexts/RecordingProvider';
-import { RECORDING_MODAL } from '../RecordingModal';
+} from '../contexts/RecordingProvider';
+import { RECORDING_MODAL } from './RecordingModal';
 
 export const Tray = () => {
   const { openModal } = useUIState();

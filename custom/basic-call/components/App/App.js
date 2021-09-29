@@ -13,7 +13,7 @@ export const App = ({ customComponentForState }) => {
 
   const componentForState = useCallUI({
     state,
-    room: () => <Room />,
+    room: <Room />,
     ...customComponentForState,
   });
 

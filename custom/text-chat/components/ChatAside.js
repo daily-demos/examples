@@ -3,8 +3,8 @@ import { Aside } from '@custom/shared/components/Aside';
 import Button from '@custom/shared/components/Button';
 import { TextInput } from '@custom/shared/components/Input';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { useChat } from '../../contexts/ChatProvider';
-import { useMessageSound } from '../../hooks/useMessageSound';
+import { useChat } from '../contexts/ChatProvider';
+import { useMessageSound } from '../hooks/useMessageSound';
 
 export const CHAT_ASIDE = 'chat';
 

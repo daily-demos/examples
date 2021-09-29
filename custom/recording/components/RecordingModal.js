@@ -15,7 +15,7 @@ import {
   RECORDING_TYPE_CLOUD,
   RECORDING_UPLOADING,
   useRecording,
-} from '../../contexts/RecordingProvider';
+} from '../contexts/RecordingProvider';
 
 export const RECORDING_MODAL = 'recording';
 
@@ -75,12 +75,13 @@ export const RecordingModal = () => {
       isOpen={currentModals[RECORDING_MODAL]}
       onClose={() => closeModal(RECORDING_MODAL)}
       actions={[
-        <Button fullWidth variant="outline">
+        <Button key="close" fullWidth variant="outline">
           Close
         </Button>,
         <Button
           fullWidth
           disabled={!disabled}
+          key="record"
           onClick={() => handleRecordingClick()}
         >
           {renderButtonLabel()}
