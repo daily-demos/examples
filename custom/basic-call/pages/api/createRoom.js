@@ -1,8 +1,8 @@
 export default async function handler(req, res) {
-  const { privacy, expiryMinutes } = req.body;
+  const { privacy, expiryMinutes, ...rest } = req.body;
 
   if (req.method === 'POST') {
-    console.log(`Creating room on domain ${process.env.DAILY_DOMAIN}`);
+    console.log(`Creating room on domain '${process.env.DAILY_DOMAIN}'`);
 
     const options = {
       method: 'POST',
@@ -13,10 +13,10 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         privacy: privacy || 'public',
         properties: {
-          exp: Math.round(Date.now() / 1000) + (expiryMinutes || 5) * 60, // expire in x minutes
+          exp: Math.round(Date.now() / 1000) + (expiryMinutes || 15) * 60, // expire in x minutes
           eject_at_room_exp: true,
           enable_knocking: privacy !== 'public',
-          enable_recording: 'local',
+          ...rest,
         },
       }),
     };

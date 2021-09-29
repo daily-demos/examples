@@ -4,6 +4,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
 import { useDeepCompareMemo } from 'use-deep-compare';
@@ -49,6 +50,11 @@ export const UIStateProvider = ({
 
   const currentModals = useDeepCompareMemo(() => activeModals, [activeModals]);
 
+  const isModalOpen = useCallback(
+    (modalName) => !!activeModals[modalName],
+    [activeModals]
+  );
+
   const toggleAside = useCallback((newAside) => {
     setShowAside((p) => (p === newAside ? null : newAside));
   }, []);
@@ -77,6 +83,7 @@ export const UIStateProvider = ({
         closeAside,
         showParticipantsBar,
         currentModals,
+        isModalOpen,
         toggleAside,
         pinnedId,
         showAside,

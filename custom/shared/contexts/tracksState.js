@@ -144,3 +144,24 @@ export function tracksReducer(prevState, action) {
       throw new Error();
   }
 }
+
+
+{
+  "action": "track-started",
+  "track": {},
+  "participant": {
+      "kind": "audio",
+      "state": "playable",
+      "track": {contentHint: ""
+enabled: true
+id: "1be0b8a2-484a-4d73-aa2e-da1d79c395b3"
+kind: "audio"
+label: "Tab audio"
+muted: false
+onended: null
+onmute: null
+onunmute: null
+readyState: "live"}
+  }
+}
+
