@@ -1,14 +1,14 @@
 import DailyIframe from '@daily-co/daily-js';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { writeText } from 'clipboard-polyfill';
-import { Button } from '@custom/shared/components/Button';
+import Button from '@custom/shared/components/Button';
 import {
   Card,
   CardBody,
   CardHeader,
   CardFooter,
 } from '@custom/shared/components/Card';
-import TextInput from '@custom/shared/components/Input';
+import { TextInput } from '@custom/shared/components/Input';
 import ExpiryTimer from '../components/ExpiryTimer';
 
 const CALL_OPTIONS = {
