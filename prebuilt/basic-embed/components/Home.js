@@ -6,9 +6,9 @@ import {
   CardHeader,
   CardFooter,
 } from '@custom/shared/components/Card';
-import CreateRoomButton from './CreateRoomButton';
 import Field from '@custom/shared/components/Field';
 import { TextInput } from '@custom/shared/components/Input';
+import CreateRoomButton from './CreateRoomButton';
 
 export const Home = ({ setRoom, setExpiry, isConfigured }) => {
   const roomRef = useRef(null);
