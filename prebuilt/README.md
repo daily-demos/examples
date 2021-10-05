@@ -8,6 +8,12 @@ These examples demonstrate how to customise and extend the prebuilt UI.
 
 ## Examples
 
+### [✅ Basic embed](./basic-embed)
+Embeds [Daily Prebuilt](https://docs.daily.co/prebuilt), a ready-to-use video chat interface, into a Next.js app. 
+
+### [💬 Chat overlay](./chat-overlay)
+Uses the Daily [sendAppMessage()](https://docs.daily.co/reference/daily-js/instance-methods/send-app-message#main) method to add a custom chat around a Daily Prebuilt call. 
+
 ### [🤙 iOS WebView](./ios-webview)
 
 Shows how to wrap the prebuilt UI in a native iOS application (using WKWebView)

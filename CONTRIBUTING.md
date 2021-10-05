@@ -14,7 +14,7 @@ Thank you for looking into contributing to`daily-demos`! We want these projects 
 
 ## Before contributing
 
-### Run prebuilt-ui locally
+### Run /prebuilt locally
 
 Please follow the instructions in `README.md`.
 
