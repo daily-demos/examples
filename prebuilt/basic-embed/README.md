@@ -2,6 +2,8 @@
 
 ![Clicking create room button starts a call](./basic-embed.gif)
 
+**Test out the live demo**: [https://prebuilt-basic-embed.vercel.app/](https://prebuilt-basic-embed.vercel.app/)
+
 ## How the demo works 
 
 This demo embeds [Daily Prebuilt](https://www.daily.co/prebuilt), a ready-to-use video chat interface, into a Next.js site. It makes use of [Next API routes](https://nextjs.org/docs/api-routes/introduction) to create Daily rooms server-side.  
