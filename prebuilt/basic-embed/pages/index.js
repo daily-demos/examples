@@ -1,9 +1,8 @@
-// import PrebuiltCall from '../components/PrebuiltCall';
 import React, { useState } from 'react';
+import Header from '@custom/shared/components/Header';
+import getDemoProps from '@custom/shared/lib/demoProps';
 import Call from '../components/Call';
 import Home from '../components/Home';
-import Header from '@dailyjs/shared/components/Header';
-import getDemoProps from '@dailyjs/shared/lib/demoProps';
 
 export default function Index({ isConfigured = false }) {
   const [room, setRoom] = useState(null);

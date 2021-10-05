@@ -1,6 +1,5 @@
 import React from 'react';
-import GlobalHead from '@dailyjs/shared/components/GlobalHead';
-import GlobalStyle from '@dailyjs/shared/components/GlobalStyle';
+import GlobalStyle from '@custom/shared/components/GlobalStyle';
 import Head from 'next/head';
 
 function App({ Component, pageProps }) {
@@ -14,7 +13,6 @@ function App({ Component, pageProps }) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <GlobalHead />
       <GlobalStyle />
       <Component {...pageProps} />
     </>

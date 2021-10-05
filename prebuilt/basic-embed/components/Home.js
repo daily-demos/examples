@@ -1,16 +1,16 @@
 import React, { useCallback, useRef, useState } from 'react';
-import Button from '@dailyjs/shared/components/Button';
+import Button from '@custom/shared/components/Button';
 import {
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
-} from '@dailyjs/shared/components/Card';
-import { CreateRoomButton } from './CreateRoomButton';
-import Field from '@dailyjs/shared/components/Field';
-import TextInput from '@dailyjs/shared/components/Input';
+  CardFooter,
+} from '@custom/shared/components/Card';
+import CreateRoomButton from './CreateRoomButton';
+import Field from '@custom/shared/components/Field';
+import { TextInput } from '@custom/shared/components/Input';
 
-export default function Home({ setRoom, setExpiry, isConfigured }) {
+export const Home = ({ setRoom, setExpiry, isConfigured }) => {
   const roomRef = useRef(null);
   const [isValidRoom, setIsValidRoom] = useState(false);
 
@@ -63,4 +63,6 @@ export default function Home({ setRoom, setExpiry, isConfigured }) {
       </CardBody>
     </Card>
   );
-}
+};
+
+export default Home;

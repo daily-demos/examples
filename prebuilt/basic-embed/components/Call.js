@@ -1,14 +1,14 @@
 import DailyIframe from '@daily-co/daily-js';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { writeText } from 'clipboard-polyfill';
-import Button from '@dailyjs/shared/components/Button';
+import { Button } from '@custom/shared/components/Button';
 import {
   Card,
   CardBody,
   CardHeader,
   CardFooter,
-} from '@dailyjs/shared/components/Card';
-import TextInput from '@dailyjs/shared/components/Input';
+} from '@custom/shared/components/Card';
+import TextInput from '@custom/shared/components/Input';
 import ExpiryTimer from '../components/ExpiryTimer';
 
 const CALL_OPTIONS = {
@@ -24,7 +24,7 @@ const CALL_OPTIONS = {
   },
 };
 
-export const Call = ({ room, setRoom, callFrame, setCallFrame, expiry }) => {
+export function Call({ room, setRoom, callFrame, setCallFrame, expiry }) {
   const callRef = useRef(null);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
@@ -124,6 +124,6 @@ export const Call = ({ room, setRoom, callFrame, setCallFrame, expiry }) => {
       </div>
     </div>
   );
-};
+}
 
 export default Call;
