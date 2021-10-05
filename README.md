@@ -18,9 +18,9 @@ Please note: these demos are intended as educational resources for using the Dai
 
 ## Contents
 
-## [Daily JS (Web)](./custom/)
+## [Custom (Web)](./custom/)
 
-Examples that showcase the Daily CallObject using our Javascript library
+Examples that showcase the Daily call object using our Javascript library
 
 ## [Prebuilt UI](./prebuilt-ui)
 

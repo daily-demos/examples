@@ -1,4 +1,4 @@
-# Daily JS Examples
+# Custom Examples (Daily JS)
 
 ### [🤙 Basic call](./basic-call)
 
