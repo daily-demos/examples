@@ -47,7 +47,7 @@ Primary call context that manages Daily call state, participant state and call o
 **[useCallMachine.js](../shared/contexts/useCallMachine.js)**
 Abstraction hook that manages Daily call state and error handling
 
-**[ParticipantProvider.js](../shared/contexts/ParticipantProvider.js)**
+**[ParticipantsProvider.js](../shared/contexts/ParticipantsProvider.js)**
 Manages participant state and abstracts common selectors / derived data
 
 ## Deploy your own on Vercel
