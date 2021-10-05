@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useWaitingRoom } from '../../contexts/WaitingRoomProvider';
-import { Button } from '../Button';
+import Button from '../Button';
 
 export const WaitingParticipantRow = ({ participant }) => {
   const { grantAccess, denyAccess } = useWaitingRoom();

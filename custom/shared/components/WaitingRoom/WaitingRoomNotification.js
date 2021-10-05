@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useCallState } from '../../contexts/CallProvider';
 import { useWaitingRoom } from '../../contexts/WaitingRoomProvider';
 import { ReactComponent as IconWaiting } from '../../icons/add-person-lg.svg';
-import { Button } from '../Button';
+import Button from '../Button';
 import { Card, CardBody, CardFooter } from '../Card';
 
 export const WaitingRoomNotification = () => {
