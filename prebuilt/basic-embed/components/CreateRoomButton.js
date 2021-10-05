@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Well from '@custom/shared/components/Well';
 import Button from '@custom/shared/components/Button';
+import Well from '@custom/shared/components/Well';
 
 export function CreateRoomButton({
   isConfigured,
