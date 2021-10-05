@@ -10,7 +10,7 @@ Setup dependencies via `yarn install`.
 
 Add the required environment variables (e.g. your Daily API key) for the demo being used. Each demo's README will list the required environment variables to run it locally.
 
-Run an example via `yarn workspace @dailyjs/basic-call dev` (replacing `basic-call` with the name of the demo).
+Run an example via `yarn workspace @custom/basic-call dev` (replacing `basic-call` with the name of the demo).
 
 Please note: these demos are intended as educational resources for using the Daily platform as well as showcasing common usage patterns and best practices. That said, they are not intended to be used as production ready applications.
 
@@ -18,7 +18,7 @@ Please note: these demos are intended as educational resources for using the Dai
 
 ## Contents
 
-## [Daily JS (Web)](./dailyjs/)
+## [Daily JS (Web)](./custom/)
 
 Examples that showcase the Daily CallObject using our Javascript library
 

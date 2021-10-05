@@ -1,0 +1,22 @@
+{
+  "name": "@custom/basic-call",
+  "description": "Basic Call Example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@custom/shared": "*",
+    "next": "^11.1.2",
+    "pluralize": "^8.0.0"
+  },
+  "devDependencies": {
+    "babel-plugin-module-resolver": "^4.1.0",
+    "next-compose-plugins": "^2.2.1",
+    "next-transpile-modules": "^8.0.0"
+  }
+}
