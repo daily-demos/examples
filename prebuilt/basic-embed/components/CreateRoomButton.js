@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Well } from '@custom/shared/components/Well';
+import Well from '@custom/shared/components/Well';
 import Button from '@custom/shared/components/Button';
 
 export function CreateRoomButton({
