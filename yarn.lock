@@ -176,10 +176,8 @@
     "@babel/helper-validator-identifier" "^7.12.11"
     to-fast-properties "^2.0.0"
 
-"@daily-co/daily-js@^0.19.0":
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/@daily-co/daily-js/-/daily-js-0.19.0.tgz#86ff62156c7ec25a1c49df5ca8edb3b7c078fb45"
-  integrity sha512-0Ixg80NUeHQX6Z044ZhKIYd0ppo5kK8SmEWbrmsjWAB01zaYQTshA+dY4HgkJfc6pG59LzZ8maziwpNEPLyliA==
+"@daily-co/daily-js@file:../daily-js":
+  version "0.20.0"
   dependencies:
     "@babel/runtime" "^7.12.5"
     bowser "^2.8.1"

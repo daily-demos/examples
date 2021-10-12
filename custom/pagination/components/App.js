@@ -7,7 +7,11 @@ import PaginatedVideoGrid from './PaginatedVideoGrid';
 export const AppWithPagination = () => (
   <App
     customComponentForState={{
-      room: <Room MainComponent={PaginatedVideoGrid} />,
+      room: (
+        <Room>
+          <PaginatedVideoGrid />
+        </Room>
+      ),
     }}
   />
 );

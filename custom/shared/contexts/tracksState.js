@@ -96,7 +96,7 @@ export function tracksReducer(prevState, action) {
       };
     }
 
-    case TRACK_VIDEO_UPDATED: {
+    case TRACK_AUDIO_UPDATED: {
       const id = getId(action.participant);
       if (action.participant?.local) {
         // Ignore local audio from mic and screen share
@@ -112,7 +112,7 @@ export function tracksReducer(prevState, action) {
       };
     }
 
-    case TRACK_AUDIO_UPDATED: {
+    case TRACK_VIDEO_UPDATED: {
       const id = getId(action.participant);
       const newVideoTracks = {
         ...prevState.videoTracks,

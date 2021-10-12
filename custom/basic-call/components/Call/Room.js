@@ -5,13 +5,11 @@ import { Container } from './Container';
 import { Header } from './Header';
 import { VideoGrid } from './VideoGrid';
 
-export function Room() {
+export function Room({ children }) {
   return (
     <Container>
       <Header />
-      <VideoContainer>
-        <VideoGrid />
-      </VideoContainer>
+      <VideoContainer>{children ? children : <VideoGrid />}</VideoContainer>
     </Container>
   );
 }

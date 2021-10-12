@@ -9,8 +9,8 @@ import React, {
   useReducer,
 } from 'react';
 
+import deepEqual from 'fast-deep-equal';
 import PropTypes from 'prop-types';
-
 import { useDeepCompareEffect } from 'use-deep-compare';
 import { sortByKey } from '../lib/sortByKey';
 import { useCallState } from './CallProvider';
@@ -228,7 +228,7 @@ export const TracksProvider = ({ children }) => {
     const handleParticipantUpdated = ({ participant }) => {
       const hasAudioChanged =
         // State changed
-        participant.tracks.audio.state !==
+        participant.tracks.audio?.state !==
           state.audioTracks?.[participant.user_id]?.state ||
         // Off/blocked reason changed
         !deepEqual(
@@ -237,13 +237,13 @@ export const TracksProvider = ({ children }) => {
             ...(participant.tracks.audio?.off ?? {}),
           },
           {
-            ...(state.audioTracks?.[participant.user_id].blocked ?? {}),
-            ...(state.audioTracks?.[participant.user_id].off ?? {}),
+            ...(state.audioTracks?.[participant.user_id]?.blocked ?? {}),
+            ...(state.audioTracks?.[participant.user_id]?.off ?? {}),
           }
         );
       const hasVideoChanged =
         // State changed
-        participant.tracks.video.state !==
+        participant.tracks.video?.state !==
           state.videoTracks?.[participant.user_id]?.state ||
         // Off/blocked reason changed
         !deepEqual(
@@ -252,10 +252,11 @@ export const TracksProvider = ({ children }) => {
             ...(participant.tracks.video?.off ?? {}),
           },
           {
-            ...(state.videoTracks?.[participant.user_id].blocked ?? {}),
-            ...(state.videoTracks?.[participant.user_id].off ?? {}),
+            ...(state.videoTracks?.[participant.user_id]?.blocked ?? {}),
+            ...(state.videoTracks?.[participant.user_id]?.off ?? {}),
           }
         );
+
       if (hasAudioChanged) {
         // Update audio track state
         dispatch({
@@ -263,6 +264,7 @@ export const TracksProvider = ({ children }) => {
           participant,
         });
       }
+
       if (hasVideoChanged) {
         // Update video track state
         dispatch({

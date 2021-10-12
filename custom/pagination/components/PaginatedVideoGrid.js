@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { Button } from '@custom/shared/components/Button';
+import Button from '@custom/shared/components/Button';
 import Tile from '@custom/shared/components/Tile';
 import {
   DEFAULT_ASPECT_RATIO,
