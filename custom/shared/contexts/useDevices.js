@@ -173,7 +173,6 @@ export const useDevices = (callObject) => {
     callObject.on('joined-meeting', handleJoinedMeeting);
     callObject.on('participant-updated', handleParticipantUpdated);
     return () => {
-      console.log('UNMOUNT');
       clearTimeout(pendingAccessTimeout);
       callObject.off('joining-meeting', handleJoiningMeeting);
       callObject.off('joined-meeting', handleJoinedMeeting);
