@@ -1,6 +1,6 @@
 # Live Transcription
 
-![Live Transcription](./image.png)
+![Live Transcription](./image.gif)
 
 ### Live example
 
@@ -30,9 +30,7 @@ yarn workspace @custom/live-transcription dev
 
 ### Setting up transcription
 
-For testing the transcription service, you will have to register for a Deepgram API key and configure your Daily domain with that key.
-
-TODO: Add more instructions here, or point to docs when ready.
+For testing the transcription service, you will have to register for a Deepgram API key and configure your Daily domain with that key. Get instructions under `enable_transcription` in our [domain configuration documentation](https://docs.daily.co/reference/rest-api/your-domain/config).
 
 ## How does this example work?
 
@@ -40,6 +38,7 @@ In this example we extend the [basic call demo](../basic-call) with the ability 
 
 We pass a custom tray object, a custom app object (wrapping the original in a new `TranscriptionProvider`) as well as add our `TranscriptionAside` panel. We also symlink both the `public` and `pages/api` folders from the basic call.
 
+Single live transcription is only available to call owners, you must create a token when joining the call.
 
 ## Deploy your own on Vercel
 
