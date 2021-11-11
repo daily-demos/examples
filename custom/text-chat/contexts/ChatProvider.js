@@ -6,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
+import { useSharedState } from '@custom/shared/hooks/useSharedState';
 import { nanoid } from 'nanoid';
 import PropTypes from 'prop-types';
 
@@ -13,54 +14,67 @@ export const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
   const { callObject } = useCallState();
-  const [chatHistory, setChatHistory] = useState([]);
+  const { sharedState, setSharedState } = useSharedState({
+    initialValues: {
+      chatHistory: [],
+    },
+    broadcast: false,
+  });
   const [hasNewMessages, setHasNewMessages] = useState(false);
 
   const handleNewMessage = useCallback(
     (e) => {
+      if (e?.data?.message?.type) return;
       const participants = callObject.participants();
       const sender = participants[e.fromId].user_name
         ? participants[e.fromId].user_name
         : 'Guest';
 
-      setChatHistory((oldState) => [
-        ...oldState,
-        { sender, message: e.data.message, id: nanoid() },
-      ]);
+      setSharedState(values => ({
+        ...values,
+        chatHistory: [
+          ...values.chatHistory,
+          // nanoid - we use it to generate unique ID string
+          { sender, senderID: e.fromId, message: e.data.message, id: nanoid() },
+        ]
+      }));
 
       setHasNewMessages(true);
     },
-    [callObject]
+    [callObject, setSharedState]
   );
+
 
   const sendMessage = useCallback(
     (message) => {
-      if (!callObject) {
-        return false;
-      }
+      if (!callObject) return;
 
       console.log('💬 Sending app message');
 
       callObject.sendAppMessage({ message }, '*');
 
+      const participants = callObject.participants();
       // Get the sender (local participant) name
-      const sender = callObject.participants().local.user_name
-        ? callObject.participants().local.user_name
+      const sender = participants.local.user_name
+        ? participants.local.user_name
         : 'Guest';
+      const senderID = participants.local.user_id;
 
-      // Update local chat history
-      return setChatHistory((oldState) => [
-        ...oldState,
-        { sender, message, id: nanoid(), isLocal: true },
-      ]);
+      // Update shared state chat history
+      return setSharedState(values => ({
+        ...values,
+        chatHistory: [
+          ...values.chatHistory,
+          // nanoid - we use it to generate unique ID string
+          { sender, senderID, message, id: nanoid() }
+        ]
+      }));
     },
-    [callObject]
+    [callObject, setSharedState]
   );
 
   useEffect(() => {
-    if (!callObject) {
-      return false;
-    }
+    if (!callObject) return;
 
     console.log(`💬 Chat provider listening for app messages`);
 
@@ -73,7 +87,7 @@ export const ChatProvider = ({ children }) => {
     <ChatContext.Provider
       value={{
         sendMessage,
-        chatHistory,
+        chatHistory: sharedState.chatHistory,
         hasNewMessages,
         setHasNewMessages,
       }}

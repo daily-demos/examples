@@ -11,7 +11,7 @@
 ## What does this demo do?
 
 - Use [sendAppMessage](https://docs.daily.co/reference#%EF%B8%8F-sendappmessage) to send messages
-- Listen for incoming messages using the call object `app-message` event
+- Using the `useSharedState` hook to get the chat history, for the new participants.
 - Extend the basic call demo with a chat provider and aside
 - Show a notification bubble on chat tray button when a new message is received
 - Demonstrate how to play a sound whenever a message is received
@@ -34,7 +34,7 @@ In this example we extend the [basic call demo](../basic-call) with the ability 
 
 We pass a custom tray object, a custom app object (wrapping the original in a new `ChatProvider`) as well as add our `ChatAside` panel. We also symlink both the `public` and `pages/api` folders from the basic call.
 
-In a real world use case you would likely want to implement serverside logic so that participants joining a call can retrieve previously sent messages. This round trip could be done inside of the Chat context.
+We use the `useSharedState` hook to retrieve the previously sent messages for the newly joined participants.
 
 ## Deploy your own on Vercel
 
