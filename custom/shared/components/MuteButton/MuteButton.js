@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { useCallState } from '../../contexts/CallProvider';
 import Button from '../Button';
 
-export const MuteButton = ({ isMuted, mic = false, className, ...props }) => {
+export const MuteButton = ({ isMuted, mic = false, className, disabled = false, ...props }) => {
   const { callObject } = useCallState();
   const [muted, setMuted] = useState(!isMuted);
 
@@ -28,17 +28,18 @@ export const MuteButton = ({ isMuted, mic = false, className, ...props }) => {
 
   if (!callObject) return null;
 
-  const cx = classNames(className, { muted: !muted });
+  const cx = classNames(className, { muted: disabled || !muted });
 
   return (
     <Button
       size="large-circle"
       variant="blur"
       className={cx}
+      disabled={disabled}
       {...props}
       onClick={() => toggleDevice(!muted)}
     >
-      {Icon[+muted]}
+      {disabled ? Icon[0] : Icon[+muted]}
     </Button>
   );
 };

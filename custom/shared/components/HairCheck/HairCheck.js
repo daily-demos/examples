@@ -166,8 +166,8 @@ export const HairCheck = () => {
               )}
             </div>
             <div className="mute-buttons">
-              <MuteButton isMuted={isCamMuted} />
-              <MuteButton mic isMuted={isMicMuted} />
+              <MuteButton isMuted={isCamMuted} disabled={!!camError} />
+              <MuteButton mic isMuted={isMicMuted} disabled={!!micError} />
             </div>
             {tileMemo}
           </div>

@@ -18,7 +18,7 @@ export const Header = () => {
           height="32"
         />
 
-        <HeaderCapsule>Basic call demo</HeaderCapsule>
+        <HeaderCapsule>{process.env.PROJECT_TITLE}</HeaderCapsule>
         <HeaderCapsule>
           {`${participantCount} ${
             participantCount === 1 ? 'participant' : 'participants'
