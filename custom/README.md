@@ -12,6 +12,10 @@ Send messages to other participants using sendAppMessage
 
 Broadcast call to a custom RTMP endpoint using a variety of different layout modes
 
+### [📺 Live transcription](./live-transcription)
+
+Transcribe audio from call participants and view transcript alongside video
+
 ### [⏺️ Recording](./recording)
 
 Record a call video and audio using both cloud and local modes
