@@ -33,9 +33,9 @@ export const Button = forwardRef(
 
     const content = (
       <>
-        {IconBefore && <IconBefore />}
+        {IconBefore && <IconBefore style={{ marginRight: '.5em'}}/>}
         {children}
-        {IconAfter && <IconAfter />}
+        {IconAfter && <IconAfter style={{ marginLeft: '.5em'}}/>}
       </>
     );
 
