@@ -33,6 +33,7 @@ const initialParticipantsState = {
       lastActiveDate: null,
       micMutedByHost: false,
       name: '',
+      user_id: '',
     },
   ],
   screens: [],
@@ -85,6 +86,7 @@ function getNewParticipant(participant) {
     lastActiveDate: null,
     micMutedByHost: audio?.off?.byRemoteRequest,
     name: participant.user_name,
+    user_id: participant.user_id,
   };
 }
 
@@ -116,6 +118,7 @@ function getUpdatedParticipant(participant, participants) {
     isRecording: !!participant.record,
     micMutedByHost: audio?.off?.byRemoteRequest,
     name: participant.user_name,
+    user_id: participant.user_id,
   };
 }
 

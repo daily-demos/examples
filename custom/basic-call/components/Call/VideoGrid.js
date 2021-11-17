@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Tile from '@custom/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@custom/shared/constants';
+import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
+import { useSharedState } from '@custom/shared/hooks/useSharedState';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 /**
@@ -17,12 +19,36 @@ import { useDeepCompareMemo } from 'use-deep-compare';
  */
 export const VideoGrid = React.memo(
   () => {
+    const { callObject } = useCallState();
     const containerRef = useRef();
-    const { participants } = useParticipants();
+    const { participants, localParticipant } = useParticipants();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
     });
+
+    const { sharedState, setSharedState } = useSharedState({
+      networkState: {},
+    });
+
+    useEffect(() => {
+      if (!callObject) return;
+
+      const getNetworkStats = async () => {
+        const stats = await callObject.getNetworkStats();
+        if (sharedState.networkState?.[localParticipant.user_id] === stats.threshold) return;
+        setSharedState(state => ({
+          networkState: {
+            ...state.networkState,
+            [localParticipant.user_id]: stats.threshold,
+          }
+        }));
+      };
+      const i = setInterval(getNetworkStats, 2000);
+
+      return () => clearInterval(i);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [callObject, localParticipant.user_id, setSharedState]);
 
     // Keep a reference to the width and height of the page, so we can repack
     useEffect(() => {
@@ -89,7 +115,7 @@ export const VideoGrid = React.memo(
       return bestLayout;
     }, [dimensions, participants]);
 
-    // Memoize our tile list to avoid unnecassary re-renders
+    // Memoize our tile list to avoid unnecessary re-renders
     const tiles = useDeepCompareMemo(
       () =>
         participants.map((p) => (
@@ -97,6 +123,7 @@ export const VideoGrid = React.memo(
             participant={p}
             key={p.id}
             mirrored
+            networkStrength={sharedState.networkState?.[localParticipant.user_id] || 'good'}
             style={{ maxWidth: layout.width, maxHeight: layout.height }}
           />
         )),
