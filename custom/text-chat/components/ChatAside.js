@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Aside } from '@custom/shared/components/Aside';
 import Button from '@custom/shared/components/Button';
 import { TextInput } from '@custom/shared/components/Input';
+import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { useChat } from '../contexts/ChatProvider';
 import { useMessageSound } from '../hooks/useMessageSound';
@@ -12,6 +13,7 @@ export const ChatAside = () => {
   const { showAside, setShowAside } = useUIState();
   const { sendMessage, chatHistory, hasNewMessages, setHasNewMessages } =
     useChat();
+  const { localParticipant } = useParticipants();
   const [newMessage, setNewMessage] = useState('');
   const playMessageSound = useMessageSound();
 
@@ -36,6 +38,8 @@ export const ChatAside = () => {
     }
   }, [chatHistory?.length]);
 
+  const isLocalUser = (id) => id === localParticipant.user_id;
+
   if (!showAside || showAside !== CHAT_ASIDE) {
     return null;
   }
@@ -45,7 +49,7 @@ export const ChatAside = () => {
       <div className="messages-container" ref={chatWindowRef}>
         {chatHistory.map((chatItem) => (
           <div
-            className={chatItem.isLocal ? 'message local' : 'message'}
+            className={isLocalUser(chatItem.senderID) ? 'message local' : 'message'}
             key={chatItem.id}
           >
             <span className="content">{chatItem.message}</span>
@@ -91,7 +95,7 @@ export const ChatAside = () => {
         }
 
         .message.local .sender {
-          color: var(--primary-default);
+          color: var(--primary-dark);
         }
 
         .content {
