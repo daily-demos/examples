@@ -26,7 +26,10 @@ export const RECORDING_COUNTDOWN_3 = 'starting3';
 export const RECORDING_IDLE = 'idle';
 
 export const RECORDING_TYPE_CLOUD = 'cloud';
+export const RECORDING_TYPE_CLOUD_BETA = 'cloud-beta';
 export const RECORDING_TYPE_LOCAL = 'local';
+export const RECORDING_TYPE_OUTPUT_BYTE_STREAM = 'output-byte-stream';
+export const RECORDING_TYPE_RTP_TRACKS = 'rtp-tracks';
 
 const RecordingContext = createContext({
   isRecordingLocally: false,
@@ -37,8 +40,12 @@ const RecordingContext = createContext({
 });
 
 export const RecordingProvider = ({ children }) => {
-  const { callObject, enableRecording, startCloudRecording, state } =
-    useCallState();
+  const {
+    callObject,
+    enableRecording,
+    startCloudRecording,
+    state,
+  } = useCallState();
   const { participants } = useParticipants();
   const [recordingStartedDate, setRecordingStartedDate] = useState(null);
   const [recordingState, setRecordingState] = useState(RECORDING_IDLE);
@@ -85,11 +92,26 @@ export const RecordingProvider = ({ children }) => {
       }
     };
 
+    // The 'recording-data' event is emitted when an output-byte-stream recording has started
+    const handleRecordingData = async (ev) => {
+      try {
+        console.log('got data', ev);
+        await window.writer.write(ev.data);
+        if (ev.finished) {
+          console.log('closing!');
+          window.writer.close();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
     const handleRecordingUploadCompleted = () => {
       setRecordingState(RECORDING_SAVED);
     };
 
     callObject.on('app-message', handleAppMessage);
+    callObject.on('recording-data', handleRecordingData);
     callObject.on('recording-upload-completed', handleRecordingUploadCompleted);
 
     return () => {
@@ -263,10 +285,13 @@ export const RecordingProvider = ({ children }) => {
     if (recordingState === RECORDING_RECORDING) {
       switch (enableRecording) {
         case RECORDING_TYPE_LOCAL:
+        case RECORDING_TYPE_OUTPUT_BYTE_STREAM:
           setRecordingState(RECORDING_SAVED);
           setIsRecordingLocally(false);
           break;
         case RECORDING_TYPE_CLOUD:
+        case RECORDING_TYPE_CLOUD_BETA:
+        case RECORDING_TYPE_RTP_TRACKS:
           setRecordingState(RECORDING_UPLOADING);
           break;
         default:

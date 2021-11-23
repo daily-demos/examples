@@ -13,6 +13,8 @@ import {
   RECORDING_RECORDING,
   RECORDING_SAVED,
   RECORDING_TYPE_CLOUD,
+  RECORDING_TYPE_CLOUD_BETA,
+  RECORDING_TYPE_RTP_TRACKS,
   RECORDING_UPLOADING,
   useRecording,
 } from '../contexts/RecordingProvider';
@@ -105,13 +107,33 @@ export const RecordingModal = () => {
           <p>Recording started: {recordingStartedDate.toString()}</p>
         )}
 
-        {enableRecording === RECORDING_TYPE_CLOUD && (
+        {[RECORDING_TYPE_CLOUD, RECORDING_TYPE_CLOUD_BETA].includes(
+          enableRecording
+        ) && (
           <>
             <hr />
 
             <p>
               Cloud recordings can be accessed via the Daily dashboard under the
               &quot;Recordings&quot; section.
+            </p>
+          </>
+        )}
+        {enableRecording === RECORDING_TYPE_RTP_TRACKS && (
+          <>
+            <hr />
+
+            <p>
+              rtp-tracks recordings can be accessed via the Daily API. See the{' '}
+              <a
+                href="https://docs.daily.co/guides/recording-calls-with-the-daily-api#retrieve-individual-tracks-from-rtp-tracks-recordings"
+                noreferrer
+                target="_blank"
+                rel="noreferrer"
+              >
+                Daily recording guide
+              </a>{' '}
+              for details.
             </p>
           </>
         )}
