@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useState, useRef } from 'react';
+import NetworkStrength from '@custom/shared/components/NetworkStrength';
 import useVideoTrack from '@custom/shared/hooks/useVideoTrack';
 import { ReactComponent as IconMicMute } from '@custom/shared/icons/mic-off-sm.svg';
 import classNames from 'classnames';
@@ -19,12 +20,15 @@ export const Tile = memo(
     videoFit = 'contain',
     aspectRatio = DEFAULT_ASPECT_RATIO,
     onVideoResize,
+    networkStrength = null,
     ...props
   }) => {
     const videoTrack = useVideoTrack(participant);
     const videoRef = useRef(null);
     const tileRef = useRef(null);
     const [tileWidth, setTileWidth] = useState(0);
+
+    const [displayNetwork, setDisplayNetwork] = useState(false);
 
     /**
      * Effect: Resize
@@ -77,6 +81,15 @@ export const Tile = memo(
       };
     }, [tileRef]);
 
+    useEffect(() => {
+      tileRef.current.addEventListener('mouseenter', () => setDisplayNetwork(true));
+      tileRef.current.addEventListener('mouseleave', () => setDisplayNetwork(false))
+      return () => {
+        tileRef.current.removeEventListener('mouseenter', () => setDisplayNetwork(true));
+        tileRef.current.removeEventListener('mouseleave', () => setDisplayNetwork(false))
+      };
+    }, [tileRef]);
+
     const cx = classNames('tile', videoFit, {
       mirrored,
       avatar: showAvatar && !videoTrack,
@@ -88,6 +101,11 @@ export const Tile = memo(
     return (
       <div ref={tileRef} className={cx} {...props}>
         <div className="content">
+          {displayNetwork && (
+            <div className="network-quality">
+              <NetworkStrength strength={networkStrength} />
+            </div>
+          )}
           {showName && (
             <div className="name">
               {participant.isMicMuted && !participant.isScreenShare && (
@@ -160,6 +178,19 @@ export const Tile = memo(
 
           .tile.small .name {
             font-size: 12px;
+          }
+          
+          .tile .network-quality {
+            position: absolute;
+            top: 0;
+            display: flex;
+            align-items: center;
+            left: 0;
+            z-index: 2;
+            line-height: 1;
+            color: white;
+            padding: var(--spacing-xxxxs);
+            gap: var(--spacing-xxs);
           }
 
           .tile :global(video) {
