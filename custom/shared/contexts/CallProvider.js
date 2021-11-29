@@ -31,6 +31,7 @@ export const CallProvider = ({
   token = '',
   subscribeToTracksAutomatically = true,
 }) => {
+  const [enableJoinSound, setEnableJoinSound] = useState(true);
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
   const [showLocalVideo, setShowLocalVideo] = useState(true);
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
@@ -113,6 +114,7 @@ export const CallProvider = ({
         showLocalVideo,
         roomExp,
         enableRecording,
+        enableJoinSound,
         videoQuality,
         setVideoQuality,
         setBandwidth,
@@ -120,6 +122,7 @@ export const CallProvider = ({
         setShowLocalVideo,
         startCloudRecording,
         subscribeToTracksAutomatically,
+        setEnableJoinSound
       }}
     >
       {children}

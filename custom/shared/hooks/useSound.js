@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-export const useSound = (src) => {
+const defaultNotMuted = () => false;
+
+export const useSound = (src, isMuted = defaultNotMuted) => {
   const audio = useRef(null);
 
   useEffect(() => {
@@ -22,17 +24,15 @@ export const useSound = (src) => {
     audio.current.load();
   }, [audio]);
 
-  const play = useCallback(() => {
-    if (!audio.current) return;
+  const play = useCallback(async () => {
+    if (!audio.current || isMuted()) return;
     try {
       audio.current.currentTime = 0;
-      audio.current.play();
+      await audio.current.play();
     } catch (e) {
       console.error(e);
     }
-  }, [audio]);
+  }, [audio, isMuted]);
 
   return { load, play };
 };
-
-export default useSound;

@@ -6,12 +6,12 @@ import { useParticipants } from '../contexts/ParticipantsProvider';
  * (= the current one and only actively speaking person)
  */
 export const useActiveSpeaker = () => {
-  const { showLocalVideo } = useCallState();
+  const { broadcastRole, showLocalVideo } = useCallState();
   const { activeParticipant, localParticipant, participantCount } =
     useParticipants();
 
   // we don't show active speaker indicators EVER in a 1:1 call or when the user is alone in-call
-  if (participantCount <= 2) return null;
+  if (broadcastRole !== 'attendee' && participantCount <= 2) return null;
 
   if (!activeParticipant?.isMicMuted) {
     return activeParticipant?.id;
