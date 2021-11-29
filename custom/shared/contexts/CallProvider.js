@@ -37,6 +37,7 @@ export const CallProvider = ({
   const router = useRouter();
   const [roomInfo, setRoomInfo] = useState(null);
   const [enableScreenShare, setEnableScreenShare] = useState(false);
+  const [enableJoinSound, setEnableJoinSound] = useState(true);
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
   const [showLocalVideo, setShowLocalVideo] = useState(true);
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
@@ -144,6 +145,7 @@ export const CallProvider = ({
         roomExp,
         enableRecording,
         enableScreenShare,
+        enableJoinSound,
         videoQuality,
         setVideoQuality,
         roomInfo,
@@ -154,6 +156,7 @@ export const CallProvider = ({
         setEnableScreenShare,
         startCloudRecording,
         subscribeToTracksAutomatically,
+        setEnableJoinSound
       }}
     >
       {children}

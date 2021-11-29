@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState, useRef } from 'react';
-import useVideoTrack from '@custom/shared/hooks/useVideoTrack';
+import { useVideoTrack } from '@custom/shared/hooks/useVideoTrack';
 import { ReactComponent as IconMicMute } from '@custom/shared/icons/mic-off-sm.svg';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
@@ -21,7 +21,7 @@ export const Tile = memo(
     onVideoResize,
     ...props
   }) => {
-    const videoTrack = useVideoTrack(participant);
+    const videoTrack = useVideoTrack(participant.id);
     const videoRef = useRef(null);
     const tileRef = useRef(null);
     const [tileWidth, setTileWidth] = useState(0);

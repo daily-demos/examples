@@ -1,4 +1,3 @@
-/* global rtcpeers */
 import { useCallback, useEffect, useState } from 'react';
 
 import {
@@ -21,10 +20,10 @@ export const useNetworkState = (
 
   const setQuality = useCallback(
     (q) => {
-      if (!callObject || typeof rtcpeers === 'undefined') return;
+      if (!callObject) return;
 
       const peers = Object.keys(callObject.participants()).length - 1;
-      const isSFU = rtcpeers?.currentlyPreferred?.typeName?.() === 'sfu';
+      const isSFU = callObject.getNetworkTopology().topology === 'sfu';
 
       const lowKbs = isSFU
         ? STANDARD_LOW_BITRATE_CAP
