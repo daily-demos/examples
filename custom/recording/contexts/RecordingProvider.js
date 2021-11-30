@@ -106,20 +106,11 @@ export const RecordingProvider = ({ children }) => {
       }
     };
 
-    const handleRecordingUploadCompleted = () => {
-      setRecordingState(RECORDING_SAVED);
-    };
-
     callObject.on('app-message', handleAppMessage);
     callObject.on('recording-data', handleRecordingData);
-    callObject.on('recording-upload-completed', handleRecordingUploadCompleted);
 
     return () => {
       callObject.off('app-message', handleAppMessage);
-      callObject.off(
-        'recording-upload-completed',
-        handleRecordingUploadCompleted
-      );
     };
   }, [callObject, enableRecording]);
 
@@ -213,7 +204,8 @@ export const RecordingProvider = ({ children }) => {
   useEffect(() => {
     if (!callObject || !enableRecording) return false;
 
-    const handleRecordingStopped = () => {
+    const handleRecordingStopped = (event) => {
+      console.log(event);
       if (isRecordingLocally) return;
       setRecordingState(RECORDING_IDLE);
       setRecordingStartedDate(null);
@@ -305,6 +297,7 @@ export const RecordingProvider = ({ children }) => {
         case RECORDING_TYPE_CLOUD_BETA:
         case RECORDING_TYPE_RTP_TRACKS:
           setRecordingState(RECORDING_UPLOADING);
+          setRecordingState(RECORDING_SAVED);
           break;
         default:
           break;
