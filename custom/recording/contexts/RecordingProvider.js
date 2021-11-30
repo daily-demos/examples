@@ -177,13 +177,25 @@ export const RecordingProvider = ({ children }) => {
    */
   const handleRecordingStarted = useCallback(
     (event) => {
+      console.log('RECORDING');
+      console.log(event);
+
       if (recordingState === RECORDING_RECORDING) return;
+      setRecordingState(RECORDING_RECORDING);
       if (event.local) {
         // Recording started locally, either through UI or programmatically
         setIsRecordingLocally(true);
         if (!recordingStartedDate) setRecordingStartedDate(new Date());
+        if (event.type === 'output-byte-stream') {
+          const { readable, writable } = new TransformStream({
+            transform: (chunk, ctrl) => {
+              chunk.arrayBuffer().then((b) => ctrl.enqueue(new Uint8Array(b)));
+            },
+          });
+          window.writer = writable.getWriter();
+          readable.pipeTo(window.streamSaver.createWriteStream('test-vid.mp4'));
+        }
       }
-      setRecordingState(RECORDING_RECORDING);
     },
     [recordingState, recordingStartedDate]
   );

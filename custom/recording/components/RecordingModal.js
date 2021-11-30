@@ -94,7 +94,7 @@ export const RecordingModal = () => {
         {!enableRecording ? (
           <Well variant="error">
             Recording is not enabled for this room (or your browser does not
-            support it.) Please enabled recording when creating the room or via
+            support it.) Please enable recording when creating the room or via
             the Daily dashboard.
           </Well>
         ) : (
