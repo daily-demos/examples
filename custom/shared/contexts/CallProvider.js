@@ -3,7 +3,7 @@
  * ---
  * Configures the general state of a Daily call, such as which features
  * to enable, as well as instantiate the 'call machine' hook responsible
- * fir the overaching call loop (joining, leaving, etc)
+ * for the overaching call loop (joining, leaving, etc)
  */
 import React, {
   createContext,
@@ -60,19 +60,22 @@ export const CallProvider = ({
         );
       }
       const browser = Bowser.parse(window.navigator.userAgent);
+      const recordingType =
+        roomConfig?.tokenConfig?.enable_recording ??
+        roomConfig?.config?.enable_recording;
+
+      // Mobile and Safari recordings are only supported under the 'cloud-beta' type
       const supportsRecording =
-        browser.platform.type === 'desktop' && browser.engine.name === 'Blink';
-      // recording and screen sharing is hidden in owner_only_broadcast for non-owners
+        ((browser.platform.type !== 'desktop' ||
+          browser.engine.name !== 'Blink') &&
+          recordingType === 'cloud-beta') ||
+        (browser.platform.type === 'desktop' &&
+          browser.engine.name === 'Blink');
       if (supportsRecording) {
-        const recordingType =
-          roomConfig?.tokenConfig?.enable_recording ??
-          roomConfig?.config?.enable_recording;
-        if (['local', 'cloud'].includes(recordingType)) {
-          setEnableRecording(recordingType);
-          setStartCloudRecording(
-            roomConfig?.tokenConfig?.start_cloud_recording ?? false
-          );
-        }
+        setEnableRecording(recordingType);
+        setStartCloudRecording(
+          roomConfig?.tokenConfig?.start_cloud_recording ?? false
+        );
       }
     };
     updateRoomConfigState();
