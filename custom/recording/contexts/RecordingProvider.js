@@ -93,6 +93,7 @@ export const RecordingProvider = ({ children }) => {
     };
 
     // The 'recording-data' event is emitted when an output-byte-stream recording has started
+    // When the event emits, start writing data to the stream created in handleRecordingStarted()
     const handleRecordingData = async (ev) => {
       try {
         console.log('got data', ev);
@@ -178,6 +179,7 @@ export const RecordingProvider = ({ children }) => {
         // Recording started locally, either through UI or programmatically
         setIsRecordingLocally(true);
         if (!recordingStartedDate) setRecordingStartedDate(new Date());
+        // If an output-byte-stream recording has started, create a new data stream that can be piped to a third-party (in this case a file)
         if (event.type === 'output-byte-stream') {
           const { readable, writable } = new TransformStream({
             transform: (chunk, ctrl) => {
