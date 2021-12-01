@@ -111,6 +111,7 @@ export const RecordingProvider = ({ children }) => {
 
     return () => {
       callObject.off('app-message', handleAppMessage);
+      callObject.off('recording-data', handleRecordingData);
     };
   }, [callObject, enableRecording]);
 
