@@ -72,6 +72,9 @@ export const useSharedState = ({ initialValues = {}, broadcast = true }) => {
             new Date(p.joined_at) < new Date(localParticipant.joined_at)
         );
 
+        // avoid sending message if no remote participants are available
+        if (remoteParticipants?.length === 0) return;
+
         const randomPeer =
           remoteParticipants[
             Math.floor(Math.random() * remoteParticipants.length)
