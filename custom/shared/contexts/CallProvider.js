@@ -52,9 +52,10 @@ export const CallProvider = ({
     if (!daily) return;
     const updateRoomConfigState = async () => {
       const roomConfig = await daily.room();
-      if (!('config' in roomConfig)) return;
+      const config = roomConfig?.config;
+      if (!config) return;
 
-      if (roomConfig?.config?.exp) {
+      if (config.exp) {
         setRoomExp(
           roomConfig?.config?.exp * 1000 || Date.now() + 1 * 60 * 1000
         );
