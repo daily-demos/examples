@@ -56,9 +56,7 @@ export const CallProvider = ({
       if (!config) return;
 
       if (config.exp) {
-        setRoomExp(
-          roomConfig?.config?.exp * 1000 || Date.now() + 1 * 60 * 1000
-        );
+        setRoomExp(config.exp * 1000 || Date.now() + 1 * 60 * 1000);
       }
       const browser = Bowser.parse(window.navigator.userAgent);
       const recordingType =
