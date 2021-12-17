@@ -50,7 +50,9 @@ export const CardBody = ({ children }) => (
   <div className="card-body">
     {children}
     <style jsx>{`
-      color: var(--text-mid);
+      .card-body {
+        color: var(--text-mid);
+      }
 
       & + :global(.card-footer) {
         margin-top: var(--spacing-md);

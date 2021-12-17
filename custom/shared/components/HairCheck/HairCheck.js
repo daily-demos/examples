@@ -105,17 +105,12 @@ export const HairCheck = () => {
   ]);
 
   const hasError = useMemo(() => {
-    if (
-      !deviceState ||
+    return !(!deviceState ||
       [
         DEVICE_STATE_LOADING,
         DEVICE_STATE_PENDING,
         DEVICE_STATE_GRANTED,
-      ].includes(deviceState)
-    ) {
-      return false;
-    }
-    return true;
+      ].includes(deviceState));
   }, [deviceState]);
 
   const camErrorVerbose = useMemo(() => {

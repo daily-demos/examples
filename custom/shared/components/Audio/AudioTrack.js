@@ -1,38 +1,35 @@
 import React, { useRef, useEffect } from 'react';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import PropTypes from 'prop-types';
 
-const AudioTrack = ({ track }) => {
+export const AudioTrack = ({ track }) => {
   const audioRef = useRef(null);
+  const { setShowAutoplayFailedModal } = useUIState();
 
   useEffect(() => {
-    if (!audioRef.current) return false;
+    const audioTag = audioRef.current;
+    if (!audioTag) return false;
     let playTimeout;
 
     const handleCanPlay = () => {
       playTimeout = setTimeout(() => {
-        console.log('Unable to autoplay audio element');
+        setShowAutoplayFailedModal(true);
       }, 1500);
     };
     const handlePlay = () => {
       clearTimeout(playTimeout);
     };
-    audioRef.current.addEventListener('canplay', handleCanPlay);
-    audioRef.current.addEventListener('play', handlePlay);
-    audioRef.current.srcObject = new MediaStream([track]);
-
-    const audioEl = audioRef.current;
+    audioTag.addEventListener('canplay', handleCanPlay);
+    audioTag.addEventListener('play', handlePlay);
+    audioTag.srcObject = new MediaStream([track]);
 
     return () => {
-      audioEl?.removeEventListener('canplay', handleCanPlay);
-      audioEl?.removeEventListener('play', handlePlay);
+      audioTag?.removeEventListener('canplay', handleCanPlay);
+      audioTag?.removeEventListener('play', handlePlay);
     };
-  }, [track]);
+  }, [setShowAutoplayFailedModal, track]);
 
-  return track ? (
-    <audio autoPlay playsInline ref={audioRef}>
-      <track kind="captions" />
-    </audio>
-  ) : null;
+  return track ? <audio autoPlay playsInline ref={audioRef} /> : null;
 };
 
 AudioTrack.propTypes = {
