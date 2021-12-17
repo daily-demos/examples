@@ -20,6 +20,7 @@ export const UIStateProvider = ({
   customTrayComponent,
   children,
 }) => {
+  const [isMobile, setIsMobile] = useState(false);
   const [pinnedId, setPinnedId] = useState(null);
   const [preferredViewMode, setPreferredViewMode] = useState(VIEW_MODE_SPEAKER);
   const [viewMode, setViewMode] = useState(preferredViewMode);
@@ -28,6 +29,7 @@ export const UIStateProvider = ({
   const [showAside, setShowAside] = useState();
   const [activeModals, setActiveModals] = useState({});
   const [customCapsule, setCustomCapsule] = useState();
+  const [showAutoplayFailedModal, setShowAutoplayFailedModal] = useState(false);
 
   const openModal = useCallback((modalName) => {
     setActiveModals((prevState) => ({
@@ -87,6 +89,10 @@ export const UIStateProvider = ({
         setShowParticipantsBar,
         customCapsule,
         setCustomCapsule,
+        showAutoplayFailedModal,
+        setShowAutoplayFailedModal,
+        isMobile,
+        setIsMobile,
       }}
     >
       {children}
