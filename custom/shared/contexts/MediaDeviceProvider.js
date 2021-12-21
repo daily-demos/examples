@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import { useCallState } from './CallProvider';
@@ -12,33 +12,72 @@ export const MediaDeviceProvider = ({ children }) => {
   const { localParticipant } = useParticipants();
 
   const {
-    cams,
-    mics,
-    speakers,
     camError,
-    micError,
-    currentDevices,
+    cams,
+    currentCam,
+    currentMic,
+    currentSpeaker,
     deviceState,
-    setMicDevice,
-    setCamDevice,
-    setSpeakersDevice,
+    micError,
+    mics,
+    refreshDevices,
+    setCurrentCam,
+    setCurrentMic,
+    setCurrentSpeaker,
+    speakers,
   } = useDevices(callObject);
+
+  const selectCamera = useCallback(
+    async (newCam) => {
+      if (!callObject || newCam.deviceId === currentCam?.deviceId) return;
+      const { camera } = await callObject.setInputDevicesAsync({
+        videoDeviceId: newCam.deviceId,
+      });
+      setCurrentCam(camera);
+    },
+    [callObject, currentCam, setCurrentCam]
+  );
+
+  const selectMic = useCallback(
+    async (newMic) => {
+      if (!callObject || newMic.deviceId === currentMic?.deviceId) return;
+      const { mic } = await callObject.setInputDevicesAsync({
+        audioDeviceId: newMic.deviceId,
+      });
+      setCurrentMic(mic);
+    },
+    [callObject, currentMic, setCurrentMic]
+  );
+
+  const selectSpeaker = useCallback(
+    (newSpeaker) => {
+      if (!callObject || newSpeaker.deviceId === currentSpeaker?.deviceId) return;
+      callObject.setOutputDevice({
+        outputDeviceId: newSpeaker.deviceId,
+      });
+      setCurrentSpeaker(newSpeaker);
+    },
+    [callObject, currentSpeaker, setCurrentSpeaker]
+  );
 
   return (
     <MediaDeviceContext.Provider
       value={{
-        cams,
-        mics,
-        speakers,
         camError,
-        micError,
-        currentDevices,
+        cams,
+        currentCam,
+        currentMic,
+        currentSpeaker,
         deviceState,
         isCamMuted: localParticipant.isCamMuted,
         isMicMuted: localParticipant.isMicMuted,
-        setMicDevice,
-        setCamDevice,
-        setSpeakersDevice,
+        micError,
+        mics,
+        refreshDevices,
+        setCurrentCam: selectCamera,
+        setCurrentMic: selectMic,
+        setCurrentSpeaker: selectSpeaker,
+        speakers,
       }}
     >
       {children}

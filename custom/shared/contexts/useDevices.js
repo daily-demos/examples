@@ -15,7 +15,9 @@ export const DEVICE_STATE_SENDABLE = 'sendable';
 
 export const useDevices = (callObject) => {
   const [deviceState, setDeviceState] = useState(DEVICE_STATE_LOADING);
-  const [currentDevices, setCurrentDevices] = useState(null);
+  const [currentCam, setCurrentCam] = useState(null);
+  const [currentMic, setCurrentMic] = useState(null);
+  const [currentSpeaker, setCurrentSpeaker] = useState(null);
 
   const [cams, setCams] = useState([]);
   const [mics, setMics] = useState([]);
@@ -37,6 +39,10 @@ export const useDevices = (callObject) => {
       const { devices } = await callObject.enumerateDevices();
 
       const { camera, mic, speaker } = await callObject.getInputDevices();
+
+      setCurrentCam(camera ?? null);
+      setCurrentMic(mic ?? null);
+      setCurrentSpeaker(speaker ?? null);
 
       const [defaultCam, ...videoDevices] = devices.filter(
         (d) => d.kind === 'videoinput' && d.deviceId !== ''
@@ -65,12 +71,6 @@ export const useDevices = (callObject) => {
           ...speakerDevices.sort((a, b) => sortByKey(a, b, 'label', false)),
         ].filter(Boolean)
       );
-
-      setCurrentDevices({
-        camera,
-        mic,
-        speaker,
-      });
 
       console.log(`Current cam: ${camera.label}`);
       console.log(`Current mic: ${mic.label}`);
@@ -125,31 +125,26 @@ export const useDevices = (callObject) => {
 
   const handleParticipantUpdated = useCallback(
     ({ participant }) => {
-      if (!callObject || !participant.local) return;
+      if (!callObject || deviceState === 'not-supported' || !participant.local) return;
 
-      setDeviceState((prevState) => {
-        if (prevState === DEVICE_STATE_NOT_SUPPORTED) return prevState;
-        switch (participant?.tracks.video.state) {
-          case DEVICE_STATE_BLOCKED:
-            updateDeviceErrors();
-            return DEVICE_STATE_ERROR;
-          case DEVICE_STATE_OFF:
-          case DEVICE_STATE_PLAYABLE:
-            if (prevState === DEVICE_STATE_GRANTED) {
-              return prevState;
-            }
-            updateDeviceState();
-            return DEVICE_STATE_GRANTED;
-          default:
-            return prevState;
-        }
-      });
+      switch (participant?.tracks.video.state) {
+        case DEVICE_STATE_BLOCKED:
+          setDeviceState(DEVICE_STATE_ERROR);
+          break;
+        case DEVICE_STATE_OFF:
+        case DEVICE_STATE_PLAYABLE:
+          updateDeviceState();
+          setDeviceState(DEVICE_STATE_GRANTED);
+          break;
+      }
+
+      updateDeviceErrors();
     },
-    [callObject, updateDeviceState, updateDeviceErrors]
+    [callObject, deviceState, updateDeviceErrors, updateDeviceState]
   );
 
   useEffect(() => {
-    if (!callObject) return false;
+    if (!callObject) return;
 
     /**
       If the user is slow to allow access, we'll update the device state
@@ -169,6 +164,7 @@ export const useDevices = (callObject) => {
       updateDeviceState();
     };
 
+    updateDeviceState();
     callObject.on('joining-meeting', handleJoiningMeeting);
     callObject.on('joined-meeting', handleJoinedMeeting);
     callObject.on('participant-updated', handleParticipantUpdated);
@@ -180,74 +176,8 @@ export const useDevices = (callObject) => {
     };
   }, [callObject, handleParticipantUpdated, updateDeviceState]);
 
-  const setCamDevice = useCallback(
-    async (newCam, useLocalStorage = true) => {
-      if (!callObject || newCam.deviceId === currentDevices?.cam?.deviceId) {
-        return;
-      }
-
-      console.log(`🔛 Changing camera device to: ${newCam.label}`);
-
-      if (useLocalStorage) {
-        localStorage.setItem('defaultCamId', newCam.deviceId);
-      }
-
-      await callObject.setInputDevicesAsync({
-        videoDeviceId: newCam.deviceId,
-      });
-
-      setCurrentDevices((prev) => ({ ...prev, camera: newCam }));
-    },
-    [callObject, currentDevices]
-  );
-
-  const setMicDevice = useCallback(
-    async (newMic, useLocalStorage = true) => {
-      if (!callObject || newMic.deviceId === currentDevices?.mic?.deviceId) {
-        return;
-      }
-
-      console.log(`🔛 Changing mic device to: ${newMic.label}`);
-
-      if (useLocalStorage) {
-        localStorage.setItem('defaultMicId', newMic.deviceId);
-      }
-
-      await callObject.setInputDevicesAsync({
-        audioDeviceId: newMic.deviceId,
-      });
-
-      setCurrentDevices((prev) => ({ ...prev, mic: newMic }));
-    },
-    [callObject, currentDevices]
-  );
-
-  const setSpeakersDevice = useCallback(
-    async (newSpeakers, useLocalStorage = true) => {
-      if (
-        !callObject ||
-        newSpeakers.deviceId === currentDevices?.speaker?.deviceId
-      ) {
-        return;
-      }
-
-      console.log(`Changing speakers device to: ${newSpeakers.label}`);
-
-      if (useLocalStorage) {
-        localStorage.setItem('defaultSpeakersId', newSpeakers.deviceId);
-      }
-
-      callObject.setOutputDevice({
-        outputDeviceId: newSpeakers.deviceId,
-      });
-
-      setCurrentDevices((prev) => ({ ...prev, speaker: newSpeakers }));
-    },
-    [callObject, currentDevices]
-  );
-
   useEffect(() => {
-    if (!callObject) return false;
+    if (!callObject) return;
 
     console.log('💻 Device provider events bound');
 
@@ -313,16 +243,19 @@ export const useDevices = (callObject) => {
   }, [callObject, updateDeviceErrors]);
 
   return {
-    cams,
-    mics,
-    speakers,
     camError,
-    micError,
-    currentDevices,
+    cams,
+    currentCam,
+    currentMic,
+    currentSpeaker,
     deviceState,
-    setCamDevice,
-    setMicDevice,
-    setSpeakersDevice,
+    micError,
+    mics,
+    refreshDevices: updateDeviceState,
+    setCurrentCam,
+    setCurrentMic,
+    setCurrentSpeaker,
+    speakers,
   };
 };
 

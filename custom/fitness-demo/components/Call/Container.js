@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Audio } from '@custom/shared/components/Audio';
 import { BasicTray } from '@custom/shared/components/Tray';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
-import useJoinSound from '@custom/shared/hooks/useJoinSound';
+import { useJoinSound } from '@custom/shared/hooks/useJoinSound';
 import PropTypes from 'prop-types';
 import { WaitingRoom } from './WaitingRoom';
 

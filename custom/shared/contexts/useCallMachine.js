@@ -29,6 +29,7 @@ export const CALL_STATE_REDIRECTING = 'redirecting';
 export const CALL_STATE_NOT_FOUND = 'not-found';
 export const CALL_STATE_NOT_ALLOWED = 'not-allowed';
 export const CALL_STATE_AWAITING_ARGS = 'awaiting-args';
+export const CALL_STATE_NOT_SECURE = 'not-secure';
 
 export const useCallMachine = ({
   domain,
@@ -78,9 +79,10 @@ export const useCallMachine = ({
   const join = useCallback(
     async (callObject) => {
       setState(CALL_STATE_JOINING);
+      const dailyRoomInfo = await callObject.room();
 
       // Force mute clients when joining a call with experimental_optimize_large_calls enabled.
-      if (room?.config?.experimental_optimize_large_calls) {
+      if (dailyRoomInfo?.config?.experimental_optimize_large_calls) {
         callObject.setLocalAudio(false);
       }
 
@@ -188,6 +190,15 @@ export const useCallMachine = ({
   useEffect(() => {
     if (daily || !url || state !== CALL_STATE_READY) return;
 
+    if (
+      location.protocol !== 'https:' &&
+      // We want to still allow local development.
+      !['localhost'].includes(location.hostname)
+    ) {
+      setState('not-secure');
+      return;
+    }
+
     console.log('🚀 Creating call object');
 
     const co = DailyIframe.createCallObject({
@@ -206,7 +217,7 @@ export const useCallMachine = ({
    * Listen for changes in the participant's access state
    */
   useEffect(() => {
-    if (!daily) return false;
+    if (!daily) return;
 
     daily.on('access-state-updated', handleAccessStateUpdated);
     return () => daily.off('access-state-updated', handleAccessStateUpdated);

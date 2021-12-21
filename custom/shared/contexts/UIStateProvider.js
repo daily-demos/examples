@@ -20,8 +20,8 @@ export const UIStateProvider = ({
   customTrayComponent,
   children,
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
   const [pinnedId, setPinnedId] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [preferredViewMode, setPreferredViewMode] = useState(VIEW_MODE_SPEAKER);
   const [viewMode, setViewMode] = useState(preferredViewMode);
   const [isShowingScreenshare, setIsShowingScreenshare] = useState(false);
@@ -30,6 +30,20 @@ export const UIStateProvider = ({
   const [activeModals, setActiveModals] = useState({});
   const [customCapsule, setCustomCapsule] = useState();
   const [showAutoplayFailedModal, setShowAutoplayFailedModal] = useState(false);
+
+
+  /**
+   * Decide on view mode based on input conditions.
+   */
+  useEffect(() => {
+    if (isMobile) {
+      setViewMode(VIEW_MODE_MOBILE);
+    } else if (pinnedId || isShowingScreenshare) {
+      setViewMode(VIEW_MODE_SPEAKER);
+    } else {
+      setViewMode(preferredViewMode);
+    }
+  }, [pinnedId, isMobile, isShowingScreenshare, preferredViewMode]);
 
   const openModal = useCallback((modalName) => {
     setActiveModals((prevState) => ({

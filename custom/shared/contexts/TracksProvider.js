@@ -15,6 +15,7 @@ import { useDeepCompareEffect } from 'use-deep-compare';
 import { sortByKey } from '../lib/sortByKey';
 import { useCallState } from './CallProvider';
 import { useParticipants } from './ParticipantsProvider';
+import { useUIState } from './UIStateProvider';
 import { isLocalId, isScreenId } from './participantsState';
 import {
   initialTracksState,
@@ -42,6 +43,7 @@ const TracksContext = createContext(null);
 export const TracksProvider = ({ children }) => {
   const { callObject, subscribeToTracksAutomatically } = useCallState();
   const { participants } = useParticipants();
+  const { viewMode } = useUIState();
   const [state, dispatch] = useReducer(tracksReducer, initialTracksState);
 
   const recentSpeakerIds = useMemo(
@@ -83,13 +85,19 @@ export const TracksProvider = ({ children }) => {
       // stage all remote cams that aren't already marked for subscription.
       // Otherwise, honor the provided stagedIds, with recent speakers appended
       // who aren't already marked for subscription.
-      const stagedIdsFiltered =
+      if (
         remoteParticipantIds.length <= SUBSCRIBE_OR_STAGE_ALL_VIDEO_THRESHOLD
-          ? remoteParticipantIds.filter((id) => !subscribedIds.includes(id))
-          : [
-              ...stagedIds,
-              ...recentSpeakerIds.filter((id) => !subscribedIds.includes(id)),
-            ];
+      ) {
+        stagedIds = remoteParticipantIds.filter(
+          (id) => !subscribedIds.includes(id)
+        );
+      } else {
+        if (viewMode !== 'grid') {
+          stagedIds.push(
+            ...recentSpeakerIds.filter((id) => !subscribedIds.includes(id))
+          );
+        }
+      }
 
       // Assemble updates to get to desired cam subscriptions
       const updates = remoteParticipantIds.reduce((u, id) => {
@@ -104,7 +112,7 @@ export const TracksProvider = ({ children }) => {
         // subscribed, staged, or unsubscribed
         if (subscribedIds.includes(id)) {
           desiredSubscription = true;
-        } else if (stagedIdsFiltered.includes(id)) {
+        } else if (stagedIds.includes(id)) {
           desiredSubscription = 'staged';
         } else {
           desiredSubscription = false;
@@ -116,9 +124,6 @@ export const TracksProvider = ({ children }) => {
 
         u[id] = {
           setSubscribedTracks: {
-            audio: true,
-            screenAudio: true,
-            screenVideo: true,
             video: desiredSubscription,
           },
         };
@@ -128,7 +133,7 @@ export const TracksProvider = ({ children }) => {
       if (Object.keys(updates).length === 0) return;
       callObject.updateParticipants(updates);
     },
-    [callObject, remoteParticipantIds, recentSpeakerIds]
+    [callObject, remoteParticipantIds, viewMode, recentSpeakerIds]
   );
 
   useEffect(() => {
