@@ -22,7 +22,6 @@ const initialParticipantsState = {
       camMutedByHost: false,
       hasNameSet: false,
       id: 'local',
-      user_id: '',
       isActiveSpeaker: false,
       isCamMuted: false,
       isLoading: true,
@@ -34,6 +33,7 @@ const initialParticipantsState = {
       lastActiveDate: null,
       micMutedByHost: false,
       name: '',
+      sessionId: '',
     },
   ],
   screens: [],
@@ -42,7 +42,7 @@ const initialParticipantsState = {
 // --- Derived data ---
 
 function getId(participant) {
-  return participant.local ? 'local' : participant.user_id;
+  return participant.local ? 'local' : participant.session_id;
 }
 
 function getScreenId(id) {
@@ -69,28 +69,25 @@ function getNewParticipant(participant) {
     camMutedByHost: video?.off?.byRemoteRequest,
     hasNameSet: !!participant.user_name,
     id,
-    user_id: participant.user_id,
     isActiveSpeaker: false,
-    isCamMuted:
-      video?.state === DEVICE_STATE_OFF ||
-      video?.state === DEVICE_STATE_BLOCKED,
-    isLoading:
-      audio?.state === DEVICE_STATE_LOADING ||
-      video?.state === DEVICE_STATE_LOADING,
+    isCamMuted: video?.state === 'off' || video?.state === 'blocked',
+    isLoading: audio?.state === 'loading' || video?.state === 'loading',
     isLocal: local,
-    isMicMuted:
-      audio?.state === DEVICE_STATE_OFF ||
-      audio?.state === DEVICE_STATE_BLOCKED,
+    isMicMuted: audio?.state === 'off' || audio?.state === 'blocked',
     isOwner: !!participant.owner,
     isRecording: !!participant.record,
     isScreenshare: false,
     lastActiveDate: null,
     micMutedByHost: audio?.off?.byRemoteRequest,
     name: participant.user_name,
+    sessionId: participant.session_id,
   };
 }
 
-function getUpdatedParticipant(participant, participants) {
+function getUpdatedParticipant(
+  participant,
+  participants
+) {
   const id = getId(participant);
   const prevItem = participants.find((p) => p.id === id);
 
@@ -99,26 +96,21 @@ function getUpdatedParticipant(participant, participants) {
 
   const { local } = participant;
   const { audio, video } = participant.tracks;
+
   return {
     ...prevItem,
     camMutedByHost: video?.off?.byRemoteRequest,
     hasNameSet: !!participant.user_name,
     id,
-    user_id: participant.user_id,
-    isCamMuted:
-      video?.state === DEVICE_STATE_OFF ||
-      video?.state === DEVICE_STATE_BLOCKED,
-    isLoading:
-      audio?.state === DEVICE_STATE_LOADING ||
-      video?.state === DEVICE_STATE_LOADING,
+    isCamMuted: video?.state === 'off' || video?.state === 'blocked',
+    isLoading: audio?.state === 'loading' || video?.state === 'loading',
     isLocal: local,
-    isMicMuted:
-      audio?.state === DEVICE_STATE_OFF ||
-      audio?.state === DEVICE_STATE_BLOCKED,
+    isMicMuted: audio?.state === 'off' || audio?.state === 'blocked',
     isOwner: !!participant.owner,
     isRecording: !!participant.record,
     micMutedByHost: audio?.off?.byRemoteRequest,
     name: participant.user_name,
+    sessionId: participant.session_id,
   };
 }
 
@@ -132,6 +124,7 @@ function getScreenItem(participant) {
     isScreenshare: true,
     lastActiveDate: null,
     name: participant.user_name,
+    sessionId: participant.session_id,
   };
 }
 
