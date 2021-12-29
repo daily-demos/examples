@@ -97,7 +97,7 @@ PersonRow.propTypes = {
 export const PeopleAside = () => {
   const { callObject } = useCallState();
   const { showAside, setShowAside } = useUIState();
-  const { allParticipants, isOwner } = useParticipants();
+  const { participants, isOwner } = useParticipants();
 
   if (!showAside || showAside !== PEOPLE_ASIDE) {
     return null;
@@ -131,7 +131,7 @@ export const PeopleAside = () => {
           </div>
         )}
         <div className="rows">
-          {allParticipants.map((p) => (
+          {participants.map((p) => (
             <PersonRow participant={p} key={p.id} isOwner={isOwner} />
           ))}
         </div>

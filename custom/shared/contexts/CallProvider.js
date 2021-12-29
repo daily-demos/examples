@@ -12,6 +12,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import DailyIframe from '@daily-co/daily-js';
 import Bowser from 'bowser';
 import PropTypes from 'prop-types';
 import {
@@ -31,6 +32,7 @@ export const CallProvider = ({
   token = '',
   subscribeToTracksAutomatically = true,
 }) => {
+  const [enableScreenShare, setEnableScreenShare] = useState(false);
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
   const [showLocalVideo, setShowLocalVideo] = useState(true);
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
@@ -52,7 +54,12 @@ export const CallProvider = ({
     if (!daily) return;
     const updateRoomConfigState = async () => {
       const roomConfig = await daily.room();
+      const isOob = !!roomConfig.config?.owner_only_broadcast;
+      const owner = roomConfig.tokenConfig?.is_owner;
       const config = roomConfig?.config;
+
+      const fullUI = !isOob || (isOob && owner);
+
       if (!config) return;
 
       if (config.exp) {
@@ -76,6 +83,12 @@ export const CallProvider = ({
           roomConfig?.tokenConfig?.start_cloud_recording ?? false
         );
       }
+      setEnableScreenShare(
+        fullUI &&
+        (roomConfig?.tokenConfig?.enable_screenshare ??
+          roomConfig?.config?.enable_screenshare) &&
+        DailyIframe.supportedBrowser().supportsScreenShare
+      );
     };
     updateRoomConfigState();
   }, [state, daily]);
@@ -115,11 +128,13 @@ export const CallProvider = ({
         showLocalVideo,
         roomExp,
         enableRecording,
+        enableScreenShare,
         videoQuality,
         setVideoQuality,
         setBandwidth,
         setRedirectOnLeave,
         setShowLocalVideo,
+        setEnableScreenShare,
         startCloudRecording,
         subscribeToTracksAutomatically,
       }}

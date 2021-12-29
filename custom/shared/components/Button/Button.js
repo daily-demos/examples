@@ -289,6 +289,24 @@ export const Button = forwardRef(
           .button.dark:disabled {
             opacity: 0.35;
           }
+          
+          .button.gray {
+            background: ${theme.gray.light};
+            color: ${theme.gray.dark};
+            border: 0;
+          }
+          .button.gray:hover,
+          .button.gray:focus,
+          .button.gray:active {
+            background: ${theme.gray.default};
+            border: 0;
+          }
+          .button.gray:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+          }
+          .button.gray:disabled {
+            opacity: 0.35;
+          }
 
           .button.white {
             background: white;

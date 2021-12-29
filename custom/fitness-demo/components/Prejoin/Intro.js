@@ -9,6 +9,7 @@ import {
 import Field from '@custom/shared/components/Field';
 import { TextInput, BooleanInput, SelectInput } from '@custom/shared/components/Input';
 import Well from '@custom/shared/components/Well';
+import { slugify } from '@custom/shared/lib/slugify';
 import PropTypes from 'prop-types';
 
 /**
@@ -24,7 +25,7 @@ export const Intro = ({
   const [rooms, setRooms] = useState({});
   const [duration, setDuration] = useState("30");
   const [roomName, setRoomName] = useState();
-  const [privacy, setPrivacy] = useState(false);
+  const [privacy, setPrivacy] = useState(true);
 
   const fetchRooms = async () => {
     const res = await fetch('/api/presence', {
@@ -62,12 +63,17 @@ export const Intro = ({
             {Object.keys(rooms).map(room => (
               <div className="room" key={room}>
                 <div>
-                  <div className="label">{room}</div>
-                  <span>{`${rooms[room].length} people in class`}</span>
+                  <div className="label">{slugify.revert(room)}</div>
+                  <span>
+                    {`${rooms[room].length} ${rooms[room].length > 1 ? 'people' : 'person'} in class`}
+                  </span>
                 </div>
                 <div className="join-room">
-                  <Button variant="dark" size="tiny" onClick={() => onJoin(room, 'join')}>
-                    Join Room
+                  <Button
+                    variant="gray"
+                    size="tiny"
+                    onClick={() => onJoin(slugify.convert(room), 'join')}>
+                    Join Class
                   </Button>
                 </div>
               </div>
@@ -88,7 +94,7 @@ export const Intro = ({
             <Field label="Give you a class name">
               <TextInput
                 type="text"
-                placeholder="Eg. super-stretch"
+                placeholder="Eg. Super stretchy morning flow"
                 defaultValue={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 required
@@ -104,13 +110,16 @@ export const Intro = ({
               </SelectInput>
             </Field>
             <Field label="Public (anyone can join)">
-              <BooleanInput value={privacy} onChange={e => setPrivacy(e.target.checked)} />
+              <BooleanInput
+                value={privacy}
+                onChange={e => setPrivacy(e.target.checked)}
+              />
             </Field>
           </CardBody>
           <CardFooter divider>
             <Button
               fullWidth
-              onClick={() => onJoin(roomName, 'create', duration, privacy)}
+              onClick={() => onJoin(slugify.convert(roomName), 'create', duration, privacy)}
             >
               Create class
             </Button>
@@ -131,7 +140,7 @@ export const Intro = ({
           display: flex;
           width: 25vw;
           border-bottom: 1px solid var(--gray-light);
-          padding-bottom: var(--spacing-xxs);
+          padding: var(--spacing-xxs) 0;
           gap: 10px;
         }
         .room .label {

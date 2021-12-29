@@ -2,6 +2,9 @@ import React from 'react';
 import GlobalStyle from '@custom/shared/components/GlobalStyle';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
+import { CustomApp } from '../components/App/App';
+import ChatAside from '../components/Call/ChatAside';
+import Tray from '../components/Tray';
 
 function App({ Component, pageProps }) {
   return (
@@ -31,9 +34,9 @@ App.propTypes = {
   pageProps: PropTypes.object,
 };
 
-App.asides = [];
+App.asides = [ChatAside];
 App.modals = [];
-App.customTrayComponent = null;
-App.customAppComponent = null;
+App.customTrayComponent = <Tray />;
+App.customAppComponent = <CustomApp />;
 
 export default App;
