@@ -228,6 +228,13 @@ export const Button = forwardRef(
             width: 64px;
             border-radius: 32px;
           }
+          
+          .button.small-circle {
+            padding: 0px;
+            height: 42px;
+            width: 42px;
+            border-radius: 21px;
+          }
 
           .button.translucent {
             background: ${hexa(theme.blue.light, 0.35)};

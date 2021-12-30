@@ -4,6 +4,7 @@ import Button from '@custom/shared/components/Button';
 import { TextInput } from '@custom/shared/components/Input';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { ReactComponent as IconEmoji } from '@custom/shared/icons/emoji-sm.svg';
 import { useChat } from '../../contexts/ChatProvider';
 import { useMessageSound } from '../../hooks/useMessageSound';
 
@@ -16,6 +17,7 @@ export const ChatAside = () => {
   const { localParticipant } = useParticipants();
   const [newMessage, setNewMessage] = useState('');
   const playMessageSound = useMessageSound();
+  const [showEmojis, setShowEmojis] = useState(false);
 
   const chatWindowRef = useRef();
 
@@ -57,7 +59,67 @@ export const ChatAside = () => {
           </div>
         ))}
       </div>
+      {showEmojis && (
+        <div className="emojis">
+          <Button
+            variant="gray"
+            size="small-circle"
+            onClick={() => sendMessage('😍')}
+          >
+            😍
+          </Button>
+          <Button
+            variant="gray"
+            size="small-circle"
+            onClick={() => sendMessage('😭')}
+          >
+            😭
+          </Button>
+          <Button
+            variant="gray"
+            size="small-circle"
+            onClick={() => sendMessage('😂')}
+          >
+            😂
+          </Button>
+          <Button
+            variant="gray"
+            size="small-circle"
+            onClick={() => sendMessage('👋')}
+          >
+            👋
+          </Button>
+          <Button
+            variant="gray"
+            size="small-circle"
+            onClick={() => sendMessage('👌')}
+          >
+            👌
+          </Button>
+          <Button
+            variant="gray"
+            size="small-circle"
+            onClick={() => sendMessage('👏')}
+          >
+            👏
+          </Button>
+          <Button
+            variant="gray"
+            size="small-circle"
+            onClick={() => sendMessage('🙏')}
+          >
+            🙏
+          </Button>
+        </div>
+      )}
       <footer className="chat-footer">
+        <Button
+          variant="gray"
+          size="small-circle"
+          onClick={() => setShowEmojis(!showEmojis)}
+        >
+          <IconEmoji />
+        </Button>
         <TextInput
           value={newMessage}
           placeholder="Type message here"
@@ -77,6 +139,20 @@ export const ChatAside = () => {
         </Button>
       </footer>
       <style jsx>{`
+        .emojis {
+          position: absolute;
+          display: flex;
+          bottom: var(--spacing-xxl);
+          left: 0px;
+          transform: translateX(calc(-50% + 26px));
+          z-index: 99;
+          background: white;
+          padding: var(--spacing-xxxs);
+          column-gap: 5px;
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-depth-2);
+        }
+
         .messages-container {
           flex: 1;
           overflow-y: scroll;
@@ -122,7 +198,7 @@ export const ChatAside = () => {
         }
 
         .chat-footer :global(.input-container input) {
-          padding-right: 0px;
+          padding-right: 0;
         }
 
         .chat-footer :global(.send-button) {
