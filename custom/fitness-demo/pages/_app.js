@@ -4,6 +4,7 @@ import Head from 'next/head';
 import PropTypes from 'prop-types';
 import { App as CustomApp } from '../components/App/App';
 import ChatAside from '../components/Call/ChatAside';
+import RecordingModal from '../components/Modals/RecordingModal';
 import Tray from '../components/Tray';
 
 function App({ Component, pageProps }) {
@@ -35,7 +36,7 @@ App.propTypes = {
 };
 
 App.asides = [ChatAside];
-App.modals = [];
+App.modals = [RecordingModal];
 App.customTrayComponent = <Tray />;
 App.customAppComponent = <CustomApp />;
 

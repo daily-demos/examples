@@ -1,5 +1,6 @@
 import React from 'react';
 import ChatTray from './Chat';
+import RecordTray from './Record';
 import ScreenShareTray from './ScreenShare';
 
 export const Tray = () => {
@@ -7,6 +8,7 @@ export const Tray = () => {
     <>
       <ChatTray />
       <ScreenShareTray />
+      <RecordTray />
     </>
   );
 };
