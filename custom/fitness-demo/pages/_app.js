@@ -2,7 +2,7 @@ import React from 'react';
 import GlobalStyle from '@custom/shared/components/GlobalStyle';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
-import { CustomApp } from '../components/App/App';
+import { App as CustomApp } from '../components/App/App';
 import ChatAside from '../components/Call/ChatAside';
 import Tray from '../components/Tray';
 

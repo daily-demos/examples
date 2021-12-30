@@ -1,8 +1,12 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import ParticipantBar from '@custom/shared/components/ParticipantBar';
 import Tile from '@custom/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@custom/shared/constants';
+import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useDeepCompareMemo } from 'use-deep-compare';
+
+const SIDEBAR_WIDTH = 186;
 
 /**
  * Basic unpaginated video tile grid, scaled by aspect ratio
@@ -18,7 +22,8 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { allParticipants } = useParticipants();
+    const { allParticipants, participants, screens, localParticipant } = useParticipants();
+    const { showLocalVideo } = useCallState();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -45,10 +50,12 @@ export const VideoGrid = React.memo(
       };
     }, []);
 
+    const hasScreenshares = useMemo(() => screens.length > 0, [screens]);
+
     // Basic brute-force packing algo
     const layout = useMemo(() => {
       const aspectRatio = DEFAULT_ASPECT_RATIO;
-      const tileCount = allParticipants.length || 0;
+      const tileCount = hasScreenshares ? screens.length : participants.length || 0;
       const w = dimensions.width;
       const h = dimensions.height;
 
@@ -87,29 +94,73 @@ export const VideoGrid = React.memo(
       }
 
       return bestLayout;
-    }, [dimensions, allParticipants]);
+    }, [hasScreenshares, screens.length, participants.length, dimensions.width, dimensions.height]);
+
+    const otherParticipants = useMemo(
+      () => participants.filter(({ isLocal }) => !isLocal),
+      [participants]
+    );
+
+    const fixedItems = useMemo(() => {
+      const items = [];
+      if (showLocalVideo) {
+        items.push(localParticipant);
+      }
+      if (hasScreenshares && otherParticipants.length > 0) {
+        items.push(otherParticipants[0]);
+      }
+      return items;
+    }, [hasScreenshares, localParticipant, otherParticipants, showLocalVideo]);
+
+    const otherItems = useMemo(() => {
+      if (otherParticipants.length > 1) {
+        return otherParticipants.slice(hasScreenshares ? 1 : 0);
+      }
+      return [];
+    }, [hasScreenshares, otherParticipants]);
 
     // Memoize our tile list to avoid unnecassary re-renders
     const tiles = useDeepCompareMemo(
       () =>
-        allParticipants.map((p) => (
+        participants.map((p) => (
           <Tile
             participant={p}
             key={p.id}
-            mirrored={!p.isScreenshare}
+            mirrored
             style={{ maxWidth: layout.width, maxHeight: layout.height }}
           />
         )),
-      [layout, allParticipants]
+      [layout, participants]
     );
 
-    if (!allParticipants.length) {
-      return null;
-    }
+    const screenShareTiles = useDeepCompareMemo(
+      () =>
+        screens.map((p) => (
+          <Tile
+            participant={p}
+            key={p.id}
+            mirrored={false}
+            style={{ maxWidth: layout.width, maxHeight: layout.height }}
+          />
+        )),
+      [layout, screens]
+    );
+
+    if (!participants.length) return null;
 
     return (
       <div className="video-grid" ref={containerRef}>
-        <div className="tiles">{tiles}</div>
+        <div className="tiles">
+          {screenShareTiles}
+          {!hasScreenshares && tiles}
+        </div>
+        {hasScreenshares && (
+          <ParticipantBar
+            fixed={fixedItems}
+            others={otherItems}
+            width={SIDEBAR_WIDTH}
+          />
+        )}
         <style jsx>{`
           .video-grid {
             align-items: center;

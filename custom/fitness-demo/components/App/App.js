@@ -1,13 +1,54 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import ExpiryTimer from '@custom/shared/components/ExpiryTimer';
+import { useCallState } from '@custom/shared/contexts/CallProvider';
+import { useCallUI } from '@custom/shared/hooks/useCallUI';
+import PropTypes from 'prop-types';
 
-import App from '@custom/basic-call/components/App';
 import { ChatProvider } from '../../contexts/ChatProvider';
+import Room from '../Call/Room';
+import { Asides } from './Asides';
+import { Modals } from './Modals';
 
-// Extend our basic call app component with the chat context
-export const CustomApp = () => (
-  <ChatProvider>
-    <App />
-  </ChatProvider>
-);
+export const App = ({ customComponentForState }) => {
+  const { roomExp, state } = useCallState();
 
-export default CustomApp;
+  const componentForState = useCallUI({
+    state,
+    room: <Room />,
+    ...customComponentForState,
+  });
+
+  // Memoize children to avoid unnecassary renders from HOC
+  return useMemo(
+    () => (
+      <>
+        <ChatProvider>
+          {roomExp && <ExpiryTimer expiry={roomExp} />}
+          <div className="app">
+            {componentForState()}
+            <Modals />
+            <Asides />
+            <style jsx>{`
+              color: white;
+              height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+  
+              .loader {
+                margin: 0 auto;
+              }
+            `}</style>
+          </div>
+        </ChatProvider>
+      </>
+    ),
+    [componentForState, roomExp]
+  );
+};
+
+App.propTypes = {
+  customComponentForState: PropTypes.any,
+};
+
+export default App;
