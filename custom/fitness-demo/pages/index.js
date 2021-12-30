@@ -22,10 +22,7 @@ import NotConfigured from '../components/Prejoin/NotConfigured';
 export default function Index({
   domain,
   isConfigured = false,
-  forceFetchToken = false,
-  forceOwner = false,
   subscribeToTracksAutomatically = true,
-  demoMode = false,
   asides,
   modals,
   customTrayComponent,
@@ -33,8 +30,43 @@ export default function Index({
 }) {
   const [roomName, setRoomName] = useState();
   const [fetching, setFetching] = useState(false);
-  const [token, setToken] = useState();
   const [error, setError] = useState();
+
+  const [fetchingToken, setFetchingToken] = useState(false);
+  const [token, setToken] = useState();
+  const [tokenError, setTokenError] = useState();
+
+  const getMeetingToken = useCallback(async (room, isOwner = false) => {
+    if (!room) return false;
+
+    setFetchingToken(true);
+
+    // Fetch token from serverside method (provided by Next)
+    const res = await fetch('/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ roomName: room, isOwner }),
+    });
+    const resJson = await res.json();
+
+    if (!resJson?.token) {
+      setTokenError(resJson?.error || true);
+      setFetchingToken(false);
+      return false;
+    }
+
+    console.log(`🪙 Token received`);
+
+    setFetchingToken(false);
+    setToken(resJson.token);
+
+    // Setting room name will change ready state
+    setRoomName(room);
+
+    return true;
+  }, []);
 
   const createRoom = async (room, duration, privacy) => {
     setError(false);
@@ -59,7 +91,7 @@ export default function Index({
 
     if (resJson.name) {
       setFetching(false);
-      setRoomName(resJson.name);
+      await getMeetingToken(resJson.name, true);
       return;
     }
 
@@ -76,6 +108,9 @@ export default function Index({
           if (!isConfigured) return <NotConfigured />;
           return (
             <Intro
+              tokenError={tokenError}
+              fetching={fetching}
+              error={error}
               room={roomName}
               domain={domain}
               onJoin={(room, type, duration = 60, privacy = 'public') =>
@@ -131,10 +166,7 @@ Index.propTypes = {
   modals: PropTypes.arrayOf(PropTypes.func),
   customTrayComponent: PropTypes.node,
   customAppComponent: PropTypes.node,
-  forceFetchToken: PropTypes.bool,
-  forceOwner: PropTypes.bool,
   subscribeToTracksAutomatically: PropTypes.bool,
-  demoMode: PropTypes.bool,
 };
 
 export async function getStaticProps() {

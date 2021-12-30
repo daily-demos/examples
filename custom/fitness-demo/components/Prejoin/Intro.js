@@ -18,6 +18,8 @@ import PropTypes from 'prop-types';
  * Specify which room we would like to join
  */
 export const Intro = ({
+  tokenError,
+  fetching,
   room,
   error,
   onJoin,
@@ -88,7 +90,12 @@ export const Intro = ({
           <CardBody>
             {error && (
               <Well variant="error">
-                Failed to create room <p>{error}</p>
+                Failed to obtain token <p>{error}</p>
+              </Well>
+            )}
+            {tokenError && (
+              <Well variant="error">
+                Failed to obtain token <p>{tokenError}</p>
               </Well>
             )}
             <Field label="Give you a class name">
@@ -121,7 +128,7 @@ export const Intro = ({
               fullWidth
               onClick={() => onJoin(slugify.convert(roomName), 'create', duration, privacy)}
             >
-              Create class
+              {fetching ? 'Creating...' : 'Create class'}
             </Button>
           </CardFooter>
         </div>
