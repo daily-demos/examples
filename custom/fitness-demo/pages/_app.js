@@ -4,6 +4,7 @@ import Head from 'next/head';
 import PropTypes from 'prop-types';
 import { App as CustomApp } from '../components/App/App';
 import ChatAside from '../components/Call/ChatAside';
+import LiveStreamingModal from '../components/Modals/LiveStreamingModal';
 import RecordingModal from '../components/Modals/RecordingModal';
 import Tray from '../components/Tray';
 
@@ -36,7 +37,7 @@ App.propTypes = {
 };
 
 App.asides = [ChatAside];
-App.modals = [RecordingModal];
+App.modals = [RecordingModal, LiveStreamingModal];
 App.customTrayComponent = <Tray />;
 App.customAppComponent = <CustomApp />;
 

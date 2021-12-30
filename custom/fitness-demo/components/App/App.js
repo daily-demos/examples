@@ -5,6 +5,7 @@ import { useCallUI } from '@custom/shared/hooks/useCallUI';
 import PropTypes from 'prop-types';
 
 import { ChatProvider } from '../../contexts/ChatProvider';
+import { LiveStreamingProvider } from '../../contexts/LiveStreamingProvider';
 import { RecordingProvider } from '../../contexts/RecordingProvider';
 import Room from '../Call/Room';
 import { Asides } from './Asides';
@@ -25,23 +26,25 @@ export const App = ({ customComponentForState }) => {
       <>
         <ChatProvider>
           <RecordingProvider>
-            {roomExp && <ExpiryTimer expiry={roomExp} />}
-            <div className="app">
-              {componentForState()}
-              <Modals />
-              <Asides />
-              <style jsx>{`
-                color: white;
-                height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-    
-                .loader {
-                  margin: 0 auto;
-                }
-              `}</style>
-            </div>
+            <LiveStreamingProvider>
+              {roomExp && <ExpiryTimer expiry={roomExp} />}
+              <div className="app">
+                {componentForState()}
+                <Modals />
+                <Asides />
+                <style jsx>{`
+                  color: white;
+                  height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+      
+                  .loader {
+                    margin: 0 auto;
+                  }
+                `}</style>
+              </div>
+            </LiveStreamingProvider>
           </RecordingProvider>
         </ChatProvider>
       </>
