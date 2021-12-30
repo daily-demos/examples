@@ -1,9 +1,13 @@
 import React, { useMemo } from 'react';
 import HeaderCapsule from '@custom/shared/components/HeaderCapsule';
+import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { slugify } from '@custom/shared/lib/slugify';
+import { ReactComponent as IconLock } from '@custom/shared/icons/lock-md.svg';
 
 export const Header = () => {
+  const { roomInfo } = useCallState();
   const { participantCount } = useParticipants();
   const { customCapsule } = useUIState();
 
@@ -18,7 +22,10 @@ export const Header = () => {
           height="32"
         />
 
-        <HeaderCapsule>{process.env.PROJECT_TITLE}</HeaderCapsule>
+        <HeaderCapsule>
+          {roomInfo.privacy === 'private' && <IconLock />}
+          {slugify.revert(roomInfo.name)}
+        </HeaderCapsule>
         <HeaderCapsule>
           {`${participantCount} ${
             participantCount === 1 ? 'participant' : 'participants'

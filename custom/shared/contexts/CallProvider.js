@@ -32,6 +32,7 @@ export const CallProvider = ({
   token = '',
   subscribeToTracksAutomatically = true,
 }) => {
+  const [roomInfo, setRoomInfo] = useState(null);
   const [enableScreenShare, setEnableScreenShare] = useState(false);
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
   const [showLocalVideo, setShowLocalVideo] = useState(true);
@@ -57,6 +58,8 @@ export const CallProvider = ({
       const isOob = !!roomConfig.config?.owner_only_broadcast;
       const owner = roomConfig.tokenConfig?.is_owner;
       const config = roomConfig?.config;
+
+      setRoomInfo(roomConfig);
 
       const fullUI = !isOob || (isOob && owner);
 
@@ -131,6 +134,8 @@ export const CallProvider = ({
         enableScreenShare,
         videoQuality,
         setVideoQuality,
+        roomInfo,
+        setRoomInfo,
         setBandwidth,
         setRedirectOnLeave,
         setShowLocalVideo,

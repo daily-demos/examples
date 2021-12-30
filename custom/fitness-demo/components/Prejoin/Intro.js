@@ -90,7 +90,7 @@ export const Intro = ({
           <CardBody>
             {error && (
               <Well variant="error">
-                Failed to obtain token <p>{error}</p>
+                Failed to create class <p>{error}</p>
               </Well>
             )}
             {tokenError && (

@@ -292,7 +292,7 @@ export const Button = forwardRef(
           
           .button.gray {
             background: ${theme.gray.light};
-            color: ${theme.gray.dark};
+            color: var(--text-default);
             border: 0;
           }
           .button.gray:hover,
