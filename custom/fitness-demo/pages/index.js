@@ -1,13 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { CallProvider } from '@custom/shared/contexts/CallProvider';
-import { MediaDeviceProvider } from '@custom/shared/contexts/MediaDeviceProvider';
-import { ParticipantsProvider } from '@custom/shared/contexts/ParticipantsProvider';
-import { TracksProvider } from '@custom/shared/contexts/TracksProvider';
-import { UIStateProvider } from '@custom/shared/contexts/UIStateProvider';
-import { WaitingRoomProvider } from '@custom/shared/contexts/WaitingRoomProvider';
 import getDemoProps from '@custom/shared/lib/demoProps';
+import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
-import App from '../components/App';
 import Intro from '../components/Prejoin/Intro';
 import NotConfigured from '../components/Prejoin/NotConfigured';
 
@@ -22,18 +16,12 @@ import NotConfigured from '../components/Prejoin/NotConfigured';
 export default function Index({
   domain,
   isConfigured = false,
-  subscribeToTracksAutomatically = true,
-  asides,
-  modals,
-  customTrayComponent,
-  customAppComponent,
 }) {
-  const [roomName, setRoomName] = useState();
+  const router = useRouter();
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState();
 
   const [fetchingToken, setFetchingToken] = useState(false);
-  const [token, setToken] = useState();
   const [tokenError, setTokenError] = useState();
 
   const getMeetingToken = useCallback(async (room, isOwner = false) => {
@@ -60,13 +48,10 @@ export default function Index({
     console.log(`🪙 Token received`);
 
     setFetchingToken(false);
-    setToken(resJson.token);
-
-    // Setting room name will change ready state
-    setRoomName(room);
+    await router.push(`/${room}?t=${resJson.token}`);
 
     return true;
-  }, []);
+  }, [router]);
 
   const createRoom = async (room, duration, privacy) => {
     setError(false);
@@ -99,63 +84,33 @@ export default function Index({
     setFetching(false);
   }
 
-  const isReady = !!(isConfigured && roomName);
-
-  if (!isReady) {
-    return (
-      <main>
-        {(() => {
-          if (!isConfigured) return <NotConfigured />;
-          return (
-            <Intro
-              tokenError={tokenError}
-              fetching={fetching}
-              error={error}
-              room={roomName}
-              domain={domain}
-              onJoin={(room, type, duration = 60, privacy = 'public') =>
-                type === 'join' ? setRoomName(room): createRoom(room, duration, privacy)
-              }
-            />
-          );
-        })()}
-
-        <style jsx>{`
-          height: 100vh;
-          display: grid;
-          align-items: center;
-          justify-content: center;
-        `}</style>
-      </main>
-    );
-  }
-
   /**
    * Main call UI
    */
   return (
-    <UIStateProvider
-      asides={asides}
-      modals={modals}
-      customTrayComponent={customTrayComponent}
-    >
-      <CallProvider
-        domain={domain}
-        room={roomName}
-        token={token}
-        subscribeToTracksAutomatically={subscribeToTracksAutomatically}
-      >
-        <ParticipantsProvider>
-          <TracksProvider>
-            <MediaDeviceProvider>
-              <WaitingRoomProvider>
-                {customAppComponent || <App />}
-              </WaitingRoomProvider>
-            </MediaDeviceProvider>
-          </TracksProvider>
-        </ParticipantsProvider>
-      </CallProvider>
-    </UIStateProvider>
+    <main>
+      {(() => {
+        if (!isConfigured) return <NotConfigured />;
+        return (
+          <Intro
+            tokenError={tokenError}
+            fetching={fetching}
+            error={error}
+            domain={domain}
+            onJoin={(room, type, duration = 60, privacy = 'public') =>
+              type === 'join' ? router.push(`/${room}`): createRoom(room, duration, privacy)
+            }
+          />
+        );
+      })()}
+
+      <style jsx>{`
+        height: 100vh;
+        display: grid;
+        align-items: center;
+        justify-content: center;
+      `}</style>
+    </main>
   );
 }
 

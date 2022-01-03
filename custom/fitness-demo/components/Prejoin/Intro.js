@@ -20,7 +20,6 @@ import PropTypes from 'prop-types';
 export const Intro = ({
   tokenError,
   fetching,
-  room,
   error,
   onJoin,
 }) => {
@@ -45,10 +44,6 @@ export const Intro = ({
     const i = setInterval(fetchRooms, 15000);
     return () => clearInterval(i);
   }, []);
-
-  useEffect(() => {
-    setRoomName(room);
-  }, [room]);
 
   return (
     <div className="intro">
