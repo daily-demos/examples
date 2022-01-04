@@ -38,7 +38,9 @@ export const HairCheck = () => {
   const [waiting, setWaiting] = useState(false);
   const [joining, setJoining] = useState(false);
   const [denied, setDenied] = useState();
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState(
+    localStorage.getItem('PLUOT_PARTICIPANT_NAME') || ''
+  );
 
   // Initialise devices (even though we're not yet in a call)
   useEffect(() => {
@@ -72,6 +74,7 @@ export const HairCheck = () => {
       if (granted) {
         // Note: we don't have to do any thing here as the call state will mutate
         console.log('👋 Access granted');
+        localStorage.setItem('PLUOT_PARTICIPANT_NAME', userName);
       } else {
         console.log('❌ Access denied');
         setDenied(true);
@@ -187,6 +190,7 @@ export const HairCheck = () => {
                   placeholder="Enter display name"
                   variant="dark"
                   disabled={joining}
+                  value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                 />
                 <Button
