@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Tile } from '@dailyjs/shared/components/Tile';
-import { DEFAULT_ASPECT_RATIO } from '@dailyjs/shared/constants';
-import { useResize } from '@dailyjs/shared/hooks/useResize';
+import Tile from '@custom/shared/components/Tile';
+import { DEFAULT_ASPECT_RATIO } from '@custom/shared/constants';
+import { useResize } from '@custom/shared/hooks/useResize';
 import PropTypes from 'prop-types';
 
 const MAX_RATIO = DEFAULT_ASPECT_RATIO;

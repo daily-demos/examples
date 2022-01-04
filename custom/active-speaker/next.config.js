@@ -1,7 +1,7 @@
 const withPlugins = require('next-compose-plugins');
 const withTM = require('next-transpile-modules')([
-  '@dailyjs/shared',
-  '@dailyjs/basic-call',
+  '@custom/shared',
+  '@custom/basic-call',
 ]);
 
 const packageJson = require('./package.json');

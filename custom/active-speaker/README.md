@@ -1,10 +1,8 @@
 # Active Speaker
 
-![Active speaker](./image.png)
-
 ### Live example
 
-**[See it in action here ➡️](https://dailyjs-active-speaker.vercel.app)**
+**[See it in action here ➡️](https://custom-active-speaker.vercel.app)**
 
 ---
 
@@ -23,7 +21,7 @@ Please note: this demo is not currently mobile optimised
 mv env.example .env.local
 
 yarn
-yarn workspace @dailyjs/active-speaker dev
+yarn workspace @custom/active-speaker dev
 ```
 
 ## Deploy your own on Vercel

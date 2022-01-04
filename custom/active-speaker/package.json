@@ -1,5 +1,5 @@
 {
-  "name": "@dailyjs/active-speaker",
+  "name": "@custom/active-speaker",
   "description": "Basic Call + Active Speaker",
   "version": "0.1.0",
   "private": true,
@@ -10,8 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@dailyjs/basic-call": "*",
-    "@dailyjs/shared": "*",
+    "@custom/basic-call": "*",
+    "@custom/shared": "*",
     "next": "^11.0.0",
     "pluralize": "^8.0.0",
     "react": "^17.0.2",
