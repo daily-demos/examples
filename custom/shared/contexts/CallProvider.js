@@ -14,6 +14,7 @@ import React, {
 } from 'react';
 import DailyIframe from '@daily-co/daily-js';
 import Bowser from 'bowser';
+import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import {
   ACCESS_STATE_LOBBY,
@@ -31,7 +32,9 @@ export const CallProvider = ({
   room,
   token = '',
   subscribeToTracksAutomatically = true,
+  cleanURLOnJoin = false,
 }) => {
+  const router = useRouter();
   const [roomInfo, setRoomInfo] = useState(null);
   const [enableScreenShare, setEnableScreenShare] = useState(false);
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
@@ -118,6 +121,15 @@ export const CallProvider = ({
     const requiresPermission = access?.level === ACCESS_STATE_LOBBY;
     setPreJoinNonAuthorized(requiresPermission && !token);
   }, [state, daily, token]);
+
+  useEffect(() => {
+    if (!daily) return;
+
+    if (cleanURLOnJoin)
+      daily.on('joined-meeting', () => router.replace(`/${room}`));
+
+    return () => daily.off('joined-meeting', () => router.replace(`/${room}`));
+  }, [cleanURLOnJoin, daily, room, router]);
 
   return (
     <CallContext.Provider

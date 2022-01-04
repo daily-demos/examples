@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import App from '../components/App';
 import NotConfigured from '../components/Prejoin/NotConfigured';
 
-const Slug = ({
+const Room = ({
   domain,
   isConfigured = false,
   subscribeToTracksAutomatically = true,
@@ -20,7 +20,7 @@ const Slug = ({
   customAppComponent,
 }) => {
   const router = useRouter();
-  const { slug, t } = router.query;
+  const { room, t } = router.query;
 
   if (!isConfigured) return <NotConfigured />;
   return (
@@ -31,9 +31,10 @@ const Slug = ({
     >
       <CallProvider
         domain={domain}
-        room={slug}
+        room={room}
         token={t}
         subscribeToTracksAutomatically={subscribeToTracksAutomatically}
+        cleanURLOnJoin
       >
         <ParticipantsProvider>
           <TracksProvider>
@@ -49,7 +50,7 @@ const Slug = ({
   )
 };
 
-export default Slug;
+export default Room;
 
 export async function getStaticProps() {
   const defaultProps = getDemoProps();
