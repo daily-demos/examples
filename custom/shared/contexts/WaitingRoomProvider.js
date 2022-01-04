@@ -13,6 +13,7 @@ const WaitingRoomContext = createContext(null);
 export const WaitingRoomProvider = ({ children }) => {
   const { callObject } = useCallState();
   const [waitingParticipants, setWaitingParticipants] = useState([]);
+  const [multipleWaiting, setMultipleWaiting] = useState();
   const [showModal, setShowModal] = useState(false);
 
   const handleWaitingParticipantEvent = useCallback(() => {
@@ -31,6 +32,7 @@ export const WaitingRoomProvider = ({ children }) => {
         };
       })
     );
+    setMultipleWaiting(waiting.length > 1);
   }, [callObject]);
 
   useEffect(() => {
@@ -97,6 +99,7 @@ export const WaitingRoomProvider = ({ children }) => {
         setShowModal,
         showModal,
         waitingParticipants,
+        multipleWaiting,
       }}
     >
       {children}
