@@ -282,7 +282,7 @@ export const RecordingProvider = ({ children }) => {
     if (!callObject || !enableRecording) return;
     setIsRecordingLocally(true);
     setRecordingState(RECORDING_COUNTDOWN_3);
-    callObject?.sendAppMessage({
+    callObject.sendAppMessage({
       event: 'recording-starting',
     });
   }, [callObject, enableRecording]);
