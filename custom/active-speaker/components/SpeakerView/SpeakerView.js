@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import RoomContainer from '@dailyjs/basic-call/components/Room/RoomContainer';
-import ParticipantBar from '@dailyjs/shared/components/ParticipantBar/ParticipantBar';
-import VideoContainer from '@dailyjs/shared/components/VideoContainer/VideoContainer';
-import { useCallState } from '@dailyjs/shared/contexts/CallProvider';
-import { useParticipants } from '@dailyjs/shared/contexts/ParticipantsProvider';
-import { useTracks } from '@dailyjs/shared/contexts/TracksProvider';
-import { useUIState } from '@dailyjs/shared/contexts/UIStateProvider';
-import { isScreenId } from '@dailyjs/shared/contexts/participantsState';
+import { Container } from '@custom/basic-call/components/Call/Container';
+import Header from '@custom/basic-call/components/Call/Header';
+import ParticipantBar from '@custom/shared/components/ParticipantBar/ParticipantBar';
+import VideoContainer from '@custom/shared/components/VideoContainer/VideoContainer';
+import { useCallState } from '@custom/shared/contexts/CallProvider';
+import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
+import { useTracks } from '@custom/shared/contexts/TracksProvider';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { isScreenId } from '@custom/shared/contexts/participantsState';
 import { SpeakerTile } from './SpeakerTile';
 
 const SIDEBAR_WIDTH = 186;
@@ -78,13 +79,14 @@ export const SpeakerView = () => {
 
   return (
     <div className="speaker-view">
-      <RoomContainer>
+      <Container>
+        <Header />
         <VideoContainer>
           <div ref={activeRef} className="active">
             <SpeakerTile participant={currentSpeaker} screenRef={activeRef} />
           </div>
         </VideoContainer>
-      </RoomContainer>
+      </Container>
       {showSidebar && (
         <ParticipantBar
           fixed={fixedItems}
