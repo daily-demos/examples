@@ -3,13 +3,13 @@ import VideoContainer from '@custom/shared/components/VideoContainer/VideoContai
 
 import { Container } from './Container';
 import { Header } from './Header';
-import { VideoGrid } from './VideoGrid';
+import { VideoView } from './VideoView';
 
 export function Room({ children }) {
   return (
     <Container>
       <Header />
-      <VideoContainer>{children ? children : <VideoGrid />}</VideoContainer>
+      <VideoContainer>{children ? children : <VideoView />}</VideoContainer>
     </Container>
   );
 }
