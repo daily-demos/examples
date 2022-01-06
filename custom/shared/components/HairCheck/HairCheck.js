@@ -140,6 +140,17 @@ export const HairCheck = () => {
         ) : (
           <span>Waiting for host to grant access</span>
         )}
+        <style jsx>{`
+          .waiting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .waiting span {
+            margin-left: var(--spacing-xxs);
+          }
+        `}</style>
       </div>
     );
   }, [denied]);
@@ -327,16 +338,6 @@ export const HairCheck = () => {
             display: grid;
             grid-template-columns: 1fr auto;
             grid-column-gap: var(--spacing-xs);
-          }
-
-          .waiting {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .waiting span {
-            margin-left: var(--spacing-xxs);
           }
 
           .logo {
