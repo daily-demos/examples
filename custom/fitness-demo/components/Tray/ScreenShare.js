@@ -9,7 +9,7 @@ const MAX_SCREEN_SHARES = 2;
 
 export const ScreenShareTray = () => {
   const { callObject, enableScreenShare } = useCallState();
-  const { screens, participants } = useParticipants();
+  const { screens, participants, localParticipant } = useParticipants();
 
   const isSharingScreen = useMemo(
     () => screens.some((s) => s.isLocal),
@@ -27,6 +27,7 @@ export const ScreenShareTray = () => {
     !isSharingScreen;
 
   if (!enableScreenShare) return null;
+  if (!localParticipant.isOwner) return null;
 
   return (
     <TrayButton

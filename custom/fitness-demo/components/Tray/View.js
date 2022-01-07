@@ -7,11 +7,13 @@ import { ReactComponent as IconGridView } from '@custom/shared/icons/grid-md.svg
 import { ReactComponent as IconSpeakerView } from '@custom/shared/icons/speaker-view-md.svg';
 
 export const ViewTray = () => {
-  const { participants } = useParticipants();
+  const { participants, localParticipant } = useParticipants();
   const { viewMode, setPreferredViewMode } = useUIState();
 
   const onViewClick = () =>
     setPreferredViewMode(viewMode === VIEW_MODE_SPEAKER ? VIEW_MODE_GRID : VIEW_MODE_SPEAKER);
+
+  if (!localParticipant.isOwner) return null;
 
   return (
     <TrayButton
