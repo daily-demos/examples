@@ -10,14 +10,14 @@ export const ViewTray = () => {
   const { participants } = useParticipants();
   const { viewMode, setPreferredViewMode } = useUIState();
 
-  const onClick = () =>
-    setPreferredViewMode(viewMode === VIEW_MODE_SPEAKER ? VIEW_MODE_GRID: VIEW_MODE_SPEAKER);
+  const onViewClick = () =>
+    setPreferredViewMode(viewMode === VIEW_MODE_SPEAKER ? VIEW_MODE_GRID : VIEW_MODE_SPEAKER);
 
   return (
     <TrayButton
       label={viewMode === VIEW_MODE_GRID ? 'Speaker': 'Grid'}
       disabled={participants.length < 2}
-      onClick={onClick}
+      onClick={onViewClick}
     >
       {viewMode === VIEW_MODE_SPEAKER ? <IconGridView />: <IconSpeakerView />}
     </TrayButton>

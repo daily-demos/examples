@@ -295,25 +295,25 @@ export const GridView = ({
 
   return (
     <div ref={gridRef} className="grid">
-      <Button
-        className="page-button prev"
-        disabled={!(pages > 1 && page > 1)}
-        type="button"
-        onClick={handlePrevClick}
-      >
-        <IconArrow />
-      </Button>
-
+      {(pages > 1 && page > 1) && (
+        <Button
+          className="page-button prev"
+          type="button"
+          onClick={handlePrevClick}
+        >
+          <IconArrow />
+        </Button>
+      )}
       <div className="tiles">{tiles}</div>
-
-      <Button
-        className="page-button next"
-        disabled={!(pages > 1 && page < pages)}
-        type="button"
-        onClick={handleNextClick}
-      >
-        <IconArrow />
-      </Button>
+      {(pages > 1 && page < pages) && (
+        <Button
+          className="page-button next"
+          type="button"
+          onClick={handleNextClick}
+        >
+          <IconArrow />
+        </Button>
+      )}
 
       <style jsx>{`
         .grid {

@@ -18,10 +18,7 @@ export const SpeakerTile = ({ participant, screenRef }) => {
     setScreenHeight(rect.height);
   }, [screenRef]);
 
-  useResize(() => {
-    updateRatio();
-  }, [updateRatio]);
-
+  useResize(() => updateRatio(), [updateRatio]);
   useEffect(() => updateRatio(), [updateRatio]);
 
   /**

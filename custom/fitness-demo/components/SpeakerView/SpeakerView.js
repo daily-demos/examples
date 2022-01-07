@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Container } from '@custom/basic-call/components/Call/Container';
-import Header from '@custom/basic-call/components/Call/Header';
 import ParticipantBar from '@custom/shared/components/ParticipantBar/ParticipantBar';
-import VideoContainer from '@custom/shared/components/VideoContainer/VideoContainer';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useTracks } from '@custom/shared/contexts/TracksProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { isScreenId } from '@custom/shared/contexts/participantsState';
+import { ScreensAndPins } from './ScreensAndPins';
 import { SpeakerTile } from './SpeakerTile';
 
 const SIDEBAR_WIDTH = 186;
@@ -40,10 +38,10 @@ export const SpeakerView = () => {
     return participants.length > 1 || hasScreenshares;
   }, [participants, pinnedId, screens]);
 
-  /* const screenShareTiles = useMemo(
+  const screenShareTiles = useMemo(
     () => <ScreensAndPins items={screensAndPinned} />,
     [screensAndPinned]
-  ); */
+  );
 
   const hasScreenshares = useMemo(() => screens.length > 0, [screens]);
 
@@ -80,7 +78,11 @@ export const SpeakerView = () => {
   return (
     <div className="speaker-view">
       <div ref={activeRef} className="active">
-        <SpeakerTile participant={currentSpeaker} screenRef={activeRef} />
+        {screensAndPinned.length > 0 ? (
+          screenShareTiles
+        ) : (
+          <SpeakerTile screenRef={activeRef} participant={currentSpeaker} />
+        )}
       </div>
       {showSidebar && (
         <ParticipantBar
