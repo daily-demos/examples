@@ -43,8 +43,10 @@ export const ParticipantsProvider = ({ children }) => {
     initialParticipantsState
   );
   const { viewMode } = useUIState();
-  const [participantMarkedForRemoval, setParticipantMarkedForRemoval] =
-    useState(null);
+  const [
+    participantMarkedForRemoval,
+    setParticipantMarkedForRemoval,
+  ] = useState(null);
 
   /**
    * ALL participants (incl. shared screens) in a convenient array
@@ -95,10 +97,9 @@ export const ParticipantsProvider = ({ children }) => {
     [allParticipants]
   );
 
-  const isOwner = useMemo(
-    () => !!localParticipant?.isOwner,
-    [localParticipant]
-  );
+  const isOwner = useMemo(() => !!localParticipant?.isOwner, [
+    localParticipant,
+  ]);
 
   /**
    * The participant who should be rendered prominently right now
