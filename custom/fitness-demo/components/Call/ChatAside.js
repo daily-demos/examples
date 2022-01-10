@@ -26,7 +26,7 @@ export const ChatAside = () => {
     if (showAside === CHAT_ASIDE) {
       setHasNewMessages(false);
     }
-  }, [showAside, chatHistory.length, setHasNewMessages]);
+  }, [showAside, chatHistory?.length, setHasNewMessages]);
 
   useEffect(() => {
     if (hasNewMessages && showAside !== CHAT_ASIDE) {
@@ -49,7 +49,7 @@ export const ChatAside = () => {
   return (
     <Aside onClose={() => setShowAside(false)}>
       <div className="messages-container" ref={chatWindowRef}>
-        {chatHistory.map((chatItem) => (
+        {chatHistory?.map((chatItem) => (
           <div
             className={isLocalUser(chatItem.senderID) ? 'message local' : 'message'}
             key={chatItem.id}
