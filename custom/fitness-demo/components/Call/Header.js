@@ -3,8 +3,8 @@ import HeaderCapsule from '@custom/shared/components/HeaderCapsule';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { slugify } from '@custom/shared/lib/slugify';
 import { ReactComponent as IconLock } from '@custom/shared/icons/lock-md.svg';
+import { slugify } from '@custom/shared/lib/slugify';
 
 export const Header = () => {
   const { roomInfo } = useCallState();
@@ -56,7 +56,7 @@ export const Header = () => {
         `}</style>
       </header>
     ),
-    [participantCount, customCapsule]
+    [roomInfo.privacy, roomInfo.name, participantCount, customCapsule]
   );
 };
 
