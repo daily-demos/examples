@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import PropTypes from 'prop-types';
@@ -32,6 +33,10 @@ export const WaitingRoomProvider = ({ children }) => {
       })
     );
   }, [callObject]);
+
+  const multipleWaiting = useMemo(() => waitingParticipants.length > 1, [
+    waitingParticipants,
+  ]);
 
   useEffect(() => {
     if (waitingParticipants.length === 0) {
@@ -97,6 +102,7 @@ export const WaitingRoomProvider = ({ children }) => {
         setShowModal,
         showModal,
         waitingParticipants,
+        multipleWaiting,
       }}
     >
       {children}
