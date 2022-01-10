@@ -1,15 +1,44 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
+import Button from '@custom/shared/components/Button';
 import HeaderCapsule from '@custom/shared/components/HeaderCapsule';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { ReactComponent as IconLock } from '@custom/shared/icons/lock-md.svg';
+import { ReactComponent as IconPlay } from '@custom/shared/icons/play-sm.svg';
 import { slugify } from '@custom/shared/lib/slugify';
+import { useClassState, PRE_CLASS_LOBBY, CLASS_IN_SESSION } from '../../contexts/ClassStateProvider';
 
 export const Header = () => {
   const { roomInfo } = useCallState();
-  const { participantCount } = useParticipants();
+  const { participantCount, localParticipant } = useParticipants();
   const { customCapsule } = useUIState();
+  const { classType, setClassType } = useClassState();
+
+  const capsuleLabel = useCallback(() => {
+    if (!localParticipant.isOwner) return;
+    if (classType === PRE_CLASS_LOBBY)
+      return (
+        <Button
+          IconBefore={IconPlay}
+          size="tiny"
+          variant="success"
+          onClick={setClassType}
+        >
+          Start Class
+        </Button>
+      )
+    if (classType === CLASS_IN_SESSION)
+      return (
+        <Button
+          size="tiny"
+          variant="error-light"
+          onClick={setClassType}
+        >
+          End Class
+        </Button>
+      )
+  }, [classType, localParticipant.isOwner, setClassType]);
 
   return useMemo(
     () => (
@@ -37,6 +66,10 @@ export const Header = () => {
             {customCapsule.label}
           </HeaderCapsule>
         )}
+        <HeaderCapsule>
+          {classType}
+          {capsuleLabel()}
+        </HeaderCapsule>
 
         <style jsx>{`
           .room-header {
@@ -56,7 +89,7 @@ export const Header = () => {
         `}</style>
       </header>
     ),
-    [roomInfo.privacy, roomInfo.name, participantCount, customCapsule]
+    [roomInfo.privacy, roomInfo.name, participantCount, customCapsule, classType, capsuleLabel]
   );
 };
 

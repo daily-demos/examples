@@ -3,7 +3,6 @@ import ChatTray from './Chat';
 import RecordTray from './Record';
 import ScreenShareTray from './ScreenShare';
 import StreamTray from './Stream';
-import ViewTray from './View';
 
 export const Tray = () => {
   return (
@@ -12,7 +11,6 @@ export const Tray = () => {
       <ScreenShareTray />
       <RecordTray />
       <StreamTray />
-      <ViewTray />
     </>
   );
 };
