@@ -9,10 +9,10 @@
  */
 import React, { useEffect, useMemo } from 'react';
 import { useTracks } from '@custom/shared/contexts/TracksProvider';
-import Bowser from 'bowser';
 import { Portal } from 'react-portal';
+import { isSafari } from '@custom/shared/lib/browserConfig';
 import AudioTrack from './AudioTrack';
-import CombinedAudioTrack from './CombinedAudioTrack';
+import WebAudioTracks from './WebAudioTracks';
 
 export const Audio = () => {
   const { audioTracks } = useTracks();
@@ -49,13 +49,12 @@ export const Audio = () => {
   }, []);
 
   const tracksComponent = useMemo(() => {
-    const { browser } = Bowser.parse(navigator.userAgent);
-    if (browser.name === 'Chrome' && parseInt(browser.version, 10) >= 92) {
-      return <CombinedAudioTrack tracks={renderedTracks} />;
+    if (isSafari()) {
+      return Object.entries(renderedTracks).map(([id, track]) => (
+        <AudioTrack key={id} track={track.persistentTrack} />
+      ));
     }
-    return Object.entries(renderedTracks).map(([id, track]) => (
-      <AudioTrack key={id} track={track.persistentTrack} />
-    ));
+    return <WebAudioTracks tracks={renderedTracks} />;
   }, [renderedTracks]);
 
   return (
