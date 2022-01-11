@@ -106,21 +106,28 @@ export const ParticipantsProvider = ({ children }) => {
    */
   const currentSpeaker = useMemo(() => {
     /**
-     * Ensure activeParticipant is still present in the call.
+     * If the activeParticipant is still in the call, return the activeParticipant.
      * The activeParticipant only updates to a new active participant so
      * if everyone else is muted when AP leaves, the value will be stale.
      */
     const isPresent = participants.some((p) => p?.id === activeParticipant?.id);
+    if (isPresent) {
+      return activeParticipant;
+    }
 
+    /**
+     * If the activeParticipant has left, calculate the remaining displayable participants
+     */
     const displayableParticipants = participants.filter((p) => !p?.isLocal);
 
+    /**
+     * If nobody ever unmuted, return the first participant with a camera on
+     * Or, if all cams are off, return the first remote participant
+     */
     if (
-      !isPresent &&
       displayableParticipants.length > 0 &&
       displayableParticipants.every((p) => p.isMicMuted && !p.lastActiveDate)
     ) {
-      // Return first cam on participant in case everybody is muted and nobody ever talked
-      // or first remote participant, in case everybody's cam is muted, too.
       return (
         displayableParticipants.find((p) => !p.isCamMuted) ??
         displayableParticipants?.[0]
@@ -131,7 +138,13 @@ export const ParticipantsProvider = ({ children }) => {
       .sort((a, b) => sortByKey(a, b, 'lastActiveDate'))
       .reverse();
 
-    return isPresent ? activeParticipant : sorted?.[0] ?? localParticipant;
+    const lastActiveSpeaker = sorted?.[0];
+
+    if (lastActiveSpeaker) {
+      return lastActiveSpeaker;
+    }
+
+    return localParticipant;
   }, [activeParticipant, localParticipant, participants]);
 
   /**
@@ -297,11 +310,12 @@ export const ParticipantsProvider = ({ children }) => {
        * Our UX doesn't ever highlight the local user as the active speaker.
        */
       const localId = callObject.participants().local.session_id;
-      if (localId === activeSpeaker?.peerId) return;
+      const activeSpeakerId = activeSpeaker?.peerId;
+      if (localId === activeSpeakerId) return;
 
       dispatch({
         type: ACTIVE_SPEAKER,
-        id: activeSpeaker?.peerId,
+        id: activeSpeakerId,
       });
     };
     callObject.on('active-speaker-change', handleActiveSpeakerChange);

@@ -240,8 +240,9 @@ export const ParticipantBar = ({
     const maybePromoteActiveSpeaker = () => {
       const fixedOther = fixed.find((f) => !f.isLocal);
       // Ignore when speaker is already at first position or component unmounted
-      if (!fixedOther || fixedOther?.id === activeSpeakerId || !scrollEl)
+      if (!fixedOther || fixedOther?.id === activeSpeakerId || !scrollEl) {
         return false;
+      }
 
       // Active speaker not rendered at all, promote immediately
       if (
@@ -271,8 +272,9 @@ export const ParticipantBar = ({
       if (
         scrolledOffsetTop + tileHeight / 2 < othersVisibleHeight &&
         scrolledOffsetTop > -tileHeight / 2
-      )
+      ) {
         return false;
+      }
 
       return swapParticipantPosition(fixedOther.id, currentSpeakerId);
     };
