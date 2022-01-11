@@ -113,7 +113,7 @@ const InputContainer = ({ children, prefix, className }) => (
         opacity: 1;
       }
       .dark :global(input)::-moz-placeholder {
-        ccolor: var(--text-mid);
+        color: var(--text-mid);
         opacity: 1;
       }
       .dark :global(input)::-ms-input-placeholder {
@@ -125,6 +125,12 @@ const InputContainer = ({ children, prefix, className }) => (
         background: transparent;
         border: 0px;
         box-shadow: none;
+      }
+      
+      .border :global(input) {
+        background: transparent;
+        border: 1px solid var(--reverse);
+        color: var(--reverse);
       }
     `}</style>
   </div>
