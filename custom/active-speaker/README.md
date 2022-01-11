@@ -1,5 +1,7 @@
 # Active Speaker
 
+![Active Speaker](./image.png)
+
 ### Live example
 
 **[See it in action here ➡️](https://custom-active-speaker.vercel.app)**
