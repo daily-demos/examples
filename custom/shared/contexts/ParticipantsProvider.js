@@ -140,11 +140,7 @@ export const ParticipantsProvider = ({ children }) => {
 
     const lastActiveSpeaker = sorted?.[0];
 
-    if (lastActiveSpeaker) {
-      return lastActiveSpeaker;
-    }
-
-    return localParticipant;
+    return lastActiveSpeaker || localParticipant;
   }, [activeParticipant, localParticipant, participants]);
 
   /**
