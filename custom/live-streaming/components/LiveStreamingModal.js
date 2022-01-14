@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@custom/shared/components/Button';
+import Button from '@custom/shared/components/Button';
 import { CardBody } from '@custom/shared/components/Card';
 import Field from '@custom/shared/components/Field';
 import { TextInput, SelectInput } from '@custom/shared/components/Input';
