@@ -11,6 +11,7 @@ export const Card = ({ children, className, variant }) => (
         background: var(--reverse);
         box-sizing: border-box;
         border-radius: var(--radius-md);
+        border: 1px solid #C8D1DC;
         padding: var(--spacing-md);
       }
       

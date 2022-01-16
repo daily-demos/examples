@@ -33,7 +33,7 @@ export const ChatProvider = ({ children }) => {
       setSharedState(values => ({
         ...values,
         chatHistory: [
-          ...values.chatHistory,
+          ...values?.chatHistory,
           // nanoid - we use it to generate unique ID string
           { sender, senderID: e.fromId, message: e.data.message, id: nanoid() },
         ]
@@ -64,7 +64,7 @@ export const ChatProvider = ({ children }) => {
       return setSharedState(values => ({
         ...values,
         chatHistory: [
-          ...values.chatHistory,
+          ...values?.chatHistory,
           // nanoid - we use it to generate unique ID string
           { sender, senderID, message, id: nanoid() }
         ]

@@ -93,7 +93,7 @@ export const Intro = ({
                 Failed to obtain token <p>{tokenError}</p>
               </Well>
             )}
-            <Field label="Give you a class name">
+            <Field label="Give your class a name">
               <TextInput
                 type="text"
                 placeholder="Eg. Super stretchy morning flow"
@@ -135,7 +135,6 @@ export const Intro = ({
           margin: auto;
         }
         .or-text {
-          color: var(--reverse);
           margin: auto;
         }
         .room {

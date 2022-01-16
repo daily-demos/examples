@@ -1,10 +1,10 @@
-# Basic call
+# Fitness Demo
 
 ![Basic Call](./image.png)
 
 ### Live example
 
-**[See it in action here ➡️](https://custom-basic-call.vercel.app)**
+**[See it in action here ➡️](https://custom-fitness-demo.vercel.app)**
 
 ---
 
@@ -28,7 +28,7 @@ mv env.example .env.local
 
 # from project root...
 yarn
-yarn workspace @custom/basic-call dev
+yarn workspace @custom/fitness-demo dev
 ```
 
 ## How does this example work?

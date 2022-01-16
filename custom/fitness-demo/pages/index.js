@@ -109,6 +109,7 @@ export default function Index({
         display: grid;
         align-items: center;
         justify-content: center;
+        background: var(--reverse);
       `}</style>
     </main>
   );

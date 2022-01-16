@@ -1,7 +1,6 @@
 /*
- * This is an example server-side function that generates a meeting token
- * server-side. You could replace this on your own back-end to include
- * custom user authentication, etc.
+ * This is an example server-side function that provides the real-time presence
+ * data of all the active rooms in the given domain.
  */
 export default async function handler(req, res) {
   if (req.method === 'GET') {
