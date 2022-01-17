@@ -57,30 +57,62 @@ export default function Index({
     setError(false);
     setFetching(true);
 
-    console.log(`🚪 Creating a new class...`);
+    console.log(`🚪 Verifying if there's a class with same name`);
 
-    // Create a room server side (using Next JS serverless)
-    const res = await fetch('/api/createRoom', {
-      method: 'POST',
+    const verifyingRes = await fetch(`/api/room?name=${room}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        roomName: room,
-        expiryMinutes: Number(duration),
-        privacy: !privacy ? 'private': 'public'
-      }),
     });
 
-    const resJson = await res.json();
+    const verifyingResJson = await verifyingRes.json();
 
-    if (resJson.name) {
-      setFetching(false);
-      await getMeetingToken(resJson.name, true);
-      return;
+    // it throws an error saying not-found if the room doesn't exist.
+    // so we create a new room here.
+    if (verifyingResJson.error === 'not-found') {
+      console.log(`🚪 Creating a new class...`);
+
+      // Create a room server side (using Next JS serverless)
+      const res = await fetch('/api/createRoom', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          roomName: room,
+          expiryMinutes: Number(duration),
+          privacy: !privacy ? 'private': 'public'
+        }),
+      });
+
+      const resJson = await res.json();
+
+      if (resJson.name) {
+        await getMeetingToken(resJson.name, true);
+        return;
+      }
+
+      setError(resJson?.error || 'An unknown error occured');
+    } else {
+      if (verifyingResJson.name) {
+        const editRes = await fetch(`/api/editRoom?roomName=${room}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            expiryMinutes: Number(duration),
+            privacy: !privacy ? 'private': 'public'
+          }),
+        });
+
+        const editResJson = await editRes.json();
+        await getMeetingToken(editResJson.name, true);
+        return;
+      }
     }
 
-    setError(resJson.error || 'An unknown error occured');
     setFetching(false);
   }
 

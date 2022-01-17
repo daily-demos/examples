@@ -120,6 +120,7 @@ export const Intro = ({
           </CardBody>
           <CardFooter divider>
             <Button
+              loading={fetching}
               fullWidth
               onClick={() => onJoin(slugify.convert(roomName), 'create', duration, privacy)}
             >
