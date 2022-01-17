@@ -64,12 +64,12 @@ export const InviteOthers = () => {
               width: 186px;
             }
             
-            :global(.card) {
+            :global(.invite-others .card) {
               border: 0!important;
               width: 40vw;
             }
             
-            :global(.card input) {
+            :global(.invite-others .card input) {
               width: 15vw;
             }
           `}</style>

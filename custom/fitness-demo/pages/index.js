@@ -93,7 +93,7 @@ export default function Index({
         return;
       }
 
-      setError(resJson?.error || 'An unknown error occured');
+      setError(resJson?.info || resJson?.error || 'An unknown error occured');
     } else {
       if (verifyingResJson.name) {
         const editRes = await fetch(`/api/editRoom?roomName=${room}`, {

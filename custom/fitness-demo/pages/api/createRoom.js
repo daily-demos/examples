@@ -18,7 +18,7 @@ export default async function handler(req, res) {
           eject_at_room_exp: true,
           enable_knocking: privacy !== 'public',
           enable_screenshare: true,
-          enable_recording: true,
+          enable_recording: 'local',
           ...rest,
         },
       }),
