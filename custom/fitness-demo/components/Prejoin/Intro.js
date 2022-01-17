@@ -118,7 +118,7 @@ export const Intro = ({
               />
             </Field>
           </CardBody>
-          <CardFooter divider>
+          <CardFooter>
             <Button
               loading={fetching}
               fullWidth

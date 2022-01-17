@@ -1,10 +1,13 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import ParticipantBar from '@custom/shared/components/ParticipantBar/ParticipantBar';
+import VideoContainer from '@custom/shared/components/VideoContainer';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useTracks } from '@custom/shared/contexts/TracksProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { isScreenId } from '@custom/shared/contexts/participantsState';
+import Container from '../Call/Container';
+import Header from '../Call/Header';
 import { ScreensAndPins } from './ScreensAndPins';
 import { SpeakerTile } from './SpeakerTile';
 
@@ -77,13 +80,18 @@ export const SpeakerView = () => {
 
   return (
     <div className="speaker-view">
-      <div ref={activeRef} className="active">
-        {screensAndPinned.length > 0 ? (
-          screenShareTiles
-        ) : (
-          <SpeakerTile screenRef={activeRef} participant={currentSpeaker} />
-        )}
-      </div>
+      <Container>
+        <Header />
+        <VideoContainer>
+          <div ref={activeRef} className="active">
+            {screensAndPinned.length > 0 ? (
+              screenShareTiles
+            ) : (
+              <SpeakerTile screenRef={activeRef} participant={currentSpeaker} />
+            )}
+          </div>
+        </VideoContainer>
+      </Container>
       {showSidebar && (
         <ParticipantBar
           fixed={fixedItems}

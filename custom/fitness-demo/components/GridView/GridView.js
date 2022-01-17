@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import Button from '@custom/shared/components/Button';
 import Tile from '@custom/shared/components/Tile';
+import VideoContainer from '@custom/shared/components/VideoContainer';
 import {
   DEFAULT_ASPECT_RATIO,
   MEETING_STATE_JOINED,
@@ -20,6 +21,8 @@ import { ReactComponent as IconArrow } from '@custom/shared/icons/raquo-md.svg';
 import sortByKey from '@custom/shared/lib/sortByKey';
 import PropTypes from 'prop-types';
 import { useDeepCompareMemo } from 'use-deep-compare';
+import Container from '../Call/Container';
+import Header from '../Call/Header';
 
 // --- Constants
 
@@ -294,69 +297,74 @@ export const GridView = ({
   const handleNextClick = () => setPage((p) => p + 1);
 
   return (
-    <div ref={gridRef} className="grid">
-      {(pages > 1 && page > 1) && (
-        <Button
-          className="page-button prev"
-          type="button"
-          onClick={handlePrevClick}
-        >
-          <IconArrow />
-        </Button>
-      )}
-      <div className="tiles">{tiles}</div>
-      {(pages > 1 && page < pages) && (
-        <Button
-          className="page-button next"
-          type="button"
-          onClick={handleNextClick}
-        >
-          <IconArrow />
-        </Button>
-      )}
+    <Container>
+      <Header />
+      <VideoContainer>
+        <div ref={gridRef} className="grid">
+          {(pages > 1 && page > 1) && (
+            <Button
+              className="page-button prev"
+              type="button"
+              onClick={handlePrevClick}
+            >
+              <IconArrow />
+            </Button>
+          )}
+          <div className="tiles">{tiles}</div>
+          {(pages > 1 && page < pages) && (
+            <Button
+              className="page-button next"
+              type="button"
+              onClick={handleNextClick}
+            >
+              <IconArrow />
+            </Button>
+          )}
 
-      <style jsx>{`
-        .grid {
-          align-items: center;
-          display: flex;
-          height: 100%;
-          justify-content: center;
-          position: relative;
-          width: 100%;
-        }
-
-        .grid .tiles {
-          align-items: center;
-          display: flex;
-          flex-flow: row wrap;
-          gap: 1px;
-          max-height: 100%;
-          justify-content: center;
-          margin: auto;
-          overflow: hidden;
-          width: 100%;
-        }
-
-        .grid :global(.page-button) {
-          border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-          height: 84px;
-          padding: 0px var(--spacing-xxxs) 0px var(--spacing-xxs);
-          background-color: var(--blue-default);
-          color: white;
-          border-right: 0px;
-        }
-
-        .grid :global(.page-button):disabled {
-          color: var(--blue-dark);
-          background-color: var(--blue-light);
-          border-color: var(--blue-light);
-        }
-
-        .grid :global(.page-button.prev) {
-          transform: scaleX(-1);
-        }
-      `}</style>
-    </div>
+          <style jsx>{`
+          .grid {
+            align-items: center;
+            display: flex;
+            height: 100%;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+          }
+  
+          .grid .tiles {
+            align-items: center;
+            display: flex;
+            flex-flow: row wrap;
+            gap: 1px;
+            max-height: 100%;
+            justify-content: center;
+            margin: auto;
+            overflow: hidden;
+            width: 100%;
+          }
+  
+          .grid :global(.page-button) {
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+            height: 84px;
+            padding: 0px var(--spacing-xxxs) 0px var(--spacing-xxs);
+            background-color: var(--blue-default);
+            color: white;
+            border-right: 0px;
+          }
+  
+          .grid :global(.page-button):disabled {
+            color: var(--blue-dark);
+            background-color: var(--blue-light);
+            border-color: var(--blue-light);
+          }
+  
+          .grid :global(.page-button.prev) {
+            transform: scaleX(-1);
+          }
+        `}</style>
+        </div>
+      </VideoContainer>
+    </Container>
   );
 };
 
