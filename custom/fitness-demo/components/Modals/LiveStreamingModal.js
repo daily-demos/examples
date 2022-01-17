@@ -51,7 +51,7 @@ export const LiveStreamingModal = () => {
 
   return (
     <Modal
-      title="Live stream"
+      title="Live streaming"
       isOpen={currentModals[LIVE_STREAMING_MODAL]}
       onClose={() => closeModal(LIVE_STREAMING_MODAL)}
       actions={[
@@ -77,6 +77,8 @@ export const LiveStreamingModal = () => {
         ),
       ]}
     >
+      <img src="/assets/pattern-ls.svg" className="live-streaming" alt="live streaming" />
+      <p>Please note: live streaming requires <b>Scale Plan</b> or above</p>
       {streamError && (
         <Well variant="error">
           Unable to start stream. Error message: {streamError}
@@ -141,6 +143,13 @@ export const LiveStreamingModal = () => {
           />
         </Field>
       </CardBody>
+      <style jsx>{`
+        .live-streaming {
+          display: flex;
+          width: 100%;
+          justify-content: center;
+        }
+      `}</style>
     </Modal>
   );
 };

@@ -45,11 +45,9 @@ export const InviteOthers = () => {
               display: flex;
               height: 100%;
               width: 100%;
-              position: relative;
             }
             
             .invite-others {
-              width: 50%;
               margin: auto;
               text-align: center;
             }
@@ -64,6 +62,15 @@ export const InviteOthers = () => {
               position: absolute;
               bottom: 0;
               width: 186px;
+            }
+            
+            :global(.card) {
+              border: 0!important;
+              width: 40vw;
+            }
+            
+            :global(.card input) {
+              width: 15vw;
             }
           `}</style>
         </div>
