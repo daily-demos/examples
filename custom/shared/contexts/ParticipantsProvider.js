@@ -9,16 +9,8 @@ import React, {
 } from 'react';
 import {
   useUIState,
-  VIEW_MODE_SPEAKER,
 } from '@custom/shared/contexts/UIStateProvider';
 import PropTypes from 'prop-types';
-
-import {
-  VIDEO_QUALITY_AUTO,
-  VIDEO_QUALITY_BANDWIDTH_SAVER,
-  VIDEO_QUALITY_LOW,
-  VIDEO_QUALITY_VERY_LOW,
-} from '../constants';
 import { sortByKey } from '../lib/sortByKey';
 
 import { useCallState } from './CallProvider';
@@ -37,14 +29,16 @@ import {
 export const ParticipantsContext = createContext();
 
 export const ParticipantsProvider = ({ children }) => {
-  const { callObject, videoQuality, networkState, broadcast, broadcastRole, } = useCallState();
+  const { callObject, videoQuality, networkState, broadcast } = useCallState();
   const [state, dispatch] = useReducer(
     participantsReducer,
     initialParticipantsState
   );
-  const { isMobile, viewMode, pinnedId } = useUIState();
-  const [participantMarkedForRemoval, setParticipantMarkedForRemoval] =
-    useState(null);
+  const { viewMode } = useUIState();
+  const [
+    participantMarkedForRemoval,
+    setParticipantMarkedForRemoval,
+  ] = useState(null);
 
   /**
    * ALL participants (incl. shared screens) in a convenient array
@@ -100,31 +94,37 @@ export const ParticipantsProvider = ({ children }) => {
     [allParticipants]
   );
 
+  const isOwner = useMemo(() => !!localParticipant?.isOwner, [
+    localParticipant,
+  ]);
+
   /**
    * The participant who should be rendered prominently right now
    */
   const currentSpeaker = useMemo(() => {
     /**
-     * Ensure activeParticipant is still present in the call.
+     * If the activeParticipant is still in the call, return the activeParticipant.
      * The activeParticipant only updates to a new active participant so
      * if everyone else is muted when AP leaves, the value will be stale.
      */
     const isPresent = participants.some((p) => p?.id === activeParticipant?.id);
-    const pinned = participants.find((p) => p?.id === pinnedId);
+    if (isPresent) {
+      return activeParticipant;
+    }
 
-    if (pinned) return pinned;
+    /**
+     * If the activeParticipant has left, calculate the remaining displayable participants
+     */
+    const displayableParticipants = participants.filter((p) => !p?.isLocal);
 
-    const displayableParticipants = participants.filter((p) =>
-      isMobile ? !p?.isLocal && !p?.isScreenshare : !p?.isLocal
-    );
-
+    /**
+     * If nobody ever unmuted, return the first participant with a camera on
+     * Or, if all cams are off, return the first remote participant
+     */
     if (
-      !isPresent &&
       displayableParticipants.length > 0 &&
       displayableParticipants.every((p) => p.isMicMuted && !p.lastActiveDate)
     ) {
-      // Return first cam on participant in case everybody is muted and nobody ever talked
-      // or first remote participant, in case everybody's cam is muted, too.
       return (
         displayableParticipants.find((p) => !p.isCamMuted) ??
         displayableParticipants?.[0]
@@ -135,17 +135,10 @@ export const ParticipantsProvider = ({ children }) => {
       .sort((a, b) => sortByKey(a, b, 'lastActiveDate'))
       .reverse();
 
-    const fallback = broadcastRole === 'attendee' ? null : localParticipant;
+    const lastActiveSpeaker = sorted?.[0];
 
-    return isPresent ? activeParticipant : sorted?.[0] ?? fallback;
-  }, [
-    activeParticipant,
-    broadcastRole,
-    isMobile,
-    localParticipant,
-    participants,
-    pinnedId,
-  ]);
+    return lastActiveSpeaker || localParticipant;
+  }, [activeParticipant, localParticipant, participants]);
 
   /**
    * Screen shares
@@ -164,12 +157,6 @@ export const ParticipantsProvider = ({ children }) => {
   const setUsername = (name) => {
     callObject.setUserName(name);
   };
-
-
-  const isOwner = useMemo(
-    () => !!localParticipant?.isOwner,
-    [localParticipant]
-  );
 
   const [muteNewParticipants, setMuteNewParticipants] = useState(false);
 
@@ -312,11 +299,12 @@ export const ParticipantsProvider = ({ children }) => {
        * Our UX doesn't ever highlight the local user as the active speaker.
        */
       const localId = callObject.participants().local.session_id;
-      if (localId === activeSpeaker?.peerId) return;
+      const activeSpeakerId = activeSpeaker?.peerId;
+      if (localId === activeSpeakerId) return;
 
       dispatch({
         type: ACTIVE_SPEAKER,
-        id: activeSpeaker?.peerId,
+        id: activeSpeakerId,
       });
     };
     callObject.on('active-speaker-change', handleActiveSpeakerChange);
