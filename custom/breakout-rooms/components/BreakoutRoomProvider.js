@@ -17,6 +17,7 @@ export const BreakoutRoomContext = createContext();
 export const BreakoutRoomProvider = ({ children }) => {
   const { callObject } = useCallState();
   const { participants, localParticipant } = useParticipants();
+
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [subParticipants, setSubParticipants] = useState([]);
   const [breakoutRooms, setBreakoutRooms] = useState([]);
@@ -77,12 +78,14 @@ export const BreakoutRoomProvider = ({ children }) => {
         .insert(participantsList);
 
       const groupedByData = groupBy(data, 'session_id');
+
       callObject.sendAppMessage({
         message: {
           type: 'breakout-rooms',
           value: groupedByData,
         }
       }, '*');
+
       handleTrackSubscriptions(groupedByData);
       setBreakoutRooms(groupedByData);
     }

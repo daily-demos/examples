@@ -3,6 +3,7 @@ import Tile from '@custom/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@custom/shared/constants';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useDeepCompareMemo } from 'use-deep-compare';
+import { useBreakoutRoom } from './BreakoutRoomProvider';
 
 /**
  * Basic unpaginated video tile grid, scaled by aspect ratio
@@ -19,6 +20,7 @@ export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
     const { participants } = useParticipants();
+    const { isActive, subscribedParticipants } = useBreakoutRoom();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -48,7 +50,7 @@ export const VideoGrid = React.memo(
     // Basic brute-force packing algo
     const layout = useMemo(() => {
       const aspectRatio = DEFAULT_ASPECT_RATIO;
-      const tileCount = participants.length || 0;
+      const tileCount = isActive ? subscribedParticipants.length : participants.length || 0;
       const w = dimensions.width;
       const h = dimensions.height;
 
@@ -87,20 +89,34 @@ export const VideoGrid = React.memo(
       }
 
       return bestLayout;
-    }, [dimensions, participants]);
+    }, [dimensions, isActive, subscribedParticipants, participants]);
 
-    // Memoize our tile list to avoid unnecassary re-renders
+    // Memoize our tile list to avoid unnecessary re-renders
     const tiles = useDeepCompareMemo(
       () =>
-        participants.map((p) => (
-          <Tile
-            participant={p}
-            key={p.id}
-            mirrored
-            style={{ maxWidth: layout.width, maxHeight: layout.height }}
-          />
-        )),
-      [layout, participants]
+        participants.map((p) => {
+          if (isActive) {
+            if (subscribedParticipants.includes(p.user_id))
+              return (
+                <Tile
+                  participant={p}
+                  key={p.id}
+                  mirrored
+                  style={{ maxWidth: layout.width, maxHeight: layout.height }}
+                />
+              )
+            return;
+          }
+          return (
+            <Tile
+              participant={p}
+              key={p.id}
+              mirrored
+              style={{ maxWidth: layout.width, maxHeight: layout.height }}
+            />
+          )
+        }),
+      [layout, participants, subscribedParticipants, isActive]
     );
 
     if (!participants.length) {
