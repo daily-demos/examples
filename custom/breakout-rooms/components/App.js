@@ -1,14 +1,16 @@
 import React from 'react';
 
 import App from '@custom/basic-call/components/App';
-import Room from '@custom/basic-call/components/Call/Room';
+import Room from './Room';
 
-export const AppWithPagination = () => (
-  <App
-    customComponentForState={{
-      room: <Room />,
-    }}
-  />
-);
+export const AppWithBreakoutRooms = () => {
+  return (
+    <App
+      customComponentForState={{
+        room: <Room />,
+      }}
+    />
+  );
+}
 
-export default AppWithPagination;
+export default AppWithBreakoutRooms;
