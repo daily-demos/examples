@@ -1,23 +1,25 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { uuid } from '@supabase/supabase-js/dist/main/lib/helpers';
+import PropTypes from 'prop-types';
+import { groupBy } from '../utils/groupBy';
 import { supabase } from '../utils/supabase';
 
-const groupBy = (items, key) => items.reduce(
-  (result, item) => ({
-    ...result,
-    [item[key]]: [
-      ...(result[item[key]] || []),
-      item,
-    ],
-  }),
-  {},
-);
+export const BreakoutRoomContext = createContext();
 
-const useBreakoutRoom = () => {
+export const BreakoutRoomProvider = ({ children }) => {
   const { callObject } = useCallState();
   const { participants, localParticipant } = useParticipants();
+  const [isSessionActive, setIsSessionActive] = useState(false);
+  const [subParticipants, setSubParticipants] = useState([]);
+  const [breakoutRooms, setBreakoutRooms] = useState([]);
 
   const handleTrackSubscriptions = useCallback((breakoutRooms) => {
     Object.values(breakoutRooms || []).map(room => {
@@ -25,8 +27,14 @@ const useBreakoutRoom = () => {
       const isLocalUserInRoom =
         room.filter(r => r.participant_id === localParticipant.user_id).length > 0;
       if (isLocalUserInRoom) {
+        const participantsIDs = [];
         callObject.setSubscribeToTracksAutomatically(false);
-        room.map(p => updateList[p.participant_id] = { setSubscribedTracks: true });
+        room.map(p => {
+          participantsIDs.push(p.participant_id);
+          if (p.participant_id !== localParticipant.user_id)
+            updateList[p.participant_id] = { setSubscribedTracks: true }
+        });
+        setSubParticipants(participantsIDs);
         callObject.updateParticipants(updateList);
       }
     })
@@ -34,6 +42,7 @@ const useBreakoutRoom = () => {
 
   const handleAppMessage = useCallback((e) => {
     if (e?.data?.message?.type === 'breakout-rooms') {
+      setIsSessionActive(true);
       handleTrackSubscriptions(e?.data?.message?.value);
     }
   }, [handleTrackSubscriptions]);
@@ -45,9 +54,9 @@ const useBreakoutRoom = () => {
     return () => callObject.off('app-message', handleAppMessage);
   }, [callObject, handleAppMessage]);
 
-  useEffect(handleTrackSubscriptions, [handleTrackSubscriptions]);
+  const createSession = async () => {
+    setIsSessionActive(true);
 
-  const create = async () => {
     if (participants.length < 4)
       return new Error('Can not create breakout room with less than 4 members');
     else {
@@ -67,18 +76,34 @@ const useBreakoutRoom = () => {
         .from('participants')
         .insert(participantsList);
 
+      const groupedByData = groupBy(data, 'session_id');
       callObject.sendAppMessage({
         message: {
           type: 'breakout-rooms',
-          value: groupBy(data, 'session_id')
+          value: groupedByData,
         }
       }, '*');
-
-      handleTrackSubscriptions(groupBy(data, 'session_id'));
+      handleTrackSubscriptions(groupedByData);
+      setBreakoutRooms(groupedByData);
     }
   };
 
-  return { create };
+  return (
+    <BreakoutRoomContext.Provider
+      value={{
+        isActive: isSessionActive,
+        breakoutRooms,
+        subscribedParticipants: subParticipants,
+        createSession,
+      }}
+    >
+      {children}
+    </BreakoutRoomContext.Provider>
+  );
 };
 
-export default useBreakoutRoom;
+BreakoutRoomProvider.propTypes = {
+  children: PropTypes.node,
+};
+
+export const useBreakoutRoom = () => useContext(BreakoutRoomContext);
