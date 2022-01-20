@@ -60,16 +60,16 @@ export const Header = () => {
             participantCount === 1 ? 'participant' : 'participants'
           }`}
         </HeaderCapsule>
+        <HeaderCapsule>
+          {classType}
+          {capsuleLabel()}
+        </HeaderCapsule>
         {customCapsule && (
           <HeaderCapsule variant={customCapsule.variant}>
             {customCapsule.variant === 'recording' && <span />}
             {customCapsule.label}
           </HeaderCapsule>
         )}
-        <HeaderCapsule>
-          {classType}
-          {capsuleLabel()}
-        </HeaderCapsule>
 
         <style jsx>{`
           .room-header {

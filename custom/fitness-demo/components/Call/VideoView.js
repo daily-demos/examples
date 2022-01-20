@@ -15,7 +15,7 @@ export const VideoView = () => {
   }, [screens, setIsShowingScreenshare]);
 
   if (!participants.length) return null;
-  if (participants.length === 1) return <InviteOthers />;
+  if (participants.length === 1 && !screens.length > 0) return <InviteOthers />;
 
   return viewMode === VIEW_MODE_SPEAKER ? <SpeakerView />: <GridView />;
 };
