@@ -40,8 +40,6 @@ export const ChatAside = () => {
     }
   }, [chatHistory?.length]);
 
-  const isLocalUser = (id) => id === localParticipant.user_id;
-
   if (!showAside || showAside !== CHAT_ASIDE) {
     return null;
   }
@@ -51,7 +49,7 @@ export const ChatAside = () => {
       <div className="messages-container" ref={chatWindowRef}>
         {chatHistory?.map((chatItem) => (
           <div
-            className={isLocalUser(chatItem.senderID) ? 'message local' : 'message'}
+            className={chatItem.isLocal ? 'message local' : 'message'}
             key={chatItem.id}
           >
             <span className="content">{chatItem.message}</span>
