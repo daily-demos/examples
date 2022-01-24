@@ -7,6 +7,7 @@ import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { ReactComponent as IconEmoji } from '@custom/shared/icons/emoji-sm.svg';
 import { useChat } from '../../contexts/ChatProvider';
 import { useMessageSound } from '../../hooks/useMessageSound';
+import AsideHeader from '../App/AsideHeader';
 
 export const CHAT_ASIDE = 'chat';
 
@@ -46,6 +47,7 @@ export const ChatAside = () => {
 
   return (
     <Aside onClose={() => setShowAside(false)}>
+      <AsideHeader />
       <div className="messages-container" ref={chatWindowRef}>
         {chatHistory?.map((chatItem) => (
           <div
