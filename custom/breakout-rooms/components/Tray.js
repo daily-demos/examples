@@ -1,18 +1,19 @@
 import React from 'react';
 
 import { TrayButton } from '@custom/shared/components/Tray';
-import { ReactComponent as IconAdd } from '@custom/shared/icons/add-md.svg';
-import { useBreakoutRoom } from './BreakoutRoomProvider';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { ReactComponent as IconBreakout } from '@custom/shared/icons/breakout-md.svg';
+import { BREAKOUT_ROOM_MODAL } from './BreakoutRoomModal';
 
 export const Tray = () => {
-  const { createSession } = useBreakoutRoom();
+  const { openModal } = useUIState();
 
   return (
     <>
       <TrayButton
         label="Breakout"
-        onClick={createSession}>
-        <IconAdd />
+        onClick={() => openModal(BREAKOUT_ROOM_MODAL)}>
+        <IconBreakout />
       </TrayButton>
     </>
   );

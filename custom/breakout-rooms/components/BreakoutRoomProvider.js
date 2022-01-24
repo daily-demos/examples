@@ -55,40 +55,33 @@ export const BreakoutRoomProvider = ({ children }) => {
     return () => callObject.off('app-message', handleAppMessage);
   }, [callObject, handleAppMessage]);
 
-  const createSession = async () => {
+  const createSession = async (maxParticipants) => {
     setIsSessionActive(true);
 
-    if (participants.length < 4)
-      return new Error('Can not create breakout room with less than 4 members');
-    else {
-      let n = participants.length / 2;
-      if (participants.length > 10) n = 5
+    const rooms = [];
+    new Array(Math.ceil(participants.length / maxParticipants))
+      .fill()
+      .map(_ => rooms.push({ session_id: uuid(), members: participants.splice(0, maxParticipants)}));
 
-      const rooms = [];
-      new Array(Math.ceil(participants.length / n))
-        .fill()
-        .map(_ => rooms.push({ session_id: uuid(), members: participants.splice(0, n)}));
+    const participantsList = [];
+    rooms.map(r =>
+      r.members.map(p => participantsList.push({ participant_id: p.user_id, session_id: r.session_id })));
 
-      const participantsList = [];
-      rooms.map(r =>
-        r.members.map(p => participantsList.push({ participant_id: p.user_id, session_id: r.session_id })));
+    const { data } = await supabase
+      .from('participants')
+      .insert(participantsList);
 
-      const { data } = await supabase
-        .from('participants')
-        .insert(participantsList);
+    const groupedByData = groupBy(data, 'session_id');
 
-      const groupedByData = groupBy(data, 'session_id');
+    callObject.sendAppMessage({
+      message: {
+        type: 'breakout-rooms',
+        value: groupedByData,
+      }
+    }, '*');
 
-      callObject.sendAppMessage({
-        message: {
-          type: 'breakout-rooms',
-          value: groupedByData,
-        }
-      }, '*');
-
-      handleTrackSubscriptions(groupedByData);
-      setBreakoutRooms(groupedByData);
-    }
+    handleTrackSubscriptions(groupedByData);
+    setBreakoutRooms(groupedByData);
   };
 
   return (
