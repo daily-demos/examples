@@ -31,6 +31,7 @@ export const CallProvider = ({
   token = '',
   subscribeToTracksAutomatically = true,
 }) => {
+  const [roomInfo, setRoomInfo] = useState(null);
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
   const [showLocalVideo, setShowLocalVideo] = useState(true);
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
@@ -52,6 +53,7 @@ export const CallProvider = ({
     if (!daily) return;
     const updateRoomConfigState = async () => {
       const roomConfig = await daily.room();
+      setRoomInfo(roomConfig);
       const config = roomConfig?.config;
       if (!config) return;
 
@@ -117,6 +119,8 @@ export const CallProvider = ({
         enableRecording,
         videoQuality,
         setVideoQuality,
+        roomInfo,
+        setRoomInfo,
         setBandwidth,
         setRedirectOnLeave,
         setShowLocalVideo,

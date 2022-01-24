@@ -15,7 +15,7 @@ import { supabase } from '../utils/supabase';
 export const BreakoutRoomContext = createContext();
 
 export const BreakoutRoomProvider = ({ children }) => {
-  const { callObject } = useCallState();
+  const { callObject, roomInfo } = useCallState();
   const { participants, localParticipant } = useParticipants();
 
   const [isSessionActive, setIsSessionActive] = useState(false);
@@ -58,6 +58,11 @@ export const BreakoutRoomProvider = ({ children }) => {
   const createSession = async (maxParticipants) => {
     setIsSessionActive(true);
 
+    // inserting the room status into supabase.
+    const { data: roomData } = await supabase
+      .from('breakout')
+      .insert([{ name: roomInfo.name }]);
+
     const rooms = [];
     new Array(Math.ceil(participants.length / maxParticipants))
       .fill()
@@ -65,7 +70,8 @@ export const BreakoutRoomProvider = ({ children }) => {
 
     const participantsList = [];
     rooms.map(r =>
-      r.members.map(p => participantsList.push({ participant_id: p.user_id, session_id: r.session_id })));
+      r.members.map(p =>
+        participantsList.push({ participant_id: p.user_id, session_id: r.session_id, room_id: roomData[0].id })));
 
     const { data } = await supabase
       .from('participants')

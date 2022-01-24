@@ -28,6 +28,11 @@ export const BreakoutRoomModal = () => {
     )
   }
 
+  const create = () => {
+    createSession(maxSize);
+    closeModal(BREAKOUT_ROOM_MODAL);
+  };
+
   return (
     <Modal
       title="Breakout Rooms"
@@ -41,7 +46,7 @@ export const BreakoutRoomModal = () => {
           key="submit"
           fullWidth
           disabled={participants.length < 4 || maxSize >= participants.length}
-          onClick={() => createSession(maxSize)}>
+          onClick={create}>
           Create rooms
         </Button>
       ]}
