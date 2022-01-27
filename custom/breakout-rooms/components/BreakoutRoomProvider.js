@@ -73,9 +73,18 @@ export const BreakoutRoomProvider = ({ children }) => {
     }
   }, [callObject, getBreakoutRoomsData, localParticipant.user_id, setCustomCapsule]);
 
+  const handleEndBreakoutRooms = useCallback(() => {
+    if (!callObject) return;
+
+    setIsSessionActive(false);
+    setCustomCapsule();
+    callObject.setSubscribeToTracksAutomatically(true);
+  }, [callObject, setCustomCapsule]);
+
   const handleAppMessage = useCallback((e) => {
     if (e?.data?.message?.type === 'breakout-rooms') handleTrackSubscriptions();
-  }, [handleTrackSubscriptions]);
+    if (e?.data?.message?.type === 'end-breakout-rooms') handleEndBreakoutRooms();
+  }, [handleEndBreakoutRooms, handleTrackSubscriptions]);
 
   const handleJoinedMeeting = useCallback(async () => {
     const roomsData = await getBreakoutRoomsData();
@@ -153,6 +162,26 @@ export const BreakoutRoomProvider = ({ children }) => {
     handleTrackSubscriptions();
   };
 
+  const endSession = async () => {
+    setIsSessionActive(false);
+
+    const { data } = await supabase
+      .from('breakout')
+      .select('*')
+      .eq('name', roomInfo?.name);
+
+    const room = data.slice(-1).pop();
+    if (room.is_active) {
+      await supabase
+        .from('breakout')
+        .update({ is_active: false })
+        .match({ id: room.id });
+    }
+
+    handleEndBreakoutRooms();
+    callObject.sendAppMessage({ message: { type: 'end-breakout-rooms' }}, '*');
+  };
+
   return (
     <BreakoutRoomContext.Provider
       value={{
@@ -160,6 +189,7 @@ export const BreakoutRoomProvider = ({ children }) => {
         breakoutRooms,
         subscribedParticipants: subParticipants,
         createSession,
+        endSession,
       }}
     >
       {children}
