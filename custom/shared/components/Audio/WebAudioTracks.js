@@ -1,15 +1,12 @@
-import React, { useEffect, useRef } from 'react';
-import { useDeepCompareEffect, useDeepCompareMemo } from 'use-deep-compare';
+import React, { memo, useEffect, useRef } from 'react';
+import { useCallback } from 'react';
 
+import { useCallState } from '../../contexts/CallProvider';
+import { Loopback } from '../../lib/loopback';
 
-const WebAudioTracks = ({ tracks }) => {
+const WAT = () => {
+  const { callObject } = useCallState();
   const audioEl = useRef(null);
-  /**
-   * Dummy audio to assign each track to once, to workaround Chrome bug.
-   * MediaStream must be assigned at least once to a DOM element, otherwise Web Audio remains silent.
-   * See https://bugs.chromium.org/p/chromium/issues/detail?id=933677
-   */
-  const dummyAudioEl = useRef(null);
   const audioCtx = useRef(null);
   const destination = useRef(null);
   const inputNodes = useRef({});
@@ -21,74 +18,64 @@ const WebAudioTracks = ({ tracks }) => {
     // Workaround as long as MediaDevices.selectAudioOutput is not supported
     // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/selectAudioOutput
     destination.current = audioCtx.current.createMediaStreamDestination();
-    audioEl.current.srcObject = destination.current.stream;
     // Expose map of connected nodes for Debugger
     window['dailyAudioNodes'] = inputNodes.current;
+
+    let loopback;
+    async function setupLoopback() {
+      loopback = new Loopback();
+      await loopback.start(destination.current.stream);
+      const loopbackStream = loopback.getLoopback();
+      audioEl.current.srcObject = loopbackStream;
+      audioEl.current.play();
+    }
+
+    setupLoopback();
+
+    return () => loopback.destroy();
   }, []);
 
-  const trackIds = useDeepCompareMemo(
-    () => Object.values(tracks).map((t) => t?.persistentTrack?.id),
-    [tracks]
-  );
+  const handleTrackStarted = useCallback(async ({ participant, track }) => {
+    if (track.kind !== 'audio' || participant?.local) return;
+    if (Object.keys(inputNodes.current).includes(track.id)) return;
+    const mediaStream = new MediaStream([track]);
+    const node = new MediaStreamAudioSourceNode(audioCtx.current, {
+      mediaStream,
+    });
 
-  useDeepCompareEffect(() => {
-    const audio = audioEl.current;
-    if (!audio) return;
+    // Apparently this is required due to a Chromium bug!
+    // https://bugs.chromium.org/p/chromium/issues/detail?id=933677
+    // https://stackoverflow.com/questions/55703316/audio-from-rtcpeerconnection-is-not-audible-after-processing-in-audiocontext
+    const mutedAudio = new Audio();
+    mutedAudio.muted = true;
+    mutedAudio.srcObject = mediaStream;
+    mutedAudio.play();
 
-    const disconnectTrack = (trackId) => {
-      if (!trackId) return;
-      const node = inputNodes.current?.[trackId];
-      if (!node) return;
-      node.disconnect();
-      delete inputNodes.current[trackId];
+    inputNodes.current[track.id] = node;
+    node.connect(destination.current);
+  }, []);
+
+  const handleTrackStopped = useCallback(({ participant, track }) => {
+    if (track.kind !== 'audio' || participant?.local) return;
+    const node = inputNodes.current?.[track.id];
+    if (!node) return;
+    node.disconnect();
+    delete inputNodes.current[track.id];
+  }, []);
+
+  useEffect(() => {
+    if (!callObject) return;
+
+    callObject.on('track-started', handleTrackStarted);
+    callObject.on('track-stopped', handleTrackStopped);
+
+    return () => {
+      callObject.off('track-started', handleTrackStarted);
+      callObject.off('track-stopped', handleTrackStopped);
     };
+  }, [callObject, handleTrackStarted, handleTrackStopped]);
 
-    const connectTrack = (track) => {
-      // Check if track is already connected
-      if (Object.keys(inputNodes.current).includes(track.id)) return;
-      const mediaStream = new MediaStream([track]);
-      const node = new MediaStreamAudioSourceNode(audioCtx.current, {
-        mediaStream: mediaStream,
-      });
-      inputNodes.current[track.id] = node;
-      try {
-        node.connect(destination.current);
-        dummyAudioEl.current.srcObject = mediaStream;
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    const allTracks = Object.values(tracks);
-    for (const track of allTracks) {
-      // @ts-ignore
-      const persistentTrack = track?.persistentTrack;
-      if (persistentTrack) {
-        switch (persistentTrack.readyState) {
-          case 'ended':
-            disconnectTrack(persistentTrack?.id);
-            break;
-          case 'live':
-            persistentTrack.addEventListener(
-              'ended',
-              () => {
-                disconnectTrack(persistentTrack?.id);
-              },
-              { once: true }
-            );
-            connectTrack(persistentTrack);
-            break;
-        }
-      }
-    }
-  }, [tracks, trackIds]);
-
-  return (
-    <>
-      <audio autoPlay playsInline ref={audioEl} />
-      <audio muted ref={dummyAudioEl} />
-    </>
-  );
+  return <audio autoPlay playsInline ref={audioEl} />;
 };
 
-export default WebAudioTracks;
+export const WebAudioTracks = memo(WAT);

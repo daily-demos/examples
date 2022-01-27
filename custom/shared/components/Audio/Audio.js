@@ -7,41 +7,54 @@
  * and Chrome's maximum media elements. On Chrome we add all audio tracks
  * into into a single audio node using the CombinedAudioTrack component
  */
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTracks } from '@custom/shared/contexts/TracksProvider';
-import { Portal } from 'react-portal';
 import { isSafari } from '@custom/shared/lib/browserConfig';
+import { Portal } from 'react-portal';
+import { useDeepCompareEffect } from 'use-deep-compare';
+import { useCallState } from '../../contexts/CallProvider';
+import { isScreenId } from '../../contexts/participantsState';
 import AudioTrack from './AudioTrack';
-import WebAudioTracks from './WebAudioTracks';
+import { WebAudioTracks } from './WebAudioTracks';
 
 export const Audio = () => {
+  const { disableAudio } = useCallState();
   const { audioTracks } = useTracks();
+  const [renderedTracks, setRenderedTracks] = useState({});
+  const [isClient, setIsClient] = useState(false);
 
-  const renderedTracks = useMemo(
-    () =>
-      Object.entries(audioTracks).reduce(
-        (tracks, [id, track]) => ({ ...tracks, [id]: track }),
-        {}
-      ),
-    [audioTracks]
-  );
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  // On iOS safari, when headphones are disconnected, all audio elements are paused.
-  // This means that when a user disconnects their headphones, that user will not
-  // be able to hear any other users until they mute/unmute their mics.
-  // To fix that, we call `play` on each audio track on all devicechange events.
+  useDeepCompareEffect(() => {
+    const newTracks = Object.entries(audioTracks).reduce(
+      (tracks, [id, track]) => {
+        if (!disableAudio || isScreenId(id)) {
+          tracks[id] = track;
+        }
+        return tracks;
+      },
+      {}
+    );
+    setRenderedTracks(newTracks);
+  }, [audioTracks, disableAudio]);
+
   useEffect(() => {
     const playTracks = () => {
-      document.querySelectorAll('.audioTracks audio').forEach(async (audio) => {
-        try {
-          if (audio.paused && audio.readyState === audio.HAVE_ENOUGH_DATA) {
-            await audio?.play();
+      document
+        .querySelectorAll('.audioTracks audio')
+        .forEach(async (audio) => {
+          try {
+            if (audio.paused && audio.readyState === audio.HAVE_ENOUGH_DATA) {
+              await audio?.play();
+            }
+          } catch (e) {
+            // Auto play failed
           }
-        } catch (e) {
-          // Auto play failed
-        }
-      });
+        });
     };
+
     navigator.mediaDevices.addEventListener('devicechange', playTracks);
     return () => {
       navigator.mediaDevices.removeEventListener('devicechange', playTracks);
@@ -54,8 +67,11 @@ export const Audio = () => {
         <AudioTrack key={id} track={track.persistentTrack} />
       ));
     }
-    return <WebAudioTracks tracks={renderedTracks} />;
+    return <WebAudioTracks />;
   }, [renderedTracks]);
+
+  // Only render audio tracks in browser
+  if (!isClient) return null;
 
   return (
     <Portal key="AudioTracks">
