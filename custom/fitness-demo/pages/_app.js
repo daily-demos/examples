@@ -1,11 +1,11 @@
 import React from 'react';
+import LiveStreamingModal from '@custom/live-streaming/components/LiveStreamingModal';
+import RecordingModal from '@custom/recording/components/RecordingModal';
 import GlobalStyle from '@custom/shared/components/GlobalStyle';
 import Head from 'next/head';
 import PropTypes from 'prop-types';
 import { App as CustomApp } from '../components/App/App';
 import ChatAside from '../components/Call/ChatAside';
-import LiveStreamingModal from '../components/Modals/LiveStreamingModal';
-import RecordingModal from '../components/Modals/RecordingModal';
 import Tray from '../components/Tray';
 
 function App({ Component, pageProps }) {

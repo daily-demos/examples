@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "@custom/shared": "*",
+    "@custom/basic-call": "*",
+    "@custom/text-chat": "*",
+    "@custom/live-streaming": "*",
+    "@custom/recording": "*",
     "next": "^11.1.2",
     "pluralize": "^8.0.0"
   },

@@ -1,19 +1,19 @@
 import React, { useEffect } from 'react';
 
-import { TrayButton } from '@custom/shared/components/Tray';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
-import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
-import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { ReactComponent as IconRecord } from '@custom/shared/icons/record-md.svg';
-
+import { RECORDING_MODAL } from '@custom/recording/components/RecordingModal';
 import {
   RECORDING_ERROR,
   RECORDING_RECORDING,
   RECORDING_SAVED,
   RECORDING_UPLOADING,
   useRecording,
-} from '../../contexts/RecordingProvider';
-import { RECORDING_MODAL } from '../Modals/RecordingModal';
+} from '@custom/recording/contexts/RecordingProvider';
+import { TrayButton } from '@custom/shared/components/Tray';
+import { useCallState } from '@custom/shared/contexts/CallProvider';
+import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { ReactComponent as IconRecord } from '@custom/shared/icons/record-md.svg';
+
 
 export const Tray = () => {
   const { enableRecording } = useCallState();

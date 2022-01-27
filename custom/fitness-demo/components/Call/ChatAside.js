@@ -2,11 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Aside } from '@custom/shared/components/Aside';
 import Button from '@custom/shared/components/Button';
 import { TextInput } from '@custom/shared/components/Input';
-import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { ReactComponent as IconEmoji } from '@custom/shared/icons/emoji-sm.svg';
+import { useMessageSound } from '@custom/text-chat/hooks/useMessageSound';
 import { useChat } from '../../contexts/ChatProvider';
-import { useMessageSound } from '../../hooks/useMessageSound';
 import AsideHeader from '../App/AsideHeader';
 
 export const CHAT_ASIDE = 'chat';
@@ -15,7 +14,6 @@ export const ChatAside = () => {
   const { showAside, setShowAside } = useUIState();
   const { sendMessage, chatHistory, hasNewMessages, setHasNewMessages } =
     useChat();
-  const { localParticipant } = useParticipants();
   const [newMessage, setNewMessage] = useState('');
   const playMessageSound = useMessageSound();
   const [showEmojis, setShowEmojis] = useState(false);

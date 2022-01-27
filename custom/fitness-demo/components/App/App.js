@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react';
+import { LiveStreamingProvider } from '@custom/live-streaming/contexts/LiveStreamingProvider';
+import { RecordingProvider } from '@custom/recording/contexts/RecordingProvider';
 import ExpiryTimer from '@custom/shared/components/ExpiryTimer';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useCallUI } from '@custom/shared/hooks/useCallUI';
@@ -6,8 +8,6 @@ import PropTypes from 'prop-types';
 
 import { ChatProvider } from '../../contexts/ChatProvider';
 import { ClassStateProvider } from '../../contexts/ClassStateProvider';
-import { LiveStreamingProvider } from '../../contexts/LiveStreamingProvider';
-import { RecordingProvider } from '../../contexts/RecordingProvider';
 import Room from '../Call/Room';
 import { Asides } from './Asides';
 import { Modals } from './Modals';
