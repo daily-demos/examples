@@ -1,6 +1,6 @@
 # Fitness Demo
 
-![Basic Call](./image.png)
+![Fitness Demo](./image.png)
 
 ### Live example
 

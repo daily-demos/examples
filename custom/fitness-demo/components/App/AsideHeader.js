@@ -10,34 +10,37 @@ export const AsideHeader = () => {
     <>
       <div className="aside-header">
         <div
-          className={`header ${showAside === PEOPLE_ASIDE && 'active'}`}
+          className={`tab ${showAside === PEOPLE_ASIDE && 'active'}`}
           onClick={() => setShowAside(PEOPLE_ASIDE)}
         >
-          People
+          <p>People</p>
         </div>
         <div
-          className={`header ${showAside === CHAT_ASIDE && 'active'}`}
+          className={`tab ${showAside === CHAT_ASIDE && 'active'}`}
           onClick={() => setShowAside(CHAT_ASIDE)}
         >
-          Chat
+          <p>Chat</p>
         </div>
       </div>
       <style jsx>{`
         .aside-header {
           display: flex;
+          justify-content: center;
+          align-items: center;
           width: 100%;
           height: 5vh;
           text-align: center;
-        }
-        .aside-header .header {
-          height: 100%;
-          width: 50%;
           background: var(--gray-wash);
           color: var(--gray-dark);
+        }
+        
+        .tab {
+          height: 100%;
+          width: 50%;
           cursor: pointer;
         }
         
-        .header.active {
+        .tab.active {
           background: var(--reverse)!important;
           color: var(--text-default)!important;
           font-weight: 900;

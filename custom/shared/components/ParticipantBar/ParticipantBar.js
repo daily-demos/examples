@@ -240,7 +240,7 @@ export const ParticipantBar = ({
     const maybePromoteActiveSpeaker = () => {
       const fixedOther = fixed.find((f) => !f.isLocal);
       // Ignore when speaker is already at first position or component unmounted
-      if (!fixedOther || fixedOther?.id === activeSpeakerId || !scrollEl) {
+      if (!fixedOther || fixedOther?.id === currentSpeakerId || !scrollEl) {
         return false;
       }
 
