@@ -4,7 +4,7 @@ import { CardBody } from '@custom/shared/components/Card';
 import Field from '@custom/shared/components/Field';
 import { TextInput, SelectInput } from '@custom/shared/components/Input';
 import Modal from '@custom/shared/components/Modal';
-import { Well } from '@custom/shared/components/Well';
+import Well from '@custom/shared/components/Well';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
