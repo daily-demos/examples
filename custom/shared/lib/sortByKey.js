@@ -1,4 +1,5 @@
-export const sortByKey = (a, b, key, caseSensitive = true) => {
+export const sortByKey = (key, caseSensitive = true) =>
+(a, b) => {
   const aKey =
     !caseSensitive && typeof a[key] === 'string'
       ? String(a[key])?.toLowerCase()

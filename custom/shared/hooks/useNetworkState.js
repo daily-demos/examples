@@ -1,50 +1,55 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallState } from '../contexts/CallProvider';
 
-import {
-  VIDEO_QUALITY_HIGH,
-  VIDEO_QUALITY_LOW,
-  VIDEO_QUALITY_BANDWIDTH_SAVER,
-} from '../constants';
-
-export const NETWORK_STATE_GOOD = 'good';
-export const NETWORK_STATE_LOW = 'low';
-export const NETWORK_STATE_VERY_LOW = 'very-low';
 const STANDARD_HIGH_BITRATE_CAP = 980;
 const STANDARD_LOW_BITRATE_CAP = 300;
 
 export const useNetworkState = (
-  callObject = null,
-  quality = VIDEO_QUALITY_HIGH
+  co = null,
+  quality = 'high'
 ) => {
-  const [threshold, setThreshold] = useState(NETWORK_STATE_GOOD);
+  const [threshold, setThreshold] = useState('good');
+  const lastSetKBS = useRef(null);
+
+  const callState = useCallState();
+
+  const callObject = co ?? callState?.callObject;
 
   const setQuality = useCallback(
-    (q) => {
+    async (q) => {
       if (!callObject) return;
-
       const peers = Object.keys(callObject.participants()).length - 1;
-      const isSFU = callObject.getNetworkTopology().topology === 'sfu';
-
+      const isSFU = (await callObject.getNetworkTopology()).topology === 'sfu';
       const lowKbs = isSFU
         ? STANDARD_LOW_BITRATE_CAP
-        : STANDARD_LOW_BITRATE_CAP / Math.max(1, peers);
+        : Math.floor(STANDARD_LOW_BITRATE_CAP / Math.max(1, peers));
+      const highKbs = isSFU
+        ? STANDARD_HIGH_BITRATE_CAP
+        : Math.floor(STANDARD_HIGH_BITRATE_CAP / Math.max(1, peers));
 
       switch (q) {
-        case VIDEO_QUALITY_HIGH:
-          callObject.setBandwidth({ kbs: STANDARD_HIGH_BITRATE_CAP });
+        case 'auto':
+        case 'high':
+          if (lastSetKBS.current === highKbs) break;
+          callObject.setBandwidth({
+            kbs: highKbs,
+          });
+          lastSetKBS.current = highKbs;
           break;
-        case VIDEO_QUALITY_LOW:
+        case 'low':
+          if (lastSetKBS.current === lowKbs) break;
           callObject.setBandwidth({
             kbs: lowKbs,
           });
+          lastSetKBS.current = lowKbs;
           break;
-        case VIDEO_QUALITY_BANDWIDTH_SAVER:
+        case 'bandwidth-saver':
           callObject.setLocalVideo(false);
+          if (lastSetKBS.current === lowKbs) break;
           callObject.setBandwidth({
             kbs: lowKbs,
           });
-          break;
-        default:
+          lastSetKBS.current = lowKbs;
           break;
       }
     },
@@ -56,43 +61,50 @@ export const useNetworkState = (
       if (ev.threshold === threshold) return;
 
       switch (ev.threshold) {
-        case NETWORK_STATE_VERY_LOW:
-          setQuality(VIDEO_QUALITY_BANDWIDTH_SAVER);
-          setThreshold(NETWORK_STATE_VERY_LOW);
+        case 'very-low':
+          setQuality('bandwidth-saver');
+          setThreshold('very-low');
           break;
-        case NETWORK_STATE_LOW:
+        case 'low':
+          setQuality(quality === 'bandwidth-saver' ? quality : 'low');
+          setThreshold('low');
+          break;
+        case 'good':
           setQuality(
-            quality === VIDEO_QUALITY_BANDWIDTH_SAVER
-              ? quality
-              : NETWORK_STATE_LOW
+            ['bandwidth-saver', 'low'].includes(quality) ? quality : 'high'
           );
-          setThreshold(NETWORK_STATE_LOW);
-          break;
-        case NETWORK_STATE_GOOD:
-          setQuality(
-            [VIDEO_QUALITY_BANDWIDTH_SAVER, VIDEO_QUALITY_LOW].includes(quality)
-              ? quality
-              : VIDEO_QUALITY_HIGH
-          );
-          setThreshold(NETWORK_STATE_GOOD);
-          break;
-        default:
+          setThreshold('good');
           break;
       }
     },
-    [setQuality, threshold, quality]
+    [quality, setQuality, threshold]
   );
 
   useEffect(() => {
-    if (!callObject) return false;
+    if (!callObject) return;
     callObject.on('network-quality-change', handleNetworkQualityChange);
-    return () =>
+    return () => {
       callObject.off('network-quality-change', handleNetworkQualityChange);
+    };
   }, [callObject, handleNetworkQualityChange]);
 
   useEffect(() => {
+    if (!callObject) return;
     setQuality(quality);
-  }, [quality, setQuality]);
+    let timeout;
+    const handleParticipantCountChange = () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setQuality(quality);
+      }, 500);
+    };
+    callObject.on('participant-joined', handleParticipantCountChange);
+    callObject.on('participant-left', handleParticipantCountChange);
+    return () => {
+      callObject.off('participant-joined', handleParticipantCountChange);
+      callObject.off('participant-left', handleParticipantCountChange);
+    };
+  }, [callObject, quality, setQuality]);
 
   return threshold;
 };

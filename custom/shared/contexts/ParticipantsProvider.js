@@ -1,44 +1,36 @@
-import React, {
+import {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useState,
-  useMemo,
 } from 'react';
-import {
-  useUIState,
-} from '@custom/shared/contexts/UIStateProvider';
-import PropTypes from 'prop-types';
-import { sortByKey } from '../lib/sortByKey';
-
+import { sortByKey } from '@custom/shared/lib/sortByKey';
+import { useNetworkState } from '../hooks/useNetworkState';
 import { useCallState } from './CallProvider';
-
+import { useUIState } from './UIStateProvider';
 import {
   initialParticipantsState,
   isLocalId,
-  ACTIVE_SPEAKER,
-  PARTICIPANT_JOINED,
-  PARTICIPANT_LEFT,
-  PARTICIPANT_UPDATED,
   participantsReducer,
-  SWAP_POSITION,
 } from './participantsState';
 
-export const ParticipantsContext = createContext();
+export const ParticipantsContext = createContext(null);
 
 export const ParticipantsProvider = ({ children }) => {
-  const { callObject, videoQuality, networkState, broadcast } = useCallState();
-  const [state, dispatch] = useReducer(
-    participantsReducer,
-    initialParticipantsState
-  );
-  const { viewMode } = useUIState();
-  const [
-    participantMarkedForRemoval,
-    setParticipantMarkedForRemoval,
-  ] = useState(null);
+  const { isMobile, pinnedId, viewMode } = useUIState();
+  const {
+    broadcast,
+    broadcastRole,
+    callObject: daily,
+    videoQuality,
+  } = useCallState();
+  const [state, dispatch] = useReducer(participantsReducer, initialParticipantsState);
+  const [participantMarkedForRemoval, setParticipantMarkedForRemoval] = useState(null);
+
+  const { threshold } = useNetworkState();
 
   /**
    * ALL participants (incl. shared screens) in a convenient array
@@ -57,14 +49,6 @@ export const ParticipantsProvider = ({ children }) => {
     }
     return state.participants;
   }, [broadcast, state.participants]);
-
-  /**
-   * Array of participant IDs
-   */
-  const participantIds = useMemo(
-    () => participants.map((p) => p.id).join(','),
-    [participants]
-  );
 
   /**
    * The number of participants, who are not a shared screen
@@ -103,28 +87,26 @@ export const ParticipantsProvider = ({ children }) => {
    */
   const currentSpeaker = useMemo(() => {
     /**
-     * If the activeParticipant is still in the call, return the activeParticipant.
+     * Ensure activeParticipant is still present in the call.
      * The activeParticipant only updates to a new active participant so
      * if everyone else is muted when AP leaves, the value will be stale.
      */
     const isPresent = participants.some((p) => p?.id === activeParticipant?.id);
-    if (isPresent) {
-      return activeParticipant;
-    }
+    const pinned = participants.find((p) => p?.id === pinnedId);
 
-    /**
-     * If the activeParticipant has left, calculate the remaining displayable participants
-     */
-    const displayableParticipants = participants.filter((p) => !p?.isLocal);
+    if (pinned) return pinned;
 
-    /**
-     * If nobody ever unmuted, return the first participant with a camera on
-     * Or, if all cams are off, return the first remote participant
-     */
+    const displayableParticipants = participants.filter((p) =>
+      isMobile ? !p?.isLocal && !p?.isScreenshare : !p?.isLocal
+    );
+
     if (
+      !isPresent &&
       displayableParticipants.length > 0 &&
       displayableParticipants.every((p) => p.isMicMuted && !p.lastActiveDate)
     ) {
+      // Return first cam on participant in case everybody is muted and nobody ever talked
+      // or first remote participant, in case everybody's cam is muted, too.
       return (
         displayableParticipants.find((p) => !p.isCamMuted) ??
         displayableParticipants?.[0]
@@ -132,13 +114,20 @@ export const ParticipantsProvider = ({ children }) => {
     }
 
     const sorted = displayableParticipants
-      .sort((a, b) => sortByKey(a, b, 'lastActiveDate'))
+      .sort(sortByKey('lastActiveDate'))
       .reverse();
 
-    const lastActiveSpeaker = sorted?.[0];
+    const fallback = broadcastRole === 'attendee' ? null : localParticipant;
 
-    return lastActiveSpeaker || localParticipant;
-  }, [activeParticipant, localParticipant, participants]);
+    return isPresent ? activeParticipant : sorted?.[0] ?? fallback;
+  }, [
+    activeParticipant,
+    broadcastRole,
+    isMobile,
+    localParticipant,
+    participants,
+    pinnedId,
+  ]);
 
   /**
    * Screen shares
@@ -148,33 +137,17 @@ export const ParticipantsProvider = ({ children }) => {
   /**
    * The local participant's name
    */
-  const username = callObject?.participants()?.local?.user_name ?? '';
+  const username = daily?.participants()?.local?.user_name ?? '';
 
   /**
    * Sets the local participant's name in daily-js
    * @param name The new username
    */
-  const setUsername = (name) => {
-    callObject.setUserName(name);
-  };
-
-  const [muteNewParticipants, setMuteNewParticipants] = useState(false);
-
-  const muteAll = useCallback(
-    (muteFutureParticipants = false) => {
-      if (!localParticipant.isOwner) return;
-      setMuteNewParticipants(muteFutureParticipants);
-      const unmutedParticipants = participants.filter(
-        (p) => !p.isLocal && !p.isMicMuted
-      );
-      if (!unmutedParticipants.length) return;
-      const result = unmutedParticipants.reduce(
-        (o, p) => ({ ...o[p.id], setAudio: false }),
-        {}
-      );
-      callObject.updateParticipants(result);
+  const setUsername = useCallback(
+    (name) => {
+      daily.setUserName(name);
     },
-    [callObject, localParticipant, participants]
+    [daily]
   );
 
   const swapParticipantPosition = useCallback((id1, id2) => {
@@ -192,68 +165,89 @@ export const ParticipantsProvider = ({ children }) => {
     });
   }, []);
 
+  const [muteNewParticipants, setMuteNewParticipants] = useState(false);
+
+  const muteAll = useCallback(
+    (muteFutureParticipants = false) => {
+      if (!localParticipant.isOwner) return;
+      setMuteNewParticipants(muteFutureParticipants);
+      const unmutedParticipants = participants.filter(
+        (p) => !p.isLocal && !p.isMicMuted
+      );
+      if (!unmutedParticipants.length) return;
+      daily.updateParticipants(
+        unmutedParticipants.reduce((o, p) => {
+          o[p.id] = {
+            setAudio: false,
+          };
+          return o;
+        }, {})
+      );
+    },
+    [daily, localParticipant, participants]
+  );
+
+  const handleParticipantJoined = useCallback(() => {
+    dispatch({
+      type: 'JOINED_MEETING',
+      participant: daily.participants().local,
+    });
+  }, [daily]);
+
   const handleNewParticipantsState = useCallback(
     (event = null) => {
       switch (event?.action) {
         case 'participant-joined':
           dispatch({
-            type: PARTICIPANT_JOINED,
+            type: 'PARTICIPANT_JOINED',
             participant: event.participant,
           });
+          if (muteNewParticipants && daily) {
+            daily.updateParticipant(event.participant.session_id, {
+              setAudio: false,
+            });
+          }
           break;
         case 'participant-updated':
           dispatch({
-            type: PARTICIPANT_UPDATED,
+            type: 'PARTICIPANT_UPDATED',
             participant: event.participant,
           });
           break;
         case 'participant-left':
           dispatch({
-            type: PARTICIPANT_LEFT,
+            type: 'PARTICIPANT_LEFT',
             participant: event.participant,
           });
           break;
-        default:
-          break;
       }
     },
-    [dispatch]
+    [daily, dispatch, muteNewParticipants]
   );
 
-  /**
-   * Start listening for participant changes, when the callObject is set.
-   */
   useEffect(() => {
-    if (!callObject) return false;
+    if (!daily) return;
 
-    console.log('👥 Participant provider events bound');
+    daily.on('participant-joined', handleParticipantJoined);
+    daily.on('participant-joined', handleNewParticipantsState);
+    daily.on('participant-updated', handleNewParticipantsState);
+    daily.on('participant-left', handleNewParticipantsState);
 
-    const events = [
-      'joined-meeting',
-      'participant-joined',
-      'participant-updated',
-      'participant-left',
-    ];
+    return () => {
+      daily.off('participant-joined', handleParticipantJoined);
+      daily.off('participant-joined', handleNewParticipantsState);
+      daily.off('participant-updated', handleNewParticipantsState);
+      daily.off('participant-left', handleNewParticipantsState);
+    };
+  }, [daily, handleNewParticipantsState, handleParticipantJoined]);
 
-    // Use initial state
-    handleNewParticipantsState();
-
-    // Listen for changes in state
-    events.forEach((event) => callObject.on(event, handleNewParticipantsState));
-
-    // Stop listening for changes in state
-    return () =>
-      events.forEach((event) =>
-        callObject.off(event, handleNewParticipantsState)
-      );
-  }, [callObject, handleNewParticipantsState]);
-
-  /**
-   * Change between the simulcast layers based on view / available bandwidth
-   */
+  const participantIds = useMemo(
+    () => participants.map((p) => p.id).join(','),
+    [participants]
+  );
 
   const setBandWidthControls = useCallback(() => {
-    if (!(callObject && callObject.meetingState() === 'joined-meeting')) return;
+    if (!(daily && daily.meetingState() === 'joined-meeting')) return;
 
     const ids = participantIds.split(',').filter(Boolean);
     const receiveSettings = {};
@@ -263,7 +257,7 @@ export const ParticipantsProvider = ({ children }) => {
 
       if (
         // weak or bad network
-        (['low', 'very-low'].includes(networkState) && videoQuality === 'auto') ||
+        (['low', 'very-low'].includes(threshold) && videoQuality === 'auto') ||
         // Low quality or Bandwidth saver mode enabled
         ['bandwidth-saver', 'low'].includes(videoQuality)
       ) {
@@ -284,38 +278,44 @@ export const ParticipantsProvider = ({ children }) => {
       // Mobile view settings are handled separately in MobileCall
     });
 
-    callObject.updateReceiveSettings(receiveSettings);
-  }, [callObject, participantIds, networkState, videoQuality, viewMode, currentSpeaker?.id]);
+    daily.updateReceiveSettings(receiveSettings);
+  }, [
+    currentSpeaker?.id,
+    daily,
+    participantIds,
+    threshold,
+    videoQuality,
+    viewMode,
+  ]);
 
   useEffect(() => {
     setBandWidthControls();
   }, [setBandWidthControls]);
 
   useEffect(() => {
-    if (!callObject) return false;
+    if (!daily) return;
     const handleActiveSpeakerChange = ({ activeSpeaker }) => {
       /**
        * Ignore active-speaker-change events for the local user.
        * Our UX doesn't ever highlight the local user as the active speaker.
        */
-      const localId = callObject.participants().local.session_id;
+      const localId = daily.participants().local.session_id;
       const activeSpeakerId = activeSpeaker?.peerId;
       if (localId === activeSpeakerId) return;
 
       dispatch({
-        type: ACTIVE_SPEAKER,
+        type: 'ACTIVE_SPEAKER',
         id: activeSpeakerId,
       });
     };
-    callObject.on('active-speaker-change', handleActiveSpeakerChange);
+    daily.on('active-speaker-change', handleActiveSpeakerChange);
     return () =>
-      callObject.off('active-speaker-change', handleActiveSpeakerChange);
-  }, [callObject]);
+      daily.off('active-speaker-change', handleActiveSpeakerChange);
+  }, [daily]);
 
   return (
     <ParticipantsContext.Provider
       value={{
-        activeParticipant,
         allParticipants,
         currentSpeaker,
         localParticipant,
@@ -335,10 +335,6 @@ export const ParticipantsProvider = ({ children }) => {
       {children}
     </ParticipantsContext.Provider>
   );
-};
-
-ParticipantsProvider.propTypes = {
-  children: PropTypes.node,
 };
 
 export const useParticipants = () => useContext(ParticipantsContext);

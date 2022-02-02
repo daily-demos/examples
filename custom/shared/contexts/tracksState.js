@@ -1,31 +1,18 @@
-/**
- * Track state & reducer
- * ---
- * All (participant & screen) video and audio tracks indexed on participant ID
- * If using manual track subscriptions, we'll also keep a record of those
- * and their playing / paused state
- */
-
 import { getId, getScreenId } from './participantsState';
 
-export const initialTracksState = {
+const initialTracksState = {
   audioTracks: {},
   videoTracks: {},
 };
 
-// --- Actions ---
-
-export const TRACK_STARTED = 'TRACK_STARTED';
-export const TRACK_STOPPED = 'TRACK_STOPPED';
-export const TRACK_VIDEO_UPDATED = 'TRACK_VIDEO_UPDATED';
-export const TRACK_AUDIO_UPDATED = 'TRACK_AUDIO_UPDATED';
-export const REMOVE_TRACKS = 'REMOVE_TRACKS';
-
 // --- Reducer and helpers --
 
-export function tracksReducer(prevState, action) {
+function tracksReducer(
+  prevState,
+  action
+) {
   switch (action.type) {
-    case TRACK_STARTED: {
+    case 'TRACK_STARTED': {
       const id = getId(action.participant);
       const screenId = getScreenId(id);
 
@@ -63,17 +50,15 @@ export function tracksReducer(prevState, action) {
         },
       };
     }
-
-    case TRACK_STOPPED: {
+    case 'TRACKS_STOPPED': {
       const { audioTracks, videoTracks } = prevState;
 
       const newAudioTracks = { ...audioTracks };
       const newVideoTracks = { ...videoTracks };
 
-      action.items.forEach(([participant, track]) => {
+      for (const [participant, track] of action.items) {
         const id = participant ? getId(participant) : null;
         const screenId = participant ? getScreenId(id) : null;
-
         if (track.kind === 'audio') {
           if (!participant?.local) {
             // Ignore local audio from mic and screen share
@@ -88,16 +73,16 @@ export function tracksReducer(prevState, action) {
             newVideoTracks[screenId] = participant.tracks.screenVideo;
           }
         }
-      });
+      }
 
       return {
         audioTracks: newAudioTracks,
         videoTracks: newVideoTracks,
       };
     }
-
-    case TRACK_AUDIO_UPDATED: {
+    case 'UPDATE_AUDIO_TRACK': {
       const id = getId(action.participant);
+      const screenId = getScreenId(id);
       if (action.participant?.local) {
         // Ignore local audio from mic and screen share
         return prevState;
@@ -105,14 +90,14 @@ export function tracksReducer(prevState, action) {
       const newAudioTracks = {
         ...prevState.audioTracks,
         [id]: action.participant.tracks.audio,
+        [screenId]: action.participant.tracks.screenAudio,
       };
       return {
         ...prevState,
         audioTracks: newAudioTracks,
       };
     }
-
-    case TRACK_VIDEO_UPDATED: {
+    case 'UPDATE_VIDEO_TRACK': {
       const id = getId(action.participant);
       const newVideoTracks = {
         ...prevState.videoTracks,
@@ -123,8 +108,7 @@ export function tracksReducer(prevState, action) {
         videoTracks: newVideoTracks,
       };
     }
-
-    case REMOVE_TRACKS: {
+    case 'REMOVE_TRACKS': {
       const { audioTracks, videoTracks } = prevState;
       const id = getId(action.participant);
       const screenId = getScreenId(id);
@@ -139,8 +123,9 @@ export function tracksReducer(prevState, action) {
         videoTracks,
       };
     }
-
     default:
       throw new Error();
   }
 }
+
+export { initialTracksState, tracksReducer };
