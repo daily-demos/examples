@@ -182,7 +182,7 @@ export const useDevices = (callObject) => {
 
   const setCamDevice = useCallback(
     async (newCam, useLocalStorage = true) => {
-      if (!callObject || newCam.deviceId === currentDevices?.cam?.deviceId) {
+      if (!callObject || newCam.deviceId === currentDevices?.camera?.deviceId) {
         return;
       }
 
