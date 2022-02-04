@@ -19,8 +19,7 @@ import { useBreakoutRoom } from './BreakoutRoomProvider';
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { participants } = useParticipants();
-    const { isActive, subscribedParticipants } = useBreakoutRoom();
+    const { participants } = useBreakoutRoom();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -50,7 +49,7 @@ export const VideoGrid = React.memo(
     // Basic brute-force packing algo
     const layout = useMemo(() => {
       const aspectRatio = DEFAULT_ASPECT_RATIO;
-      const tileCount = isActive ? subscribedParticipants.length : participants.length || 0;
+      const tileCount = participants.length || 0;
       const w = dimensions.width;
       const h = dimensions.height;
 
@@ -89,24 +88,12 @@ export const VideoGrid = React.memo(
       }
 
       return bestLayout;
-    }, [dimensions, isActive, subscribedParticipants, participants]);
+    }, [dimensions, participants]);
 
     // Memoize our tile list to avoid unnecessary re-renders
     const tiles = useDeepCompareMemo(
       () =>
         participants.map((p) => {
-          if (isActive) {
-            if (subscribedParticipants.includes(p.user_id))
-              return (
-                <Tile
-                  participant={p}
-                  key={p.id}
-                  mirrored
-                  style={{ maxWidth: layout.width, maxHeight: layout.height }}
-                />
-              )
-            return;
-          }
           return (
             <Tile
               participant={p}
@@ -116,7 +103,7 @@ export const VideoGrid = React.memo(
             />
           )
         }),
-      [layout, participants, subscribedParticipants, isActive]
+      [layout, participants]
     );
 
     if (!participants.length) {

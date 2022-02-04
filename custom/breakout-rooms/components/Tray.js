@@ -23,6 +23,7 @@ export const Tray = () => {
     <>
       <TrayButton
         label={isActive ? 'End': 'Breakout'}
+        orange={isActive}
         onClick={handleClick}>
         <IconBreakout />
       </TrayButton>
