@@ -12,7 +12,7 @@ export const Tray = () => {
   const { isActive, endSession } = useBreakoutRoom();
   const { localParticipant } = useParticipants();
 
-  const handleClick = () => {
+  const handleSession = () => {
     if (isActive) endSession();
     else openModal(BREAKOUT_ROOM_MODAL);
   }
@@ -24,7 +24,7 @@ export const Tray = () => {
       <TrayButton
         label={isActive ? 'End': 'Breakout'}
         orange={isActive}
-        onClick={handleClick}>
+        onClick={handleSession}>
         <IconBreakout />
       </TrayButton>
     </>
