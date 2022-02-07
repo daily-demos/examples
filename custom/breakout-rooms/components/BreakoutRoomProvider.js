@@ -129,15 +129,13 @@ export const BreakoutRoomProvider = ({ children }) => {
   const participantCount = useMemo(() => roomParticipants.length, [roomParticipants]);
 
   const createSession = async (maxParticipants) => {
-    const rooms = [];
     const participantsList = [];
 
     setIsSessionActive(true);
     const { data: roomData } = await createBreakoutRoom(roomInfo?.name, maxParticipants);
 
-    new Array(Math.ceil(participants.length / maxParticipants))
-      .fill()
-      .map(_ => rooms.push({ session_id: uuid(), members: participants.splice(0, maxParticipants)}));
+    let rooms = [...new Array(Math.ceil(participants.length / maxParticipants))]
+      .map(() => ({ session_id: uuid(), members: participants.slice(0, maxParticipants)}));
 
     rooms.map(r =>
       r.members.map(p =>
