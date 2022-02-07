@@ -321,7 +321,7 @@ export const ParticipantBar = ({
               key={key}
               aspectRatio={aspectRatio}
               participant={item}
-              network={networkState}
+              network={networkState.threshold}
             />
           );
         })}

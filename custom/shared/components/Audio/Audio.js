@@ -14,6 +14,7 @@ import { Portal } from 'react-portal';
 import { useDeepCompareEffect } from 'use-deep-compare';
 import { useCallState } from '../../contexts/CallProvider';
 import { isScreenId } from '../../contexts/participantsState';
+import { useNetworkState } from '../../hooks/useNetworkState';
 import AudioTrack from './AudioTrack';
 import { WebAudioTracks } from './WebAudioTracks';
 
@@ -22,6 +23,7 @@ export const Audio = () => {
   const { audioTracks } = useTracks();
   const [renderedTracks, setRenderedTracks] = useState({});
   const [isClient, setIsClient] = useState(false);
+  const { topology } = useNetworkState();
 
   useEffect(() => {
     setIsClient(true);
@@ -62,13 +64,13 @@ export const Audio = () => {
   }, []);
 
   const tracksComponent = useMemo(() => {
-    if (isSafari()) {
+    if (isSafari() || topology === 'peer') {
       return Object.entries(renderedTracks).map(([id, track]) => (
         <AudioTrack key={id} track={track.persistentTrack} />
       ));
     }
     return <WebAudioTracks />;
-  }, [renderedTracks]);
+  }, [renderedTracks, topology]);
 
   // Only render audio tracks in browser
   if (!isClient) return null;
