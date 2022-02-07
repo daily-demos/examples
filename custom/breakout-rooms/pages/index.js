@@ -7,8 +7,6 @@ export async function getStaticProps() {
   return {
     props: {
       ...defaultProps,
-      forceFetchToken: true,
-      forceOwner: true,
     },
   };
 }

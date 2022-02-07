@@ -3,7 +3,7 @@ import React from 'react';
 import { TrayButton } from '@custom/shared/components/Tray';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { ReactComponent as IconBreakout } from '@custom/shared/icons/breakout-md.svg';
+import { ReactComponent as IconBreakout } from '@custom/shared/icons/breakout-sm.svg';
 import { BREAKOUT_ROOM_MODAL } from './BreakoutRoomModal';
 import { useBreakoutRoom } from './BreakoutRoomProvider';
 
@@ -17,7 +17,7 @@ export const Tray = () => {
     else openModal(BREAKOUT_ROOM_MODAL);
   }
 
-  if (!localParticipant.isOwner) return;
+  if (!localParticipant.isOwner) return null;
 
   return (
     <>

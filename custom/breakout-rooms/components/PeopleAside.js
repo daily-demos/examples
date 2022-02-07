@@ -195,7 +195,17 @@ export const PeopleAside = () => {
   const { callObject } = useCallState();
   const { showAside, setShowAside } = useUIState();
   const { participants, isOwner } = useParticipants();
-  const { isActive, breakoutRooms } = useBreakoutRoom();
+  const { isActive, breakoutRooms, participants: bp } = useBreakoutRoom();
+
+  const getParticipants = () => {
+    if (isActive) {
+      if (isOwner) {
+        return Object.values(breakoutRooms)
+          .map((room, index) => <BreakoutRow room={room} key={index} index={index} />)
+      } else return bp.map(p => <PersonRow participant={p} key={p.id} isOwner={isOwner} />)
+    }
+    return participants.map((p) => <PersonRow participant={p} key={p.id} isOwner={isOwner} />)
+  }
 
   if (!showAside || showAside !== PEOPLE_ASIDE) {
     return null;
@@ -228,13 +238,7 @@ export const PeopleAside = () => {
             </Button>
           </div>
         )}
-        <div className="rows">
-          {isOwner && isActive ?
-            Object.values(breakoutRooms)
-              .map((room, index) => <BreakoutRow room={room} key={index} index={index} />):
-            participants.map((p) => <PersonRow participant={p} key={p.id} isOwner={isOwner} />)
-          }
-        </div>
+        <div className="rows">{getParticipants()}</div>
         <style jsx>{`
           .people-aside {
             display: block;
