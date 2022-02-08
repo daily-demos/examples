@@ -18,7 +18,7 @@ export const FlyingEmojisOverlay = () => {
     overlayRef.current.removeChild(node);
   }, []);
 
-  const handleNewFlyingEmoji = useCallback(
+  const handleDisplayFlyingEmoji = useCallback(
     (emoji) => {
       if (!overlayRef.current) {
         return;
@@ -42,6 +42,18 @@ export const FlyingEmojisOverlay = () => {
     [handleRemoveFlyingEmoji]
   );
 
+  const handleReceiveFlyingEmoji = useCallback(
+    (e) => {
+      if (!overlayRef.current) {
+        return;
+      }
+
+      console.log(`🚨 New emoji message received: ${e.data.message}`);
+      handleDisplayFlyingEmoji(e.data.message);
+    },
+    [handleDisplayFlyingEmoji]
+  );
+
   // -- Effects
 
   // Listen for new app messages and show new flying emojis
@@ -52,31 +64,31 @@ export const FlyingEmojisOverlay = () => {
 
     console.log(`⭐ Listening for flying emojis...`);
 
-    callObject.on('app-message', handleNewFlyingEmoji);
+    callObject.on('app-message', handleReceiveFlyingEmoji);
 
-    return () => callObject.off('app-message', handleNewFlyingEmoji);
-  }, [callObject, handleNewFlyingEmoji]);
+    return () => callObject.off('app-message', handleReceiveFlyingEmoji);
+  }, [callObject, handleReceiveFlyingEmoji]);
 
-  // Listen to window events to show local user emojis
+  // Listen to window events to show local user emojis and send the emoji to all participants on the call
   useEffect(() => {
     if (!callObject) {
       return false;
     }
 
-    function handleIncomingEmoji(e) {
+    function handleSendFlyingEmoji(e) {
       const { emoji } = e.detail;
       console.log(`⭐ Sending flying emoji: ${emoji}`);
 
       if (emoji) {
-        callObject.sendAppMessage({ emoji }, '*');
-        handleNewFlyingEmoji(emoji);
+        callObject.sendAppMessage({ message: `${emoji}` }, '*');
+        handleDisplayFlyingEmoji(emoji);
       }
     }
 
-    window.addEventListener('reaction_added', handleIncomingEmoji);
+    window.addEventListener('reaction_added', handleSendFlyingEmoji);
     return () =>
-      window.removeEventListener('reaction_added', handleIncomingEmoji);
-  }, [callObject, handleNewFlyingEmoji]);
+      window.removeEventListener('reaction_added', handleSendFlyingEmoji);
+  }, [callObject, handleDisplayFlyingEmoji]);
 
   // Remove all event listeners on unmount to prevent console warnings
   useEffect(

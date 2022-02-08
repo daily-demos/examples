@@ -32,13 +32,20 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 export const HairCheck = () => {
   const { callObject, join } = useCallState();
   const { localParticipant } = useParticipants();
-  const { deviceState, camError, micError, isCamMuted, isMicMuted } =
-    useMediaDevices();
+  const {
+    deviceState,
+    camError,
+    micError,
+    isCamMuted,
+    isMicMuted,
+  } = useMediaDevices();
   const { openModal } = useUIState();
   const [waiting, setWaiting] = useState(false);
   const [joining, setJoining] = useState(false);
   const [denied, setDenied] = useState();
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState(
+    localStorage.getItem('PLUOT_PARTICIPANT_NAME') || ''
+  );
 
   // Initialise devices (even though we're not yet in a call)
   useEffect(() => {
@@ -72,6 +79,7 @@ export const HairCheck = () => {
       if (granted) {
         // Note: we don't have to do any thing here as the call state will mutate
         console.log('👋 Access granted');
+        localStorage.setItem('PLUOT_PARTICIPANT_NAME', userName);
       } else {
         console.log('❌ Access denied');
         setDenied(true);
@@ -92,10 +100,9 @@ export const HairCheck = () => {
     [localParticipant]
   );
 
-  const isLoading = useMemo(
-    () => deviceState === DEVICE_STATE_LOADING,
-    [deviceState]
-  );
+  const isLoading = useMemo(() => deviceState === DEVICE_STATE_LOADING, [
+    deviceState,
+  ]);
 
   const hasError = useMemo(() => {
     if (
@@ -123,6 +130,50 @@ export const HairCheck = () => {
         return 'unknown';
     }
   }, [camError]);
+
+  const showWaitingMessage = useMemo(() => {
+    return (
+      <div className="waiting">
+        <Loader />
+        {denied ? (
+          <span>Call owner denied request</span>
+        ) : (
+          <span>Waiting for host to grant access</span>
+        )}
+        <style jsx>{`
+          .waiting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+
+          .waiting span {
+            margin-left: var(--spacing-xxs);
+          }
+        `}</style>
+      </div>
+    );
+  }, [denied]);
+
+  const showUsernameInput = useMemo(() => {
+    return (
+      <>
+        <TextInput
+          placeholder="Enter display name"
+          variant="dark"
+          disabled={joining}
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+        />
+        <Button
+          disabled={joining || userName.length < 3}
+          onClick={() => joinCall(userName)}
+        >
+          Join call
+        </Button>
+      </>
+    );
+  }, [userName, joinCall, joining, setUserName]);
 
   return (
     <>
@@ -171,33 +222,7 @@ export const HairCheck = () => {
             </div>
             {tileMemo}
           </div>
-          <footer>
-            {waiting ? (
-              <div className="waiting">
-                <Loader />
-                {denied ? (
-                  <span>Call owner denied request</span>
-                ) : (
-                  <span>Waiting for host to grant access</span>
-                )}
-              </div>
-            ) : (
-              <>
-                <TextInput
-                  placeholder="Enter display name"
-                  variant="dark"
-                  disabled={joining}
-                  onChange={(e) => setUserName(e.target.value)}
-                />
-                <Button
-                  disabled={joining || userName.length < 3}
-                  onClick={() => joinCall(userName)}
-                >
-                  Join call
-                </Button>
-              </>
-            )}
-          </footer>
+          <footer>{waiting ? showWaitingMessage : showUsernameInput}</footer>
         </div>
 
         <style jsx>{`
@@ -313,16 +338,6 @@ export const HairCheck = () => {
             display: grid;
             grid-template-columns: 1fr auto;
             grid-column-gap: var(--spacing-xs);
-          }
-
-          .waiting {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .waiting span {
-            margin-left: var(--spacing-xxs);
           }
 
           .logo {

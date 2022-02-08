@@ -26,7 +26,10 @@ export const RECORDING_COUNTDOWN_3 = 'starting3';
 export const RECORDING_IDLE = 'idle';
 
 export const RECORDING_TYPE_CLOUD = 'cloud';
+export const RECORDING_TYPE_CLOUD_BETA = 'cloud-beta';
 export const RECORDING_TYPE_LOCAL = 'local';
+export const RECORDING_TYPE_OUTPUT_BYTE_STREAM = 'output-byte-stream';
+export const RECORDING_TYPE_RTP_TRACKS = 'rtp-tracks';
 
 const RecordingContext = createContext({
   isRecordingLocally: false,
@@ -37,8 +40,12 @@ const RecordingContext = createContext({
 });
 
 export const RecordingProvider = ({ children }) => {
-  const { callObject, enableRecording, startCloudRecording, state } =
-    useCallState();
+  const {
+    callObject,
+    enableRecording,
+    startCloudRecording,
+    state,
+  } = useCallState();
   const { participants } = useParticipants();
   const [recordingStartedDate, setRecordingStartedDate] = useState(null);
   const [recordingState, setRecordingState] = useState(RECORDING_IDLE);
@@ -85,19 +92,27 @@ export const RecordingProvider = ({ children }) => {
       }
     };
 
-    const handleRecordingUploadCompleted = () => {
-      setRecordingState(RECORDING_SAVED);
+    // The 'recording-data' event is emitted when an output-byte-stream recording has started
+    // When the event emits, start writing data to the stream created in handleRecordingStarted()
+    const handleRecordingData = async (ev) => {
+      try {
+        console.log('got data', ev);
+        await window.writer.write(ev.data);
+        if (ev.finished) {
+          console.log('closing!');
+          window.writer.close();
+        }
+      } catch (e) {
+        console.error(e);
+      }
     };
 
     callObject.on('app-message', handleAppMessage);
-    callObject.on('recording-upload-completed', handleRecordingUploadCompleted);
+    callObject.on('recording-data', handleRecordingData);
 
     return () => {
       callObject.off('app-message', handleAppMessage);
-      callObject.off(
-        'recording-upload-completed',
-        handleRecordingUploadCompleted
-      );
+      callObject.off('recording-data', handleRecordingData);
     };
   }, [callObject, enableRecording]);
 
@@ -155,13 +170,26 @@ export const RecordingProvider = ({ children }) => {
    */
   const handleRecordingStarted = useCallback(
     (event) => {
+      console.log('RECORDING');
+      console.log(event);
+
       if (recordingState === RECORDING_RECORDING) return;
+      setRecordingState(RECORDING_RECORDING);
       if (event.local) {
         // Recording started locally, either through UI or programmatically
         setIsRecordingLocally(true);
         if (!recordingStartedDate) setRecordingStartedDate(new Date());
+        // If an output-byte-stream recording has started, create a new data stream that can be piped to a third-party (in this case a file)
+        if (event.type === 'output-byte-stream') {
+          const { readable, writable } = new TransformStream({
+            transform: (chunk, ctrl) => {
+              chunk.arrayBuffer().then((b) => ctrl.enqueue(new Uint8Array(b)));
+            },
+          });
+          window.writer = writable.getWriter();
+          readable.pipeTo(window.streamSaver.createWriteStream('test-vid.mp4'));
+        }
       }
-      setRecordingState(RECORDING_RECORDING);
     },
     [recordingState, recordingStartedDate]
   );
@@ -179,7 +207,8 @@ export const RecordingProvider = ({ children }) => {
   useEffect(() => {
     if (!callObject || !enableRecording) return false;
 
-    const handleRecordingStopped = () => {
+    const handleRecordingStopped = (event) => {
+      console.log(event);
       if (isRecordingLocally) return;
       setRecordingState(RECORDING_IDLE);
       setRecordingStartedDate(null);
@@ -253,7 +282,7 @@ export const RecordingProvider = ({ children }) => {
     if (!callObject || !enableRecording) return;
     setIsRecordingLocally(true);
     setRecordingState(RECORDING_COUNTDOWN_3);
-    callObject?.sendAppMessage({
+    callObject.sendAppMessage({
       event: 'recording-starting',
     });
   }, [callObject, enableRecording]);
@@ -263,11 +292,15 @@ export const RecordingProvider = ({ children }) => {
     if (recordingState === RECORDING_RECORDING) {
       switch (enableRecording) {
         case RECORDING_TYPE_LOCAL:
+        case RECORDING_TYPE_OUTPUT_BYTE_STREAM:
           setRecordingState(RECORDING_SAVED);
           setIsRecordingLocally(false);
           break;
         case RECORDING_TYPE_CLOUD:
+        case RECORDING_TYPE_CLOUD_BETA:
+        case RECORDING_TYPE_RTP_TRACKS:
           setRecordingState(RECORDING_UPLOADING);
+          setRecordingState(RECORDING_SAVED);
           break;
         default:
           break;

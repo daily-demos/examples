@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useCallState } from '../../contexts/CallProvider';
 import { useWaitingRoom } from '../../contexts/WaitingRoomProvider';
 import { ReactComponent as IconWaiting } from '../../icons/add-person-lg.svg';
@@ -14,8 +13,69 @@ export const WaitingRoomNotification = () => {
     showModal,
     setShowModal,
     waitingParticipants,
+    multipleWaiting,
   } = useWaitingRoom();
   const [showNotification, setShowNotification] = useState(false);
+
+  /**
+   * Click handlers passed to render functions
+   */
+  const handleViewAllClick = useCallback(() => {
+    setShowModal(true);
+    setShowNotification(false);
+  }, [setShowModal]);
+
+  const handleAllowClick = useCallback(() => {
+    grantAccess(waitingParticipants[0].id);
+  }, [grantAccess, waitingParticipants]);
+
+  const handleDenyClick = useCallback(() => {
+    denyAccess(multipleWaiting ? 'all' : waitingParticipants[0].id);
+  }, [denyAccess, waitingParticipants, multipleWaiting]);
+
+  /**
+   * Render the full participant waiting list
+   */
+  const showMultipleParticipants = useMemo(() => {
+    return (
+      <CardBody>
+        <p>
+          <strong>{waitingParticipants.length}</strong> people would like to
+          join the call
+        </p>
+        <CardFooter>
+          <Button onClick={handleViewAllClick} size="small" variant="success">
+            View all
+          </Button>
+          <Button onClick={handleDenyClick} size="small" variant="warning">
+            Deny all
+          </Button>
+        </CardFooter>
+      </CardBody>
+    );
+  }, [waitingParticipants, handleDenyClick, handleViewAllClick]);
+
+  /**
+   * Render the single waiting participant
+   */
+  const showSingleParticipant = useMemo(() => {
+    return (
+      <CardBody>
+        <p>
+          <strong>{waitingParticipants[0]?.name}</strong> would like to join the
+          call
+        </p>
+        <CardFooter>
+          <Button onClick={handleAllowClick} size="small" variant="success">
+            Allow
+          </Button>
+          <Button onClick={handleDenyClick} size="small" variant="warning">
+            Deny
+          </Button>
+        </CardFooter>
+      </CardBody>
+    );
+  }, [waitingParticipants, handleAllowClick, handleDenyClick]);
 
   /**
    * Show notification when waiting participants change.
@@ -47,48 +107,12 @@ export const WaitingRoomNotification = () => {
 
   if (!showNotification || waitingParticipants.length === 0) return null;
 
-  const hasMultiplePeopleWaiting = waitingParticipants.length > 1;
-
-  const handleViewAllClick = () => {
-    setShowModal(true);
-    setShowNotification(false);
-  };
-  const handleAllowClick = () => {
-    grantAccess(waitingParticipants[0].id);
-  };
-  const handleDenyClick = () => {
-    denyAccess(hasMultiplePeopleWaiting ? 'all' : waitingParticipants[0].id);
-  };
-
   return (
     <Card className="waiting-room-notification">
       <aside>
         <IconWaiting />
       </aside>
-      <CardBody>
-        <strong>
-          {hasMultiplePeopleWaiting
-            ? waitingParticipants.length
-            : waitingParticipants[0].name}
-        </strong>
-        {hasMultiplePeopleWaiting
-          ? ` people would like to join the call`
-          : ` would like to join the call`}
-        <CardFooter>
-          {hasMultiplePeopleWaiting ? (
-            <Button onClick={handleViewAllClick} size="small" variant="success">
-              View all
-            </Button>
-          ) : (
-            <Button onClick={handleAllowClick} size="small" variant="success">
-              Allow
-            </Button>
-          )}
-          <Button onClick={handleDenyClick} size="small" variant="warning">
-            {hasMultiplePeopleWaiting ? 'Deny All' : 'Deny'}
-          </Button>
-        </CardFooter>
-      </CardBody>
+      {multipleWaiting ? showMultipleParticipants : showSingleParticipant}
       <style jsx>{`
         :global(.card.waiting-room-notification) {
           position: absolute;

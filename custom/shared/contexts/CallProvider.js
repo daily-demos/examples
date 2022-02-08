@@ -3,7 +3,7 @@
  * ---
  * Configures the general state of a Daily call, such as which features
  * to enable, as well as instantiate the 'call machine' hook responsible
- * fir the overaching call loop (joining, leaving, etc)
+ * for the overaching call loop (joining, leaving, etc)
  */
 import React, {
   createContext,
@@ -53,27 +53,29 @@ export const CallProvider = ({
     if (!daily) return;
     const updateRoomConfigState = async () => {
       const roomConfig = await daily.room();
-      if (!('config' in roomConfig)) return;
+      const config = roomConfig?.config;
+      if (!config) return;
 
-      if (roomConfig?.config?.exp) {
-        setRoomExp(
-          roomConfig?.config?.exp * 1000 || Date.now() + 1 * 60 * 1000
-        );
+      if (config.exp) {
+        setRoomExp(config.exp * 1000 || Date.now() + 1 * 60 * 1000);
       }
       const browser = Bowser.parse(window.navigator.userAgent);
+      const recordingType =
+        roomConfig?.tokenConfig?.enable_recording ??
+        roomConfig?.config?.enable_recording;
+
+      // Mobile and Safari recordings are only supported under the 'cloud-beta' type
       const supportsRecording =
-        browser.platform.type === 'desktop' && browser.engine.name === 'Blink';
-      // recording and screen sharing is hidden in owner_only_broadcast for non-owners
+        ((browser.platform.type !== 'desktop' ||
+          browser.engine.name !== 'Blink') &&
+          recordingType === 'cloud-beta') ||
+        (browser.platform.type === 'desktop' &&
+          browser.engine.name === 'Blink');
       if (supportsRecording) {
-        const recordingType =
-          roomConfig?.tokenConfig?.enable_recording ??
-          roomConfig?.config?.enable_recording;
-        if (['local', 'cloud'].includes(recordingType)) {
-          setEnableRecording(recordingType);
-          setStartCloudRecording(
-            roomConfig?.tokenConfig?.start_cloud_recording ?? false
-          );
-        }
+        setEnableRecording(recordingType);
+        setStartCloudRecording(
+          roomConfig?.tokenConfig?.start_cloud_recording ?? false
+        );
       }
       const browserSupportsVideoProcessing = browser.platform.type === 'desktop';
       if (browserSupportsVideoProcessing) {

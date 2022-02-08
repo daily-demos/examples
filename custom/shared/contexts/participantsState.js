@@ -22,6 +22,7 @@ const initialParticipantsState = {
       camMutedByHost: false,
       hasNameSet: false,
       id: 'local',
+      user_id: '',
       isActiveSpeaker: false,
       isCamMuted: false,
       isLoading: true,
@@ -68,6 +69,7 @@ function getNewParticipant(participant) {
     camMutedByHost: video?.off?.byRemoteRequest,
     hasNameSet: !!participant.user_name,
     id,
+    user_id: participant.user_id,
     isActiveSpeaker: false,
     isCamMuted:
       video?.state === DEVICE_STATE_OFF ||
@@ -102,6 +104,7 @@ function getUpdatedParticipant(participant, participants) {
     camMutedByHost: video?.off?.byRemoteRequest,
     hasNameSet: !!participant.user_name,
     id,
+    user_id: participant.user_id,
     isCamMuted:
       video?.state === DEVICE_STATE_OFF ||
       video?.state === DEVICE_STATE_BLOCKED,
