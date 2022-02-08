@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { NETWORK_ASIDE } from '@custom/shared/components/Aside/NetworkAside';
 import { PEOPLE_ASIDE } from '@custom/shared/components/Aside/PeopleAside';
 import Button from '@custom/shared/components/Button';
@@ -19,6 +19,7 @@ import { ReactComponent as IconSettings } from '@custom/shared/icons/settings-md
 import { Tray, TrayButton } from './Tray';
 
 export const BasicTray = () => {
+  const ref = useRef(null);
   const responsive = useResponsive();
   const [showMore, setShowMore] = useState(false);
   const { callObject, leave } = useCallState();
@@ -34,6 +35,18 @@ export const BasicTray = () => {
     if (!callObject) return false;
     return callObject.setLocalAudio(newState);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target))
+        setShowMore(false);
+    };
+
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, []);
 
   return (
     <Tray className="tray">
@@ -52,7 +65,7 @@ export const BasicTray = () => {
         {isMicMuted ? <IconMicOff /> : <IconMicOn />}
       </TrayButton>
       {responsive.isMobile() && showMore && (
-        <div className="more-options">
+        <div className="more-options" ref={ref}>
           <Button
             className="translucent"
             onClick={() => openModal(DEVICE_MODAL)}

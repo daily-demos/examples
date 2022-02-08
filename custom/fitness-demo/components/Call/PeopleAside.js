@@ -61,7 +61,6 @@ const PersonRow = ({ participant, isOwner = false }) => (
         align-items: center;
         flex: 1;
       }
-
       .person-row .name {
         text-overflow: ellipsis;
         overflow: hidden;
@@ -72,7 +71,6 @@ const PersonRow = ({ participant, isOwner = false }) => (
         gap: var(--spacing-xxxs);
         margin-left: var(--spacing-xs);
       }
-
       .mute-state {
         display: flex;
         width: 24px;
@@ -80,7 +78,6 @@ const PersonRow = ({ participant, isOwner = false }) => (
         align-items: center;
         justify-content: center;
       }
-
       .state.error {
         color: var(--red-default);
       }
@@ -142,7 +139,6 @@ export const PeopleAside = () => {
             .people-aside {
               display: block;
             }
-
             .owner-actions {
               display: flex;
               align-items: center;
@@ -150,7 +146,6 @@ export const PeopleAside = () => {
               margin: var(--spacing-xs) var(--spacing-xxs);
               flex: 1;
             }
-
             .rows {
               margin: var(--spacing-xxs);
               flex: 1;

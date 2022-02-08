@@ -18,6 +18,7 @@ export const ChatAside = () => {
   const playMessageSound = useMessageSound();
   const [showEmojis, setShowEmojis] = useState(false);
 
+  const emojis = ['😍', '😭', '😂', '👋', '🙏'];
   const chatWindowRef = useRef();
 
   useEffect(() => {
@@ -59,55 +60,16 @@ export const ChatAside = () => {
       </div>
       {showEmojis && (
         <div className="emojis">
-          <Button
-            variant="gray"
-            size="small-circle"
-            onClick={() => sendMessage('😍')}
-          >
-            😍
-          </Button>
-          <Button
-            variant="gray"
-            size="small-circle"
-            onClick={() => sendMessage('😭')}
-          >
-            😭
-          </Button>
-          <Button
-            variant="gray"
-            size="small-circle"
-            onClick={() => sendMessage('😂')}
-          >
-            😂
-          </Button>
-          <Button
-            variant="gray"
-            size="small-circle"
-            onClick={() => sendMessage('👋')}
-          >
-            👋
-          </Button>
-          <Button
-            variant="gray"
-            size="small-circle"
-            onClick={() => sendMessage('👌')}
-          >
-            👌
-          </Button>
-          <Button
-            variant="gray"
-            size="small-circle"
-            onClick={() => sendMessage('👏')}
-          >
-            👏
-          </Button>
-          <Button
-            variant="gray"
-            size="small-circle"
-            onClick={() => sendMessage('🙏')}
-          >
-            🙏
-          </Button>
+          {emojis.map(emoji => (
+            <Button
+              key={emoji}
+              variant="gray"
+              size="small-circle"
+              onClick={() => sendMessage(emoji)}
+            >
+              {emoji}
+            </Button>
+          ))}
         </div>
       )}
       <footer className="chat-footer">

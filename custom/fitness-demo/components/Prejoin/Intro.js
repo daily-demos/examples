@@ -80,54 +80,60 @@ export const Intro = ({
       </Card>
       <span className="or-text">OR</span>
       <Card>
-        <div className="jc-card">
-          <CardHeader>Create a class</CardHeader>
-          <CardBody>
-            {error && (
-              <Well variant="error">
-                Failed to create class <p>{error}</p>
-              </Well>
-            )}
-            {tokenError && (
-              <Well variant="error">
-                Failed to obtain token <p>{tokenError}</p>
-              </Well>
-            )}
-            <Field label="Give your class a name">
-              <TextInput
-                type="text"
-                placeholder="Eg. Super stretchy morning flow"
-                defaultValue={roomName}
-                onChange={(e) => setRoomName(e.target.value)}
-                required
-              />
-            </Field>
-            <Field label="How long would you like to be?">
-              <SelectInput
-                onChange={(e) => setDuration(e.target.value)}
-                value={duration}>
-                <option value="15">15 minutes</option>
-                <option value="30">30 minutes</option>
-                <option value="60">60 minutes</option>
-              </SelectInput>
-            </Field>
-            <Field label="Public (anyone can join)">
-              <BooleanInput
-                value={privacy}
-                onChange={e => setPrivacy(e.target.checked)}
-              />
-            </Field>
-          </CardBody>
-          <CardFooter>
-            <Button
-              loading={fetching}
-              fullWidth
-              onClick={() => onJoin(slugify.convert(roomName), 'create', duration, privacy)}
-            >
-              {fetching ? 'Creating...' : 'Create class'}
-            </Button>
-          </CardFooter>
-        </div>
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          onJoin(slugify.convert(roomName), 'create', duration, privacy)
+        }}>
+          <div className="jc-card">
+            <CardHeader>Create a class</CardHeader>
+            <CardBody>
+              {error && (
+                <Well variant="error">
+                  Failed to create class <p>{error}</p>
+                </Well>
+              )}
+              {tokenError && (
+                <Well variant="error">
+                  Failed to obtain token <p>{tokenError}</p>
+                </Well>
+              )}
+              <Field label="Give your class a name">
+                <TextInput
+                  type="text"
+                  placeholder="Eg. Super stretchy morning flow"
+                  defaultValue={roomName}
+                  onChange={(e) => setRoomName(e.target.value)}
+                  required
+                />
+              </Field>
+              <Field label="How long would you like to be?">
+                <SelectInput
+                  onChange={(e) => setDuration(e.target.value)}
+                  value={duration}>
+                  <option value="15">15 minutes</option>
+                  <option value="30">30 minutes</option>
+                  <option value="60">60 minutes</option>
+                </SelectInput>
+              </Field>
+              <Field label="Privacy">
+                <BooleanInput
+                  value={privacy}
+                  onChange={e => setPrivacy(e.target.checked)}
+                />
+                <p>{privacy ? 'Public class (anyone can join the class)': 'Private (attendees will request access to class)'}</p>
+              </Field>
+            </CardBody>
+            <CardFooter>
+              <Button
+                loading={fetching}
+                fullWidth
+                type="submit"
+              >
+                {fetching ? 'Creating...' : 'Create class'}
+              </Button>
+            </CardFooter>
+          </div>
+        </form>
       </Card>
       <style jsx>{`
         .intro {
@@ -156,6 +162,24 @@ export const Intro = ({
         }
         .jc-card {
           width: 25vw;
+        }
+        @media screen and (max-width: 650px) {
+          .intro {
+            display: flex;
+            flex-direction: column;
+          }
+          .jc-card {
+            width: 75vw;
+          }
+        }
+        @media (min-width: 650px) and (max-width: 1000px) {
+          .intro {
+            display: flex;
+            flex-direction: column;
+          }
+          .jc-card {
+            width: 50vw;
+          }
         }
       `}
       </style>
