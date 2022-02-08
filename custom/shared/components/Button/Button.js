@@ -193,6 +193,10 @@ export const Button = forwardRef(
           .button.small {
             height: 42px;
           }
+          
+          .button.extra-small {
+            height: 30px;
+          }
 
           .button.tiny {
             height: 28px;
