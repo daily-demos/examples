@@ -57,25 +57,28 @@ export const ChatAside = () => {
           </div>
         ))}
       </div>
-      <footer className="chat-footer">
-        <TextInput
-          value={newMessage}
-          placeholder="Type message here"
-          variant="transparent"
-          onChange={(e) => setNewMessage(e.target.value)}
-        />
-        <Button
-          className="send-button"
-          variant="transparent"
-          disabled={!newMessage}
-          onClick={() => {
-            sendMessage(newMessage);
-            setNewMessage('');
-          }}
-        >
-          Send
-        </Button>
-      </footer>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        sendMessage(newMessage);
+        setNewMessage('');
+      }}>
+        <footer className="chat-footer">
+          <TextInput
+            value={newMessage}
+            placeholder="Type message here"
+            variant="transparent"
+            onChange={(e) => setNewMessage(e.target.value)}
+          />
+          <Button
+            className="send-button"
+            variant="transparent"
+            disabled={!newMessage}
+            type="submit"
+          >
+            Send
+          </Button>
+        </footer>
+      </form>
       <style jsx>{`
         .messages-container {
           flex: 1;
