@@ -18,6 +18,7 @@ export const useNetworkState = (
   quality = VIDEO_QUALITY_HIGH
 ) => {
   const [threshold, setThreshold] = useState(NETWORK_STATE_GOOD);
+  const [topology, setTopology] = useState('peer');
 
   const setQuality = useCallback(
     (q) => {
@@ -84,16 +85,28 @@ export const useNetworkState = (
     [setQuality, threshold, quality]
   );
 
+  const handleNetworkTopology = useCallback((ev) => {
+    switch (ev.event) {
+      case 'connected':
+        if (ev.type === 'peer-to-peer') setTopology('peer');
+        if (ev.type === 'sfu') setTopology('sfu');
+        break;
+    }
+  }, []);
+
   useEffect(() => {
     if (!callObject) return false;
     callObject.on('network-quality-change', handleNetworkQualityChange);
-    return () =>
+    callObject.on('network-connection', handleNetworkTopology);
+    return () => {
       callObject.off('network-quality-change', handleNetworkQualityChange);
-  }, [callObject, handleNetworkQualityChange]);
+      callObject.off('network-connection', handleNetworkTopology);
+    }
+  }, [callObject, handleNetworkQualityChange, handleNetworkTopology]);
 
   useEffect(() => {
     setQuality(quality);
   }, [quality, setQuality]);
 
-  return threshold;
+  return { threshold, topology };
 };

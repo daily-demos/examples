@@ -262,7 +262,7 @@ export const ParticipantsProvider = ({ children }) => {
 
       if (
         // weak or bad network
-        ([VIDEO_QUALITY_LOW, VIDEO_QUALITY_VERY_LOW].includes(networkState) &&
+        ([VIDEO_QUALITY_LOW, VIDEO_QUALITY_VERY_LOW].includes(networkState.threshold) &&
           videoQuality === VIDEO_QUALITY_AUTO) ||
         // Low quality or Bandwidth saver mode enabled
         [VIDEO_QUALITY_BANDWIDTH_SAVER, VIDEO_QUALITY_LOW].includes(
