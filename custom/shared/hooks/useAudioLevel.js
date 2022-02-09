@@ -1,36 +1,53 @@
 import { useEffect, useState } from 'react';
 
-export const useAudioLevel = (sessionId) => {
-  const [audioLevel, setAudioLevel] = useState(0);
+export const useAudioLevel = (stream) => {
+  const [micVolume, setMicVolume] = useState(0);
 
   useEffect(() => {
-    if (!sessionId) {
-      return false;
+    if (!stream) {
+      setMicVolume(0);
+      return;
     }
+    const AudioCtx =
+      typeof AudioContext !== 'undefined'
+        ? AudioContext
+        : typeof webkitAudioContext !== 'undefined'
+          ? webkitAudioContext
+          : null;
 
-    const i = setInterval(async () => {
+    if (!AudioCtx) return;
+    const audioContext = new AudioCtx();
+    const mediaStreamSource = audioContext.createMediaStreamSource(stream);
+    let node;
+
+    const startProcessing = async () => {
       try {
-        if (!(window.rtcpeers && window.rtcpeers.sfu)) {
-          return;
-        }
-        const consumer =
-          window.rtcpeers.sfu.consumers[`${sessionId}/cam-audio`];
-        if (!(consumer && consumer.getStats)) {
-          return;
-        }
-        const level = Array.from((await consumer.getStats()).values()).find(
-          (s) => 'audioLevel' in s
-        ).audioLevel;
-        setAudioLevel(level);
-      } catch (e) {
-        console.error(e);
-      }
-    }, 2000);
+        await audioContext.audioWorklet.addModule(
+          '/assets/audiolevel-processor.js'
+        );
 
-    return () => clearInterval(i);
-  }, [sessionId]);
+        node = new AudioWorkletNode(audioContext, 'audiolevel');
 
-  return audioLevel;
+        node.port.onmessage = (event) => {
+          let volume = 0;
+          if (event.data.volume) volume = event.data.volume;
+          if (!node) return;
+          setMicVolume(volume);
+        };
+
+        mediaStreamSource.connect(node).connect(audioContext.destination);
+      } catch {}
+    };
+
+    startProcessing();
+
+    return () => {
+      node?.disconnect();
+      node = null;
+      mediaStreamSource?.disconnect();
+      audioContext?.close();
+    };
+  }, [stream]);
+
+  return micVolume;
 };
-
-export default useAudioLevel;
