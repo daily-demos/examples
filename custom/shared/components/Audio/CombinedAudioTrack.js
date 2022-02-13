@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDeepCompareEffect, useDeepCompareMemo } from 'use-deep-compare';
 
-const CombinedAudioTrack = ({ tracks }) => {
+export const CombinedAudioTrack = ({ tracks }) => {
   const audioEl = useRef(null);
 
   useEffect(() => {
@@ -25,12 +25,21 @@ const CombinedAudioTrack = ({ tracks }) => {
     allTracks.forEach((track) => {
       const persistentTrack = track?.persistentTrack;
       if (persistentTrack) {
-        persistentTrack.addEventListener(
-          'ended',
-          (ev) => stream.removeTrack(ev.target),
-          { once: true }
-        );
-        stream.addTrack(persistentTrack);
+        switch (persistentTrack.readyState) {
+          case 'ended':
+            stream.removeTrack(persistentTrack);
+            break;
+          case 'live':
+            persistentTrack.addEventListener(
+              'ended',
+              (ev) => {
+                stream.removeTrack(ev.target);
+              },
+              { once: true }
+            );
+            stream.addTrack(persistentTrack);
+            break;
+        }
       }
     });
 
@@ -53,11 +62,7 @@ const CombinedAudioTrack = ({ tracks }) => {
     playAudio();
   }, [tracks, trackIds]);
 
-  return (
-    <audio autoPlay playsInline ref={audioEl}>
-      <track kind="captions" />
-    </audio>
-  );
+  return <audio autoPlay playsInline ref={audioEl} />;
 };
 
 CombinedAudioTrack.propTypes = {

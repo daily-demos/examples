@@ -6,10 +6,12 @@ export const Card = ({ children, className }) => (
   <div className={classNames('card', className)}>
     {children}
     <style jsx>{`
-      background: white;
-      box-sizing: border-box;
-      border-radius: var(--radius-md);
-      padding: var(--spacing-md);
+      .card {
+        background: white;
+        box-sizing: border-box;
+        border-radius: var(--radius-md);
+        padding: var(--spacing-md);
+      }
     `}</style>
   </div>
 );
@@ -43,7 +45,9 @@ export const CardBody = ({ children }) => (
   <div className="card-body">
     {children}
     <style jsx>{`
-      color: var(--text-mid);
+      .card-body {
+        color: var(--text-mid);
+      }
 
       & + :global(.card-footer) {
         margin-top: var(--spacing-md);
