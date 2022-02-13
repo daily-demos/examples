@@ -78,10 +78,16 @@ export const useCallMachine = ({
   const join = useCallback(
     async (callObject) => {
       setState(CALL_STATE_JOINING);
+
+      // Force mute clients when joining a call with experimental_optimize_large_calls enabled.
+      if (room?.config?.experimental_optimize_large_calls) {
+        callObject.setLocalAudio(false);
+      }
+
       await callObject.join({ subscribeToTracksAutomatically, token, url });
       setState(CALL_STATE_JOINED);
     },
-    [token, subscribeToTracksAutomatically, url]
+    [room, token, subscribeToTracksAutomatically, url]
   );
 
   /**

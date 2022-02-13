@@ -1,22 +1,28 @@
 import { useDeepCompareMemo } from 'use-deep-compare';
-import { useTracks } from '../contexts/TracksProvider';
-import { DEVICE_STATE_BLOCKED, DEVICE_STATE_OFF } from '../contexts/useDevices';
 
-export const useVideoTrack = (participant) => {
+import { useTracks } from '../contexts/TracksProvider';
+import { isLocalId, isScreenId } from '../contexts/participantsState';
+
+export const useVideoTrack = (id) => {
   const { videoTracks } = useTracks();
 
+  const videoTrack = useDeepCompareMemo(
+    () => videoTracks?.[id],
+    [id, videoTracks]
+  );
+
+  /**
+   * MediaStreamTrack's are difficult to compare.
+   * Changes to a video track's id will likely need to be reflected in the UI / DOM.
+   * This usually happens on P2P / SFU switches.
+   */
   return useDeepCompareMemo(() => {
-    const videoTrack = videoTracks?.[participant?.id];
     if (
-      videoTrack?.state === DEVICE_STATE_OFF ||
-      videoTrack?.state === DEVICE_STATE_BLOCKED ||
-      (!videoTrack?.subscribed &&
-        participant?.id !== 'local' &&
-        !participant.isScreenshare)
+      videoTrack?.state === 'off' ||
+      videoTrack?.state === 'blocked' ||
+      (!videoTrack?.subscribed && !isLocalId(id) && !isScreenId(id))
     )
       return null;
     return videoTrack?.persistentTrack;
-  }, [participant?.id, videoTracks]);
+  }, [id, videoTrack]);
 };
-
-export default useVideoTrack;
