@@ -30,7 +30,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
  * - Set user name and join call / request access
  */
 export const HairCheck = () => {
-  const { callObject, join } = useCallState();
+  const { callObject } = useCallState();
   const { localParticipant } = useParticipants();
   const {
     deviceState,
@@ -167,13 +167,13 @@ export const HairCheck = () => {
         />
         <Button
           disabled={joining || userName.length < 3}
-          onClick={() => joinCall(userName)}
+          type="submit"
         >
           Join call
         </Button>
       </>
     );
-  }, [userName, joinCall, joining, setUserName]);
+  }, [userName, joining, setUserName]);
 
   return (
     <>
@@ -222,7 +222,12 @@ export const HairCheck = () => {
             </div>
             {tileMemo}
           </div>
-          <footer>{waiting ? showWaitingMessage : showUsernameInput}</footer>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            joinCall(userName);
+          }}>
+            <footer>{waiting ? showWaitingMessage : showUsernameInput}</footer>
+          </form>
         </div>
 
         <style jsx>{`

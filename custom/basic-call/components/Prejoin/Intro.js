@@ -35,44 +35,49 @@ export const Intro = ({
   }, [room]);
 
   return (
-    <Card>
-      <CardHeader>{title}</CardHeader>
-      <CardBody>
-        {error && (
-          <Well variant="error">
-            Failed to obtain token <p>{error}</p>
-          </Well>
-        )}
-        <Field label="Enter room to join">
-          <TextInput
-            type="text"
-            prefix={`${domain}.daily.co/`}
-            placeholder="Room name"
-            defaultValue={roomName}
-            onChange={(e) => setRoomName(e.target.value)}
-            required
-          />
-        </Field>
-        {!forceFetchToken && (
-          <Field label="Fetch meeting token">
-            <BooleanInput onChange={(e) => setFetchToken(e.target.checked)} />
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      onJoin(roomName, owner, fetchToken);
+    }}>
+      <Card>
+        <CardHeader>{title}</CardHeader>
+        <CardBody>
+          {error && (
+            <Well variant="error">
+              Failed to obtain token <p>{error}</p>
+            </Well>
+          )}
+          <Field label="Enter room to join">
+            <TextInput
+              type="text"
+              prefix={`${domain}.daily.co/`}
+              placeholder="Room name"
+              defaultValue={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              required
+            />
           </Field>
-        )}
-        {fetchToken && !forceOwner && (
-          <Field label="Join as owner">
-            <BooleanInput onChange={(e) => setOwner(e.target.checked)} />
-          </Field>
-        )}
-      </CardBody>
-      <CardFooter divider>
-        <Button
-          onClick={() => onJoin(roomName, owner, fetchToken)}
-          disabled={!roomName || fetching}
-        >
-          {fetching ? 'Fetching token...' : 'Join meeting'}
-        </Button>
-      </CardFooter>
-    </Card>
+          {!forceFetchToken && (
+            <Field label="Fetch meeting token">
+              <BooleanInput onChange={(e) => setFetchToken(e.target.checked)} />
+            </Field>
+          )}
+          {fetchToken && !forceOwner && (
+            <Field label="Join as owner">
+              <BooleanInput onChange={(e) => setOwner(e.target.checked)} />
+            </Field>
+          )}
+        </CardBody>
+        <CardFooter divider>
+          <Button
+            type="submit"
+            disabled={!roomName || fetching}
+          >
+            {fetching ? 'Fetching token...' : 'Join meeting'}
+          </Button>
+        </CardFooter>
+      </Card>
+    </form>
   );
 };
 
