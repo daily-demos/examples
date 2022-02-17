@@ -1,15 +1,15 @@
-# Background Blur
+# Background Effects
 
 ### Live example
 
-**[See it in action here ➡️](https://custom-flying-emojis.vercel.app)**
+**[See it in action here ➡️](https://custom-background-effects.vercel.app)**
 
 ---
 
 ## What does this demo do?
 
-- Use [updateInputSettings](https://docs.daily.co/reference/daily-js/instance-methods/update-input-settings) to blur your background
-- Implements a custom `<Tray />` that adds Background Blur option to the tray.
+- Use [updateInputSettings](https://docs.daily.co/reference/daily-js/instance-methods/update-input-settings) to add effects to your background
+- Implements a custom `<Tray />` that adds Background effects option to the tray.
 
 Please note: this demo is not currently mobile optimised
 
@@ -20,7 +20,7 @@ Please note: this demo is not currently mobile optimised
 mv env.example .env.local
 
 yarn
-yarn workspace @custom/flying-emojis dev
+yarn workspace @custom/background-effects dev
 ```
 
 ## Deploy your own on Vercel

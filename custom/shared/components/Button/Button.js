@@ -225,6 +225,11 @@ export const Button = forwardRef(
             height: 52px;
             width: 52px;
           }
+          .button.extra-large-square {
+            padding: 0px;
+            height: 60px;
+            width: 60px;
+          }
 
           .button.large-circle {
             padding: 0px;

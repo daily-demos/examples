@@ -1,6 +1,6 @@
 {
-  "name": "@custom/background-blur",
-  "description": "Basic Call + Background Blur",
+  "name": "@custom/background-effects",
+  "description": "Basic Call + Background Effects",
   "version": "0.1.0",
   "private": true,
   "scripts": {
