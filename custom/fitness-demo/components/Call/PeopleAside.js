@@ -101,6 +101,22 @@ export const PeopleAside = () => {
     return null;
   }
 
+  async function muteAll(deviceType) {
+    let updatedParticipantList = {};
+    // Accommodate muting mics and cameras
+    const newSetting =
+      deviceType === 'video' ? { setVideo: false } : { setAudio: false };
+    for (let id in callObject.participants()) {
+      // Do not update the local participant's device (aka the instructor)
+      if (id === 'local') continue;
+
+      updatedParticipantList[id] = newSetting;
+    }
+
+    // Update all participants at once
+    callObject.updateParticipants(updatedParticipantList);
+  }
+
   return (
     <Aside onClose={() => setShowAside(false)}>
       <AsideHeader />
@@ -111,9 +127,7 @@ export const PeopleAside = () => {
               fullWidth
               size="tiny"
               variant="outline-gray"
-              onClick={() =>
-                callObject.updateParticipants({ '*': { setAudio: false } })
-              }
+              onClick={() => muteAll('audio')}
             >
               Mute all mics
             </Button>
@@ -121,9 +135,7 @@ export const PeopleAside = () => {
               fullWidth
               size="tiny"
               variant="outline-gray"
-              onClick={() =>
-                callObject.updateParticipants({ '*': { setVideo: false } })
-              }
+              onClick={() => muteAll('video')}
             >
               Mute all cams
             </Button>
