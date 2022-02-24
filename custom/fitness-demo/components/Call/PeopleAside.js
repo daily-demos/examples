@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Aside } from '@custom/shared/components/Aside';
 import Button from '@custom/shared/components/Button';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
@@ -97,6 +97,28 @@ export const PeopleAside = () => {
   const { showAside, setShowAside } = useUIState();
   const { participants, isOwner } = useParticipants();
 
+  const muteAll = useCallback(
+    (deviceType) => {
+      let updatedParticipantList = {};
+      // Accommodate muting mics and cameras
+      const newSetting =
+        deviceType === 'video' ? { setVideo: false } : { setAudio: false };
+      for (let id in callObject.participants()) {
+        // Do not update the local participant's device (aka the instructor)
+        if (id === 'local') continue;
+
+        updatedParticipantList[id] = newSetting;
+      }
+
+      // Update all participants at once
+      callObject.updateParticipants(updatedParticipantList);
+    },
+    [callObject]
+  );
+
+  const handleMuteAllAudio = () => muteAll('audio');
+  const handleMuteAllVideo = () => muteAll('video');
+
   if (!showAside || showAside !== PEOPLE_ASIDE) {
     return null;
   }
@@ -111,9 +133,7 @@ export const PeopleAside = () => {
               fullWidth
               size="tiny"
               variant="outline-gray"
-              onClick={() =>
-                callObject.updateParticipants({ '*': { setAudio: false } })
-              }
+              onClick={handleMuteAllAudio}
             >
               Mute all mics
             </Button>
@@ -121,9 +141,7 @@ export const PeopleAside = () => {
               fullWidth
               size="tiny"
               variant="outline-gray"
-              onClick={() =>
-                callObject.updateParticipants({ '*': { setVideo: false } })
-              }
+              onClick={handleMuteAllVideo}
             >
               Mute all cams
             </Button>
