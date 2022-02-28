@@ -193,6 +193,10 @@ export const Button = forwardRef(
           .button.small {
             height: 42px;
           }
+          
+          .button.extra-small {
+            height: 30px;
+          }
 
           .button.tiny {
             height: 28px;
@@ -220,6 +224,11 @@ export const Button = forwardRef(
             padding: 0px;
             height: 52px;
             width: 52px;
+          }
+          .button.extra-large-square {
+            padding: 0px;
+            height: 60px;
+            width: 60px;
           }
 
           .button.large-circle {

@@ -10,14 +10,17 @@ export const TrayButton = ({
   bubble = false,
   orange = false,
   disabled = false,
+  effects = false,
+  variant = "dark",
+  size = "large-square"
 }) => {
-  const cx = classNames('tray-button', { orange, bubble });
+  const cx = classNames('tray-button', { orange, bubble, effects });
   return (
     <div className={cx}>
       <Button
         onClick={() => onClick()}
-        variant="dark"
-        size="large-square"
+        variant={variant}
+        size={size}
         disabled={disabled}
       >
         {children}
@@ -30,7 +33,9 @@ export const TrayButton = ({
           user-select: none;
           position: relative;
         }
-
+        .tray-button.effects :global(span) {
+          color: var(--background);
+        }
         .tray-button.orange :global(.button) {
           color: var(--secondary-dark);
         }

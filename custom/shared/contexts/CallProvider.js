@@ -32,6 +32,7 @@ export const CallProvider = ({
   subscribeToTracksAutomatically = true,
 }) => {
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
+  const [supportsVideoProcessing, setSupportsVideoProcessing] = useState(null);
   const [showLocalVideo, setShowLocalVideo] = useState(true);
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
   const [enableRecording, setEnableRecording] = useState(null);
@@ -75,6 +76,13 @@ export const CallProvider = ({
         setStartCloudRecording(
           roomConfig?.tokenConfig?.start_cloud_recording ?? false
         );
+      }
+      const browserSupportsVideoProcessing = browser.platform.type === 'desktop';
+      if (browserSupportsVideoProcessing) {
+        setSupportsVideoProcessing(
+          roomConfig?.config?.enable_video_processing_ui ??
+          roomConfig?.domainConfig?.enable_video_processing_ui
+        )
       }
     };
     updateRoomConfigState();
@@ -122,6 +130,7 @@ export const CallProvider = ({
         setShowLocalVideo,
         startCloudRecording,
         subscribeToTracksAutomatically,
+        supportsVideoProcessing,
       }}
     >
       {children}
