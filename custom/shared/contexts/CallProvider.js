@@ -80,7 +80,7 @@ export const CallProvider = ({
       const browserSupportsVideoProcessing = browser.platform.type === 'desktop';
       if (browserSupportsVideoProcessing) {
         setSupportsVideoProcessing(
-          roomConfig?.tokenConfig?.enable_video_processing_ui ??
+          roomConfig?.config?.enable_video_processing_ui ??
           roomConfig?.domainConfig?.enable_video_processing_ui
         )
       }

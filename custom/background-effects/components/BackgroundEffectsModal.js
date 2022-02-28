@@ -94,7 +94,7 @@ export const BackgroundEffectsModal = () => {
         {!supportsVideoProcessing ? (
           <Well variant="error">
             Background effects are not enabled for this room (or your browser does not
-            support it.) Please enable video processing ui when creating the room or via
+            support it.) Please enable video processing UI when creating the room or via
             the Daily dashboard.
           </Well>
         ) : <p>Experimental: Background effects may cause your fan to run louder and your battery to be depleted more
@@ -118,7 +118,7 @@ export const BackgroundEffectsModal = () => {
               size="extra-large-square"
               onClick={() => handleUpdateInputSettings({ model: 'background-blur', type: 'soft-blur' })}
             >
-              <PeopleIcon />
+              <PeopleIcon className="soft-blur" />
             </TrayButton>
             <TrayButton
               label="Strong blur"
@@ -127,7 +127,7 @@ export const BackgroundEffectsModal = () => {
               size="extra-large-square"
               onClick={() => handleUpdateInputSettings({ model: 'background-blur', type: 'strong-blur' })}
             >
-              <PeopleIcon />
+              <PeopleIcon className="strong-blur" />
             </TrayButton>
             {backgroundImages.map((image, index) => (
               <TrayButton
@@ -154,6 +154,12 @@ export const BackgroundEffectsModal = () => {
         }
         .effects :global(.background-image) {
           border-radius: var(--radius-sm);
+        }
+        .effects :global(.soft-blur) {
+          filter: blur(0.7px);
+        }
+        .effects :global(.strong-blur) {
+          filter: blur(1px);
         }
       `}</style>
     </Modal>

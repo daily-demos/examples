@@ -8,12 +8,14 @@
 
 ## What does this demo do?
 
-- Use [updateInputSettings](https://docs.daily.co/reference/daily-js/instance-methods/update-input-settings) to add effects to your background
-- Implements a custom `<Tray />` that adds Background effects option to the tray.
+- Uses [updateInputSettings](https://docs.daily.co/reference/daily-js/instance-methods/update-input-settings) to add effects to your background.
+- Adds a button to a custom video call controls tray to update background effects in the call.
 
 Please note: this demo is not currently mobile optimised
 
 ### Getting started
+
+This demo requires a Daily [room](https://docs.daily.co/reference/rest-api/rooms/config#enable_video_processing_ui) or [domain](https://dashboard.daily.co/rooms-settings) with the enable_video_processing_ui option turned on. This can be done via Daily's [REST API](https://docs.daily.co/reference/rest-api/rooms/create-room) or the Daily [dashboard](https://dashboard.daily.co/rooms/create).
 
 ```
 # set both DAILY_API_KEY and DAILY_DOMAIN
