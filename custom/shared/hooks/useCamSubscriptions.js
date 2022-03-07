@@ -15,12 +15,10 @@ export const useCamSubscriptions = (
   const { updateCamSubscriptions } = useTracks();
 
   useDeepCompareEffect(() => {
-    if (!subscribedIds || !stagedIds) return false;
+    if (!subscribedIds || !stagedIds) return;
     const timeout = setTimeout(() => {
       updateCamSubscriptions(subscribedIds, stagedIds);
     }, throttle);
     return () => clearTimeout(timeout);
   }, [subscribedIds, stagedIds, throttle, updateCamSubscriptions]);
 };
-
-export default useCamSubscriptions;

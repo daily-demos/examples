@@ -1,0 +1,26 @@
+{
+  "name": "@custom/fitness-demo",
+  "description": "Basic Call + Fitness Demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@custom/shared": "*",
+    "@custom/basic-call": "*",
+    "@custom/text-chat": "*",
+    "@custom/live-streaming": "*",
+    "@custom/recording": "*",
+    "next": "^11.1.2",
+    "pluralize": "^8.0.0"
+  },
+  "devDependencies": {
+    "babel-plugin-module-resolver": "^4.1.0",
+    "next-compose-plugins": "^2.2.1",
+    "next-transpile-modules": "^8.0.0"
+  }
+}

@@ -2,14 +2,13 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 
 import { useTracks } from '../contexts/TracksProvider';
 
-export const useAudioTrack = (participant) => {
+export const useAudioTrack = (id) => {
   const { audioTracks } = useTracks();
 
   return useDeepCompareMemo(() => {
-    const audioTrack = audioTracks?.[participant?.id];
-    // @ts-ignore
+    const audioTrack = audioTracks?.[id];
     return audioTrack?.persistentTrack;
-  }, [participant?.id, audioTracks]);
+  }, [id, audioTracks]);
 };
 
 export default useAudioTrack;

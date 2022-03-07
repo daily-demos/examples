@@ -22,9 +22,7 @@ export const NetworkAside = () => {
   }, [callObject]);
 
   useEffect(() => {
-    if (!callObject) {
-      return;
-    }
+    if (!callObject) return;
 
     updateStats();
 
@@ -38,7 +36,7 @@ export const NetworkAside = () => {
       Math.round(
         (networkStats?.stats?.latest?.videoRecvBitsPerSecond ?? 0) / 1000
       ),
-    [networkStats]
+    [networkStats?.stats?.latest?.videoRecvBitsPerSecond]
   );
 
   const uploadKbs = useMemo(
@@ -46,7 +44,7 @@ export const NetworkAside = () => {
       Math.round(
         (networkStats?.stats?.latest?.videoSendBitsPerSecond ?? 0) / 1000
       ),
-    [networkStats]
+    [networkStats?.stats?.latest?.videoSendBitsPerSecond]
   );
 
   if (!showAside || showAside !== NETWORK_ASIDE) {

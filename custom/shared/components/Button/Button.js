@@ -228,6 +228,13 @@ export const Button = forwardRef(
             width: 64px;
             border-radius: 32px;
           }
+          
+          .button.small-circle {
+            padding: 0px;
+            height: 42px;
+            width: 42px;
+            border-radius: 21px;
+          }
 
           .button.translucent {
             background: ${hexa(theme.blue.light, 0.35)};
@@ -287,6 +294,24 @@ export const Button = forwardRef(
             box-shadow: 0 0 0px 3px rgba(255, 255, 255, 0.15);
           }
           .button.dark:disabled {
+            opacity: 0.35;
+          }
+          
+          .button.gray {
+            background: ${theme.gray.light};
+            color: var(--text-default);
+            border: 0;
+          }
+          .button.gray:hover,
+          .button.gray:focus,
+          .button.gray:active {
+            background: ${theme.gray.default};
+            border: 0;
+          }
+          .button.gray:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+          }
+          .button.gray:disabled {
             opacity: 0.35;
           }
 

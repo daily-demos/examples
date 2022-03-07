@@ -2,14 +2,22 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-export const Card = ({ children, className }) => (
-  <div className={classNames('card', className)}>
+export const Card = ({ children, className, variant }) => (
+  <div className={classNames('card', className, variant)}>
     {children}
     <style jsx>{`
-      background: white;
-      box-sizing: border-box;
-      border-radius: var(--radius-md);
-      padding: var(--spacing-md);
+
+      .card {
+        background: var(--reverse);
+        box-sizing: border-box;
+        border-radius: var(--radius-md);
+        border: 1px solid #C8D1DC;
+        padding: var(--spacing-md);
+      }
+      
+      .card.dark {
+        background-color: var(--blue-dark);;
+      }
     `}</style>
   </div>
 );
@@ -26,7 +34,6 @@ export const CardHeader = ({ children }) => (
       h2 {
         font-size: 1.375rem;
         margin: 0px;
-        color: var(--text-default);
       }
 
       & + :global(.card-body) {
@@ -43,7 +50,9 @@ export const CardBody = ({ children }) => (
   <div className="card-body">
     {children}
     <style jsx>{`
-      color: var(--text-mid);
+      .card-body {
+        color: var(--text-mid);
+      }
 
       & + :global(.card-footer) {
         margin-top: var(--spacing-md);

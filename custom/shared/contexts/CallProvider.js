@@ -12,7 +12,9 @@ import React, {
   useEffect,
   useState,
 } from 'react';
+import DailyIframe from '@daily-co/daily-js';
 import Bowser from 'bowser';
+import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import {
   ACCESS_STATE_LOBBY,
@@ -30,7 +32,12 @@ export const CallProvider = ({
   room,
   token = '',
   subscribeToTracksAutomatically = true,
+  cleanURLOnJoin = false,
 }) => {
+  const router = useRouter();
+  const [roomInfo, setRoomInfo] = useState(null);
+  const [enableScreenShare, setEnableScreenShare] = useState(false);
+  const [enableJoinSound, setEnableJoinSound] = useState(true);
   const [videoQuality, setVideoQuality] = useState(VIDEO_QUALITY_AUTO);
   const [showLocalVideo, setShowLocalVideo] = useState(true);
   const [preJoinNonAuthorized, setPreJoinNonAuthorized] = useState(false);
@@ -52,7 +59,14 @@ export const CallProvider = ({
     if (!daily) return;
     const updateRoomConfigState = async () => {
       const roomConfig = await daily.room();
+      const isOob = !!roomConfig.config?.owner_only_broadcast;
+      const owner = roomConfig.tokenConfig?.is_owner;
       const config = roomConfig?.config;
+
+      setRoomInfo(roomConfig);
+
+      const fullUI = !isOob || (isOob && owner);
+
       if (!config) return;
 
       if (config.exp) {
@@ -76,6 +90,12 @@ export const CallProvider = ({
           roomConfig?.tokenConfig?.start_cloud_recording ?? false
         );
       }
+      setEnableScreenShare(
+        fullUI &&
+        (roomConfig?.tokenConfig?.enable_screenshare ??
+          roomConfig?.config?.enable_screenshare) &&
+        DailyIframe.supportedBrowser().supportsScreenShare
+      );
     };
     updateRoomConfigState();
   }, [state, daily]);
@@ -103,6 +123,15 @@ export const CallProvider = ({
     setPreJoinNonAuthorized(requiresPermission && !token);
   }, [state, daily, token]);
 
+  useEffect(() => {
+    if (!daily) return;
+
+    if (cleanURLOnJoin)
+      daily.on('joined-meeting', () => router.replace(`/${room}`));
+
+    return () => daily.off('joined-meeting', () => router.replace(`/${room}`));
+  }, [cleanURLOnJoin, daily, room, router]);
+
   return (
     <CallContext.Provider
       value={{
@@ -115,13 +144,19 @@ export const CallProvider = ({
         showLocalVideo,
         roomExp,
         enableRecording,
+        enableScreenShare,
+        enableJoinSound,
         videoQuality,
         setVideoQuality,
+        roomInfo,
+        setRoomInfo,
         setBandwidth,
         setRedirectOnLeave,
         setShowLocalVideo,
+        setEnableScreenShare,
         startCloudRecording,
         subscribeToTracksAutomatically,
+        setEnableJoinSound
       }}
     >
       {children}

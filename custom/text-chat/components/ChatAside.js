@@ -4,8 +4,8 @@ import Button from '@custom/shared/components/Button';
 import { TextInput } from '@custom/shared/components/Input';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { useMessageSound } from '@custom/text-chat/hooks/useMessageSound';
 import { useChat } from '../contexts/ChatProvider';
-import { useMessageSound } from '../hooks/useMessageSound';
 
 export const CHAT_ASIDE = 'chat';
 

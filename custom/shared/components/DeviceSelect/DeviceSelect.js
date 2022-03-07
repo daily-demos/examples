@@ -8,13 +8,15 @@ export const DeviceSelect = () => {
     cams,
     mics,
     speakers,
-    currentDevices,
-    setCamDevice,
-    setMicDevice,
-    setSpeakersDevice,
+    currentCam,
+    setCurrentCam,
+    currentMic,
+    setCurrentMic,
+    currentSpeaker,
+    setCurrentSpeaker,
   } = useMediaDevices();
 
-  if (!currentDevices) {
+  if (!currentCam && !currentMic && !currentSpeaker) {
     return <div>Loading devices...</div>;
   }
 
@@ -22,9 +24,9 @@ export const DeviceSelect = () => {
     <>
       <Field label="Select camera:">
         <SelectInput
-          onChange={(e) => setCamDevice(cams[e.target.value])}
+          onChange={(e) => setCurrentCam(cams[e.target.value])}
           value={cams.findIndex(
-            (i) => i.deviceId === currentDevices.camera.deviceId
+            (i) => i.deviceId === currentCam.deviceId
           )}
         >
           {cams.map(({ deviceId, label }, i) => (
@@ -37,9 +39,9 @@ export const DeviceSelect = () => {
 
       <Field label="Select microphone:">
         <SelectInput
-          onChange={(e) => setMicDevice(mics[e.target.value])}
+          onChange={(e) => setCurrentMic(mics[e.target.value])}
           value={mics.findIndex(
-            (i) => i.deviceId === currentDevices.mic.deviceId
+            (i) => i.deviceId === currentMic.deviceId
           )}
         >
           {mics.map(({ deviceId, label }, i) => (
@@ -56,9 +58,9 @@ export const DeviceSelect = () => {
       {speakers.length > 0 && (
         <Field label="Select speakers:">
           <SelectInput
-            onChange={(e) => setSpeakersDevice(speakers[e.target.value])}
+            onChange={(e) => setCurrentSpeaker(speakers[e.target.value])}
             value={speakers.findIndex(
-              (i) => i.deviceId === currentDevices.speaker.deviceId
+              (i) => i.deviceId === currentSpeaker.deviceId
             )}
           >
             {speakers.map(({ deviceId, label }, i) => (
