@@ -13,10 +13,7 @@ import NotConfigured from '../components/Prejoin/NotConfigured';
  * - Set call owner status
  * - Finally, renders the main application loop
  */
-export default function Index({
-  domain,
-  isConfigured = false,
-}) {
+export default function Index({ domain, isConfigured = false }) {
   const router = useRouter();
   const [fetching, setFetching] = useState(false);
   const [error, setError] = useState();
@@ -24,34 +21,37 @@ export default function Index({
   const [fetchingToken, setFetchingToken] = useState(false);
   const [tokenError, setTokenError] = useState();
 
-  const getMeetingToken = useCallback(async (room, isOwner = false) => {
-    if (!room) return false;
+  const getMeetingToken = useCallback(
+    async (room, isOwner = false) => {
+      if (!room) return false;
 
-    setFetchingToken(true);
+      setFetchingToken(true);
 
-    // Fetch token from serverside method (provided by Next)
-    const res = await fetch('/api/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ roomName: room, isOwner }),
-    });
-    const resJson = await res.json();
+      // Fetch token from serverside method (provided by Next)
+      const res = await fetch('/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ roomName: room, isOwner }),
+      });
+      const resJson = await res.json();
 
-    if (!resJson?.token) {
-      setTokenError(resJson?.error || true);
+      if (!resJson?.token) {
+        setTokenError(resJson?.error || true);
+        setFetchingToken(false);
+        return false;
+      }
+
+      console.log(`🪙 Token received`);
+
       setFetchingToken(false);
-      return false;
-    }
+      await router.push(`/${room}?t=${resJson.token}`);
 
-    console.log(`🪙 Token received`);
-
-    setFetchingToken(false);
-    await router.push(`/${room}?t=${resJson.token}`);
-
-    return true;
-  }, [router]);
+      return true;
+    },
+    [router]
+  );
 
   const createRoom = async (room, duration, privacy) => {
     setError(false);
@@ -82,7 +82,7 @@ export default function Index({
         body: JSON.stringify({
           roomName: room,
           expiryMinutes: Number(duration),
-          privacy: !privacy ? 'private': 'public'
+          privacy: !privacy ? 'private' : 'public',
         }),
       });
 
@@ -103,7 +103,7 @@ export default function Index({
           },
           body: JSON.stringify({
             expiryMinutes: Number(duration),
-            privacy: !privacy ? 'private': 'public'
+            privacy: !privacy ? 'private' : 'public',
           }),
         });
 
@@ -114,7 +114,7 @@ export default function Index({
     }
 
     setFetching(false);
-  }
+  };
 
   /**
    * Main call UI
@@ -130,7 +130,9 @@ export default function Index({
             error={error}
             domain={domain}
             onJoin={(room, type, duration = 60, privacy = 'public') =>
-              type === 'join' ? router.push(`/${room}`): createRoom(room, duration, privacy)
+              type === 'join'
+                ? router.push(`/${room}`)
+                : createRoom(room, duration, privacy)
             }
           />
         );

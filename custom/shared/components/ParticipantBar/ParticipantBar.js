@@ -11,14 +11,20 @@ import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useTracks } from '@custom/shared/contexts/TracksProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { isLocalId } from '@custom/shared/contexts/participantsState';
 import { useCamSubscriptions } from '@custom/shared/hooks/useCamSubscriptions';
 import { useResize } from '@custom/shared/hooks/useResize';
 import { useScrollbarWidth } from '@custom/shared/hooks/useScrollbarWidth';
+import { throttle } from '@custom/shared/lib/throttle';
+import {
+  useLocalParticipant,
+  useNetwork,
+  useScreenShare,
+} from '@daily-co/daily-react-hooks';
 import classnames from 'classnames';
 import debounce from 'debounce';
 import PropTypes from 'prop-types';
 
+import { useActiveSpeaker } from '../../hooks/useActiveSpeaker';
 import { useBlockScrolling } from './useBlockScrolling';
 
 /**
@@ -38,22 +44,17 @@ export const ParticipantBar = ({
   others = [],
   width,
 }) => {
-  const { networkState } = useCallState();
-  const {
-    currentSpeaker,
-    screens,
-    swapParticipantPosition,
-  } = useParticipants();
+  const { currentSpeakerId, swapParticipantPosition } = useParticipants();
   const { maxCamSubscriptions } = useTracks();
-  const { pinnedId, showParticipantsBar } = useUIState();
-  const itemHeight = useMemo(() => width / aspectRatio + GAP, [
-    aspectRatio,
-    width,
-  ]);
-  const paddingTop = useMemo(() => itemHeight * fixed.length, [
-    fixed,
-    itemHeight,
-  ]);
+  const { pinnedId } = useUIState();
+  const itemHeight = useMemo(
+    () => width / aspectRatio + GAP,
+    [aspectRatio, width]
+  );
+  const paddingTop = useMemo(
+    () => itemHeight * fixed.length,
+    [fixed, itemHeight]
+  );
   const scrollTop = useRef(0);
   const spaceBefore = useRef(null);
   const spaceAfter = useRef(null);
@@ -63,94 +64,115 @@ export const ParticipantBar = ({
   const [isSidebarScrollable, setIsSidebarScrollable] = useState(false);
   const blockScrolling = useBlockScrolling(scrollRef);
   const scrollbarWidth = useScrollbarWidth();
+  const activeSpeakerId = useActiveSpeaker();
+  const { screens } = useScreenShare();
+
   const hasScreenshares = useMemo(() => screens.length > 0, [screens]);
   const othersCount = useMemo(() => others.length, [others]);
-  const visibleOthers = useMemo(() => others.slice(range[0], range[1]), [
-    others,
-    range,
-  ]);
-  const currentSpeakerId = useMemo(() => currentSpeaker?.id, [currentSpeaker]);
+  const visibleOthers = useMemo(
+    () => others.slice(range[0], range[1]),
+    [others, range]
+  );
+  const localParticipant = useLocalParticipant();
+  const { threshold } = useNetwork();
 
   /**
-   * Store other ids as string to reduce amount of running useEffects below.
+   * Determines whether or not to render the active speaker border.
+   * Border should be omitted in 1-to-1 scenarios.
    */
-  const otherIds = useMemo(() => others.map((o) => o?.id), [others]);
+  const shouldRenderSpeakerBorder = useMemo(
+    () =>
+      // Non-floating bar with at least 3 rendered participants
+      fixed.length + others.length > 2 ||
+      // Floating bar with more than 1 participant on shared screen
+      (fixed.length > 1 && hasScreenshares),
+    [fixed.length, hasScreenshares, others.length]
+  );
 
   const [camSubscriptions, setCamSubscriptions] = useState({
     subscribedIds: [],
-    pausedIds: [],
+    stagedIds: [],
   });
   useCamSubscriptions(
     camSubscriptions?.subscribedIds,
-    camSubscriptions?.pausedIds
+    camSubscriptions?.stagedIds
   );
 
   /**
-   * Determines subscribed and paused participant ids,
+   * Determines subscribed and staged participant ids,
    * based on rendered range, scroll position and viewport.
    */
   const updateCamSubscriptions = useCallback(
-    (r) => {
+    (range) => {
+      const fixedRemote = fixed.filter(
+        (id) => id !== localParticipant?.session_id
+      );
       const scrollEl = scrollRef.current;
-      const fixedRemote = fixed.filter((p) => !isLocalId(p.id));
 
-      if (!showParticipantsBar) {
+      // No participant bar = Subscribe to speaker & pinned only
+      if (!scrollEl) {
         setCamSubscriptions({
-          subscribedIds: [
-            currentSpeakerId,
-            pinnedId,
-            ...fixedRemote.map((p) => p.id),
-          ],
-          pausedIds: [],
+          subscribedIds: [currentSpeakerId, pinnedId, ...fixedRemote],
+          stagedIds: [],
         });
         return;
       }
-      if (!scrollEl) return;
 
       /**
+       * Get list of participant ids being rendered or within scroll buffer.
        * Make sure we don't accidentally end up with a negative buffer,
        * in case maxCamSubscriptions is lower than the amount of displayable
        * participants.
        */
       const buffer =
-        Math.max(0, maxCamSubscriptions - (r[1] - r[0]) - fixedRemote.length) /
-        2;
-      const min = Math.max(0, r[0] - buffer);
-      const max = Math.min(otherIds.length, r[1] + buffer);
-      const ids = otherIds.slice(min, max);
-      if (!ids.includes(currentSpeakerId) && !isLocalId(currentSpeakerId)) {
-        ids.push(currentSpeakerId);
+        Math.max(
+          0,
+          maxCamSubscriptions - (range[1] - range[0]) - fixedRemote.length
+        ) / 2;
+      const min = Math.max(0, range[0] - buffer);
+      const max = Math.min(others.length, range[1] + buffer);
+      let renderedOrBufferedIds = others.slice(min, max);
+      if (
+        !renderedOrBufferedIds.includes(currentSpeakerId) &&
+        currentSpeakerId !== localParticipant?.session_id
+      ) {
+        renderedOrBufferedIds.push(currentSpeakerId);
       }
-      // Calculate paused participant ids by determining their tile position
-      const subscribedIds = [...fixedRemote.map((p) => p.id), ...ids];
-      const pausedIds = otherIds.filter((id, i) => {
-        // ignore unrendered ids, they'll be unsubscribed instead
-        if (!ids.includes(id)) return false;
-        // ignore current speaker, it should never be paused
+      renderedOrBufferedIds = [...fixedRemote, ...renderedOrBufferedIds];
+
+      // Determine whether to stage or subscribe to video tracks based on their
+      // visibility.
+      const stagedIds = others.filter((id, i) => {
+        // ignore unrendered or unbuffered ids, they'll be unsubscribed instead
+        if (!renderedOrBufferedIds.includes(id)) return false;
+        // ignore current speaker, it should always be subscribed
         if (id === currentSpeakerId) return false;
         const top = i * itemHeight;
         const fixedHeight = fixed.length * itemHeight;
         const visibleScrollHeight = scrollEl.clientHeight - fixedHeight;
-        const paused =
+        const staged =
           // bottom video edge above top viewport edge
           top + itemHeight < scrollEl.scrollTop ||
           // top video edge below bottom viewport edge
           top > scrollEl.scrollTop + visibleScrollHeight;
-        return paused;
+        return staged;
       });
+      const subscribedIds = renderedOrBufferedIds.filter(
+        (id) => !stagedIds.includes(id)
+      );
       setCamSubscriptions({
         subscribedIds,
-        pausedIds,
+        stagedIds,
       });
     },
     [
       currentSpeakerId,
       fixed,
       itemHeight,
+      localParticipant?.session_id,
       maxCamSubscriptions,
-      otherIds,
+      others,
       pinnedId,
-      showParticipantsBar,
     ]
   );
 
@@ -160,7 +182,7 @@ export const ParticipantBar = ({
    * 2. the spacing boxes before and after the visible tiles
    */
   const updateVisibleRange = useCallback(
-    (st) => {
+    (scrollTop) => {
       const visibleHeight = scrollRef.current.clientHeight - paddingTop;
       const scrollBuffer = Math.min(
         MAX_SCROLL_BUFFER,
@@ -170,7 +192,7 @@ export const ParticipantBar = ({
         visibleHeight / itemHeight + scrollBuffer
       );
       let start = Math.floor(
-        Math.max(0, st - (scrollBuffer / 2) * itemHeight) / itemHeight
+        Math.max(0, scrollTop - (scrollBuffer / 2) * itemHeight) / itemHeight
       );
       const end = Math.min(start + visibleItemCount, othersCount);
       if (end - visibleItemCount < start) {
@@ -191,25 +213,37 @@ export const ParticipantBar = ({
     [itemHeight, othersCount, paddingTop, spaceAfter, spaceBefore]
   );
 
+  /**
+   * WARNING: this resize event is critical for all subscriptions updates,
+   * even those unrelated to resizing, due to its dependency on
+   * updateCamSubscriptions causing it to trigger when anything changes
+   * that might effect subscriptions, like changes in active speaker.
+   *
+   * It is required when showParticipantBar is true AND false.
+   *
+   * TODO: we may want to change this so subscriptions rely on a useEffect hook instead.
+   */
   useResize(() => {
     const scrollEl = scrollRef.current;
-    if (!scrollEl) return;
+    /**
+     * No participant bar and/or no scroll area
+     * We still have to call updateCamSubscriptions, otherwise we wouldn't subscribe to the speaker.
+     */
+    if (!scrollEl) {
+      updateCamSubscriptions([0, 0]);
+      return;
+    }
     setIsSidebarScrollable(scrollEl?.scrollHeight > scrollEl?.clientHeight);
-    const r = updateVisibleRange(scrollEl.scrollTop);
-    updateCamSubscriptions(r);
-  }, [
-    scrollRef,
-    showParticipantsBar,
-    updateCamSubscriptions,
-    updateVisibleRange,
-  ]);
+    const range = updateVisibleRange(scrollEl.scrollTop);
+    updateCamSubscriptions(range);
+  }, [scrollRef, updateCamSubscriptions, updateVisibleRange]);
 
   /**
    * Setup optimized scroll listener.
    */
   useEffect(() => {
     const scrollEl = scrollRef.current;
-    if (!scrollEl) return false;
+    if (!scrollEl) return;
 
     let frame;
     const handleScroll = () => {
@@ -217,8 +251,8 @@ export const ParticipantBar = ({
       if (frame) cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         if (!scrollEl) return;
-        const r = updateVisibleRange(scrollEl.scrollTop);
-        updateCamSubscriptions(r);
+        const range = updateVisibleRange(scrollEl.scrollTop);
+        updateCamSubscriptions(range);
       });
     };
 
@@ -235,32 +269,40 @@ export const ParticipantBar = ({
     const scrollEl = scrollRef.current;
     // Ignore promoting, when no screens are being shared
     // because the active participant will be shown in the SpeakerTile anyway
-    if (!hasScreenshares || !scrollEl) return false;
+    if (!hasScreenshares || !scrollEl) return;
 
     const maybePromoteActiveSpeaker = () => {
-      const fixedOther = fixed.find((f) => !f.isLocal);
-      // Ignore when speaker is already at first position or component unmounted
-      if (!fixedOther || fixedOther?.id === currentSpeakerId || !scrollEl) {
-        return false;
+      const fixedOtherId = fixed.find(
+        (id) => id !== localParticipant?.session_id
+      );
+
+      // Promote speaker when participant bar isn't rendered & screen is shared
+      if (hasScreenshares && fixedOtherId) {
+        swapParticipantPosition(fixedOtherId, activeSpeakerId);
+        return;
       }
+
+      // Ignore when speaker is already at first position or component unmounted
+      if (!fixedOtherId || fixedOtherId === activeSpeakerId || !scrollEl)
+        return;
 
       // Active speaker not rendered at all, promote immediately
       if (
-        visibleOthers.every((p) => p.id !== currentSpeakerId) &&
-        !isLocalId(currentSpeakerId)
+        visibleOthers.every((id) => id !== activeSpeakerId) &&
+        activeSpeakerId !== localParticipant?.session_id
       ) {
-        swapParticipantPosition(fixedOther.id, currentSpeakerId);
-        return false;
+        swapParticipantPosition(fixedOtherId, activeSpeakerId);
+        return;
       }
 
       const activeTile = othersRef.current?.querySelector(
-        `[id="${currentSpeakerId}"]`
+        `[id="${activeSpeakerId}"]`
       );
       // Ignore when active speaker is not within "others"
-      if (!activeTile) return false;
+      if (!activeTile) return;
 
       // Ignore when active speaker is already pinned
-      if (currentSpeakerId === pinnedId) return false;
+      if (activeSpeakerId === pinnedId) return;
 
       const { height: tileHeight } = activeTile.getBoundingClientRect();
       const othersVisibleHeight =
@@ -272,23 +314,22 @@ export const ParticipantBar = ({
       if (
         scrolledOffsetTop + tileHeight / 2 < othersVisibleHeight &&
         scrolledOffsetTop > -tileHeight / 2
-      ) {
-        return false;
-      }
+      )
+        return;
 
-      return swapParticipantPosition(fixedOther.id, currentSpeakerId);
+      swapParticipantPosition(fixedOtherId, activeSpeakerId);
     };
     maybePromoteActiveSpeaker();
-    const throttledHandler = debounce(maybePromoteActiveSpeaker, 100);
+    const throttledHandler = throttle(maybePromoteActiveSpeaker, 100);
     scrollEl.addEventListener('scroll', throttledHandler);
-
     return () => {
       scrollEl?.removeEventListener('scroll', throttledHandler);
     };
   }, [
-    currentSpeakerId,
+    activeSpeakerId,
     fixed,
     hasScreenshares,
+    localParticipant?.session_id,
     pinnedId,
     swapParticipantPosition,
     visibleOthers,
@@ -296,15 +337,18 @@ export const ParticipantBar = ({
 
   const otherTiles = useMemo(
     () =>
-      visibleOthers.map((callItem) => (
+      visibleOthers.map((id) => (
         <Tile
           aspectRatio={aspectRatio}
-          key={callItem.id}
-          participant={callItem}
+          key={id}
+          isSpeaking={shouldRenderSpeakerBorder && id === activeSpeakerId}
+          sessionId={id}
         />
       )),
-    [aspectRatio, visibleOthers]
+    [activeSpeakerId, aspectRatio, shouldRenderSpeakerBorder, visibleOthers]
   );
+
+  if (fixed.length + others.length === 0 || fixed.length === 0) return null;
 
   return (
     <div
@@ -316,26 +360,24 @@ export const ParticipantBar = ({
       })}
     >
       <div className="fixed">
-        {fixed.map((item, i) => {
+        {fixed.map((id, i) => {
           // reduce setting up & tearing down tiles as much as possible
           const key = i;
           return (
             <Tile
               key={key}
               aspectRatio={aspectRatio}
-              participant={item}
-              network={networkState}
+              sessionId={id}
+              network={id === localParticipant?.sessionId ? threshold : null}
             />
           );
         })}
       </div>
-      {showParticipantsBar && (
-        <div ref={othersRef} className="participants">
-          <div ref={spaceBefore} style={{ width }} />
-          {otherTiles}
-          <div ref={spaceAfter} style={{ width }} />
-        </div>
-      )}
+      <div ref={othersRef} className="participants">
+        <div ref={spaceBefore} style={{ width }} />
+        {otherTiles}
+        <div ref={spaceAfter} style={{ width }} />
+      </div>
       <style jsx>{`
         .sidebar {
           border-left: 1px solid var(--blue-dark);

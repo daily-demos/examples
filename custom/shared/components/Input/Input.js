@@ -126,7 +126,7 @@ const InputContainer = ({ children, prefix, className }) => (
         border: 0px;
         box-shadow: none;
       }
-      
+
       .border :global(input) {
         background: transparent;
         border: 1px solid var(--reverse);

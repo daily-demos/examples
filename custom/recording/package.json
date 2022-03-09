@@ -10,8 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@custom/shared": "*",
     "@custom/basic-call": "*",
+    "@custom/shared": "*",
+    "@daily-co/daily-react-hooks": "^0.1.0",
     "next": "^11.0.0",
     "pluralize": "^8.0.0",
     "react": "^17.0.2",

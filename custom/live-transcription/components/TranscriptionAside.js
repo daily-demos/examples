@@ -17,7 +17,6 @@ export const TranscriptionAside = () => {
 
   const msgWindowRef = useRef();
 
-
   useEffect(() => {
     if (msgWindowRef.current) {
       msgWindowRef.current.scrollTop = msgWindowRef.current.scrollHeight;
@@ -40,31 +39,26 @@ export const TranscriptionAside = () => {
 
   return (
     <Aside onClose={() => setShowAside(false)}>
-        {isOwner && (
-          <div className="owner-actions">
-
-            <Button
-              fullWidth
-              size="tiny"
-              disabled={isTranscribing}
-              onClick={() =>
-                startTranscription()
-              }
-            >
-              {isTranscribing ? 'Transcribing' : 'Start transcribing'}
-            </Button>
-            <Button
-              fullWidth
-              size="tiny"
-              disabled={!isTranscribing}
-              onClick={() =>
-                stopTranscription()
-              }
-            >
-              Stop transcribing
-            </Button>
-          </div>
-        )}
+      {isOwner && (
+        <div className="owner-actions">
+          <Button
+            fullWidth
+            size="tiny"
+            disabled={isTranscribing}
+            onClick={() => startTranscription()}
+          >
+            {isTranscribing ? 'Transcribing' : 'Start transcribing'}
+          </Button>
+          <Button
+            fullWidth
+            size="tiny"
+            disabled={!isTranscribing}
+            onClick={() => stopTranscription()}
+          >
+            Stop transcribing
+          </Button>
+        </div>
+      )}
       <div className="messages-container" ref={msgWindowRef}>
         {transcriptionHistory.map((msg) => (
           <div key={msg.id}>

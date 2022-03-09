@@ -1,36 +1,119 @@
-import React from 'react';
-import { useMediaDevices } from '@custom/shared/contexts/MediaDeviceProvider';
+import React, { useMemo } from 'react';
+import { useDevices } from '@daily-co/daily-react-hooks';
 import Field from '../Field';
 import { SelectInput } from '../Input';
 
 export const DeviceSelect = () => {
   const {
-    cams,
-    mics,
+    camState,
+    cameras,
+    setCamera,
+    micState,
+    microphones,
+    setMicrophone,
     speakers,
-    currentCam,
-    setCurrentCam,
-    currentMic,
-    setCurrentMic,
-    currentSpeaker,
-    setCurrentSpeaker,
-  } = useMediaDevices();
+    setSpeaker,
+  } = useDevices();
 
-  if (!currentCam && !currentMic && !currentSpeaker) {
-    return <div>Loading devices...</div>;
-  }
+  const camOptions = useMemo(() => {
+    switch (camState) {
+      case 'blocked':
+        return [
+          {
+            label: 'Camera access blocked',
+            value: null,
+          },
+        ];
+      case 'not-found':
+        return [
+          {
+            label: 'Camera not found',
+            value: null,
+          },
+        ];
+      default:
+        if (!cameras.length) {
+          return [
+            {
+              label: 'Turn on camera to allow access',
+              value: null,
+            },
+          ];
+        }
+        return cameras.map((cam) => ({
+          label:
+            cam.state === 'in-use'
+              ? `⚠️ ${cam.device.label || cam.device.deviceId}`
+              : cam.device.label || cam.device.deviceId,
+          selected: cam.selected,
+          value: cam.device.deviceId,
+        }));
+    }
+  }, [camState, cameras]);
+
+  const micOptions = useMemo(() => {
+    switch (micState) {
+      case 'blocked':
+        return [
+          {
+            label: 'Microphone access blocked',
+            value: null,
+          },
+        ];
+      case 'not-found':
+        return [
+          {
+            label: 'Microphone not found',
+            value: null,
+          },
+        ];
+      default:
+        if (!microphones.length) {
+          return [
+            {
+              label: 'Unmute microphone to allow access',
+              value: null,
+            },
+          ];
+        }
+        return microphones.map((mic) => ({
+          label:
+            mic.state === 'in-use'
+              ? `⚠️ ${mic.device.label || mic.device.deviceId}`
+              : mic.device.label || mic.device.deviceId,
+          selected: mic.selected,
+          value: mic.device.deviceId,
+        }));
+    }
+  }, [micState, microphones]);
+
+  const speakerOptions = useMemo(() => {
+    if (speakers.length > 0) {
+      return speakers.map((speaker) => ({
+        label: speaker.device.label || speaker.device.deviceId,
+        selected: speaker.selected,
+        value: speaker.device.deviceId,
+      }));
+    } else {
+      return [
+        {
+          label: 'System default',
+          selected: true,
+          value: 'default',
+        },
+      ];
+    }
+  }, [speakers]);
 
   return (
     <>
       <Field label="Select camera:">
         <SelectInput
-          onChange={(e) => setCurrentCam(cams[e.target.value])}
-          value={cams.findIndex(
-            (i) => i.deviceId === currentCam.deviceId
-          )}
+          disabled={!cameras.length}
+          onChange={(e) => setCamera(e.target.value)}
         >
-          {cams.map(({ deviceId, label }, i) => (
-            <option key={`cam-${deviceId}`} value={i}>
+          {camOptions.map(({ label, selected, value }) => (
+            <option key={`cam-${label}`} value={value} selected={selected}>
               {label}
             </option>
           ))}
@@ -39,13 +122,11 @@ export const DeviceSelect = () => {
 
       <Field label="Select microphone:">
         <SelectInput
-          onChange={(e) => setCurrentMic(mics[e.target.value])}
-          value={mics.findIndex(
-            (i) => i.deviceId === currentMic.deviceId
-          )}
+          disabled={!microphones.length}
+          onChange={(e) => setMicrophone(e.target.value)}
         >
-          {mics.map(({ deviceId, label }, i) => (
-            <option key={`mic-${deviceId}`} value={i}>
+          {micOptions.map(({ label, selected, value }) => (
+            <option key={`mic-${label}`} value={value} selected={selected}>
               {label}
             </option>
           ))}
@@ -58,13 +139,15 @@ export const DeviceSelect = () => {
       {speakers.length > 0 && (
         <Field label="Select speakers:">
           <SelectInput
-            onChange={(e) => setCurrentSpeaker(speakers[e.target.value])}
-            value={speakers.findIndex(
-              (i) => i.deviceId === currentSpeaker.deviceId
-            )}
+            disabled={!speakers.length}
+            onChange={(e) => setSpeaker(e.target.value)}
           >
-            {speakers.map(({ deviceId, label }, i) => (
-              <option key={`speakers-${deviceId}`} value={i}>
+            {speakerOptions.map(({ label, selected, value }) => (
+              <option
+                key={`speakers-${label}`}
+                value={value}
+                selected={selected}
+              >
                 {label}
               </option>
             ))}

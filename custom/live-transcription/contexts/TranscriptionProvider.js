@@ -23,12 +23,12 @@ export const TranscriptionProvider = ({ children }) => {
       // Collect only transcription messages, and gather enough
       // words to be able to post messages at sentence intervals
       if (e.fromId === 'transcription' && e.data?.is_final) {
+        // Get the sender's current display name or the local name
+        const sender =
+          e.data?.session_id !== participants.local.session_id
+            ? participants[e.data.session_id].user_name
+            : participants.local.user_name;
 
-      // Get the sender's current display name or the local name
-      const sender = e.data?.session_id !== participants.local.session_id
-        ? participants[e.data.session_id].user_name
-        : participants.local.user_name;
-        
         setTranscriptionHistory((oldState) => [
           ...oldState,
           { sender, message: e.data.text, id: nanoid() },
@@ -69,7 +69,13 @@ export const TranscriptionProvider = ({ children }) => {
     callObject.on('transcription-error', handleTranscriptionError);
 
     return () => callObject.off('app-message', handleNewMessage);
-  }, [callObject, handleNewMessage, handleTranscriptionStarted, handleTranscriptionStopped, handleTranscriptionError]);
+  }, [
+    callObject,
+    handleNewMessage,
+    handleTranscriptionStarted,
+    handleTranscriptionStopped,
+    handleTranscriptionError,
+  ]);
 
   return (
     <TranscriptionContext.Provider

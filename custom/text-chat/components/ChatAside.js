@@ -49,7 +49,9 @@ export const ChatAside = () => {
       <div className="messages-container" ref={chatWindowRef}>
         {chatHistory.map((chatItem) => (
           <div
-            className={isLocalUser(chatItem.senderID) ? 'message local' : 'message'}
+            className={
+              isLocalUser(chatItem.senderID) ? 'message local' : 'message'
+            }
             key={chatItem.id}
           >
             <span className="content">{chatItem.message}</span>
@@ -57,11 +59,13 @@ export const ChatAside = () => {
           </div>
         ))}
       </div>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        sendMessage(newMessage);
-        setNewMessage('');
-      }}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          sendMessage(newMessage);
+          setNewMessage('');
+        }}
+      >
         <footer className="chat-footer">
           <TextInput
             value={newMessage}

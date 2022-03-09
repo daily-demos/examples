@@ -10,7 +10,7 @@
 
 ## What does this demo do?
 
-- Use `startTranscription()` and `stopTranscription()` methods to create a transcript of a call 
+- Use `startTranscription()` and `stopTranscription()` methods to create a transcript of a call
 - Integrates Deepgram transcription service into Daily calls
 - Listen for incoming transcription messages using the call object `app-message` event
 - Extend the basic call demo with a transcription provider and aside

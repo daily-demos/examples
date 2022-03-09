@@ -3,8 +3,8 @@ import Button from '@custom/shared/components/Button';
 import { CardBody } from '@custom/shared/components/Card';
 import Modal from '@custom/shared/components/Modal';
 import Well from '@custom/shared/components/Well';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { useCallConfig } from '@custom/shared/hooks/useCallConfig';
 import {
   RECORDING_COUNTDOWN_1,
   RECORDING_COUNTDOWN_2,
@@ -23,13 +23,9 @@ export const RECORDING_MODAL = 'recording';
 
 export const RecordingModal = () => {
   const { currentModals, closeModal } = useUIState();
-  const { enableRecording } = useCallState();
-  const {
-    recordingStartedDate,
-    recordingState,
-    startRecordingWithCountdown,
-    stopRecording,
-  } = useRecording();
+  const { enableRecording } = useCallConfig();
+  const { recordingState, startRecordingWithCountdown, stopRecording } =
+    useRecording();
 
   useEffect(() => {
     if (recordingState === RECORDING_RECORDING) {
@@ -101,10 +97,6 @@ export const RecordingModal = () => {
           <p>
             Recording type enabled: <strong>{enableRecording}</strong>
           </p>
-        )}
-
-        {recordingStartedDate && (
-          <p>Recording started: {recordingStartedDate.toString()}</p>
         )}
 
         {[RECORDING_TYPE_CLOUD, RECORDING_TYPE_CLOUD_BETA].includes(

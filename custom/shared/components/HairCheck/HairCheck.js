@@ -6,20 +6,14 @@ import Loader from '@custom/shared/components/Loader';
 import MuteButton from '@custom/shared/components/MuteButton';
 import Tile from '@custom/shared/components/Tile';
 import { ACCESS_STATE_LOBBY } from '@custom/shared/constants';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
-import { useMediaDevices } from '@custom/shared/contexts/MediaDeviceProvider';
-import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import {
-  DEVICE_STATE_BLOCKED,
-  DEVICE_STATE_NOT_FOUND,
-  DEVICE_STATE_IN_USE,
-  DEVICE_STATE_PENDING,
-  DEVICE_STATE_LOADING,
-  DEVICE_STATE_GRANTED,
-} from '@custom/shared/contexts/useDevices';
 import IconSettings from '@custom/shared/icons/settings-sm.svg';
 
+import {
+  useDaily,
+  useDevices,
+  useLocalParticipant,
+} from '@daily-co/daily-react-hooks';
 import { useDeepCompareMemo } from 'use-deep-compare';
 
 /**
@@ -30,15 +24,8 @@ import { useDeepCompareMemo } from 'use-deep-compare';
  * - Set user name and join call / request access
  */
 export const HairCheck = () => {
-  const { callObject } = useCallState();
-  const { localParticipant } = useParticipants();
-  const {
-    deviceState,
-    camError,
-    micError,
-    isCamMuted,
-    isMicMuted,
-  } = useMediaDevices();
+  const daily = useDaily();
+  const { camState, hasCamError, hasMicError, micState } = useDevices();
   const { openModal } = useUIState();
   const [waiting, setWaiting] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -46,30 +33,44 @@ export const HairCheck = () => {
   const [userName, setUserName] = useState(
     localStorage.getItem('PLUOT_PARTICIPANT_NAME') || ''
   );
+  const localParticipant = useLocalParticipant();
+
+  const camMuted = useMemo(
+    () => !localParticipant?.video || hasCamError,
+    [hasCamError, localParticipant?.video]
+  );
+
+  const micMuted = useMemo(
+    () => !localParticipant?.audio || hasMicError,
+    [hasMicError, localParticipant?.audio]
+  );
+
+  const isLoading = camState === 'pending' || micState === 'pending';
+  const deviceInUse = camState === 'in-use' || micState === 'in-use';
 
   // Initialise devices (even though we're not yet in a call)
   useEffect(() => {
-    if (!callObject) return;
-    callObject.startCamera();
-  }, [callObject]);
+    if (!daily) return;
+    daily.startCamera();
+  }, [daily]);
 
   const joinCall = async () => {
-    if (!callObject) return;
+    if (!daily) return;
 
     // Disable join controls
     setJoining(true);
 
     // Set the local participants name
-    await callObject.setUserName(userName);
+    await daily.setUserName(userName);
 
     // Async request access (this will block until the call owner responds to the knock)
-    const { access } = callObject.accessState();
-    await callObject.join();
+    const { access } = daily.accessState();
+    await daily.join();
 
     // If we we're in the lobby, wait for the owner to let us in
     if (access?.level === ACCESS_STATE_LOBBY) {
       setWaiting(true);
-      const { granted } = await callObject.requestAccess({
+      const { granted } = await daily.requestAccess({
         name: userName,
         access: {
           level: 'full',
@@ -91,7 +92,7 @@ export const HairCheck = () => {
   const tileMemo = useDeepCompareMemo(
     () => (
       <Tile
-        participant={localParticipant}
+        sessionId={localParticipant?.session_id}
         mirrored
         showAvatar
         showName={false}
@@ -100,31 +101,27 @@ export const HairCheck = () => {
     [localParticipant]
   );
 
-  const isLoading = useMemo(() => deviceState === DEVICE_STATE_LOADING, [
-    deviceState,
-  ]);
-
-  const hasError = useMemo(() => {
-    return !(!deviceState ||
-      [
-        DEVICE_STATE_LOADING,
-        DEVICE_STATE_PENDING,
-        DEVICE_STATE_GRANTED,
-      ].includes(deviceState));
-  }, [deviceState]);
-
   const camErrorVerbose = useMemo(() => {
-    switch (camError) {
-      case DEVICE_STATE_BLOCKED:
-        return 'Camera blocked by user';
-      case DEVICE_STATE_NOT_FOUND:
+    switch (camState) {
+      case 'not-found':
         return 'Camera not found';
-      case DEVICE_STATE_IN_USE:
-        return 'Device in use';
+      case 'in-use':
+        return 'Camera in use';
       default:
         return 'unknown';
     }
-  }, [camError]);
+  }, [camState]);
+
+  const micErrorVerbose = useMemo(() => {
+    switch (micState) {
+      case 'not-found':
+        return 'Microphone not found';
+      case 'in-use':
+        return 'Microphone in use';
+      default:
+        return 'unknown';
+    }
+  }, [micState]);
 
   const showWaitingMessage = useMemo(() => {
     return (
@@ -160,10 +157,7 @@ export const HairCheck = () => {
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
         />
-        <Button
-          disabled={joining || userName.length < 3}
-          type="submit"
-        >
+        <Button disabled={joining || userName.length < 3} type="submit">
           Join call
         </Button>
       </>
@@ -194,33 +188,35 @@ export const HairCheck = () => {
               >
                 <IconSettings />
               </Button>
-
               {isLoading && (
                 <div className="overlay-message">
                   Loading devices, please wait...
                 </div>
               )}
-              {hasError && (
-                <>
-                  {camError && (
-                    <div className="overlay-message">{camErrorVerbose}</div>
-                  )}
-                  {micError && (
-                    <div className="overlay-message">{micError}</div>
-                  )}
-                </>
-              )}
+              {hasCamError ||
+                (hasMicError && !deviceInUse && (
+                  <>
+                    {hasCamError && (
+                      <div className="overlay-message">{camErrorVerbose}</div>
+                    )}
+                    {hasMicError && (
+                      <div className="overlay-message">{micErrorVerbose}</div>
+                    )}
+                  </>
+                ))}
             </div>
             <div className="mute-buttons">
-              <MuteButton isMuted={isCamMuted} disabled={!!camError} />
-              <MuteButton mic isMuted={isMicMuted} disabled={!!micError} />
+              <MuteButton isMuted={camMuted} disabled={!!hasCamError} />
+              <MuteButton mic isMuted={micMuted} disabled={!!hasMicError} />
             </div>
             {tileMemo}
           </div>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            joinCall(userName);
-          }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              joinCall(userName);
+            }}
+          >
             <footer>{waiting ? showWaitingMessage : showUsernameInput}</footer>
           </form>
         </div>

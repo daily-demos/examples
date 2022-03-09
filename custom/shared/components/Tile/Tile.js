@@ -1,6 +1,11 @@
-import React, { memo, useEffect, useState, useRef } from 'react';
-import { useVideoTrack } from '@custom/shared/hooks/useVideoTrack';
+import React, { memo, useEffect, useState, useRef, useMemo } from 'react';
 import { ReactComponent as IconMicMute } from '@custom/shared/icons/mic-off-sm.svg';
+import {
+  useMediaTrack,
+  useParticipant,
+  useActiveParticipant,
+  useLocalParticipant,
+} from '@daily-co/daily-react-hooks';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { DEFAULT_ASPECT_RATIO } from '../../constants';
@@ -11,30 +16,40 @@ const SM_TILE_MAX_WIDTH = 300;
 
 export const Tile = memo(
   ({
-    participant,
+    sessionId,
+    isScreen = false,
     mirrored = true,
     showName = true,
     showAvatar = true,
     showActiveSpeaker = true,
+    network,
     videoFit = 'contain',
     aspectRatio = DEFAULT_ASPECT_RATIO,
     onVideoResize,
     ...props
   }) => {
-    const videoTrack = useVideoTrack(participant.id);
-    const videoRef = useRef(null);
+    const videoState = useMediaTrack(
+      sessionId,
+      isScreen ? 'screenVideo' : 'video'
+    );
+
+    const videoEl = useRef(null);
     const tileRef = useRef(null);
+
+    const participant = useParticipant(sessionId);
+    const activeParticipant = useActiveParticipant();
+    const localParticipant = useLocalParticipant();
+
+    const [tileAspectRatio, setTileAspectRatio] = useState(aspectRatio);
     const [tileWidth, setTileWidth] = useState(0);
 
     /**
-     * Effect: Resize
-     *
      * Add optional event listener for resize event so the parent component
      * can know the video's native aspect ratio.
      */
     useEffect(() => {
-      const video = videoRef.current;
-      if (!onVideoResize || !video) return false;
+      const video = videoEl.current;
+      if (!onVideoResize || !video) return;
 
       const handleResize = () => {
         if (!video) return;
@@ -50,12 +65,58 @@ export const Tile = memo(
       video?.addEventListener('resize', handleResize);
 
       return () => video?.removeEventListener('resize', handleResize);
-    }, [onVideoResize, videoRef, participant]);
+    }, [onVideoResize, videoEl, participant]);
+
+    useEffect(() => {
+      if (aspectRatio === tileAspectRatio) return;
+      setTileAspectRatio(aspectRatio);
+    }, [aspectRatio, tileAspectRatio]);
 
     /**
-     * Effect: Resize Observer
-     *
-     * Adjust size of text overlay based on tile size
+     * When video track changes, set screen share resize & update mirroring
+     */
+    useEffect(() => {
+      const video = videoEl.current;
+
+      if (!video || !videoState.track) return;
+
+      /**
+       * Update video aspect ratio if remote screen share window gets resized
+       */
+      let timeout;
+      const handleAspectRatioResize = () => {
+        if (!video) return;
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          if (document.hidden) return;
+          const settings = videoState?.track?.getSettings();
+          const trackRatio = settings?.width / settings?.height;
+          if (trackRatio) {
+            setTileAspectRatio(trackRatio);
+            return;
+          }
+          if (!video) return;
+          const { videoHeight, videoWidth } = video;
+          if (videoWidth && videoHeight) {
+            const aspectRatio = videoWidth / videoHeight;
+            setTileAspectRatio(aspectRatio);
+          }
+        }, 33);
+      };
+
+      if (isScreen) {
+        handleAspectRatioResize();
+        video.addEventListener('resize', handleAspectRatioResize);
+      }
+      return () => {
+        if (isScreen) {
+          video?.removeEventListener('resize', handleAspectRatioResize);
+        }
+      };
+    }, [isScreen, videoState.track]);
+
+    /**
+     * Set up resize observer to update tile width
      */
     useEffect(() => {
       const tile = tileRef.current;
@@ -77,11 +138,17 @@ export const Tile = memo(
       };
     }, [tileRef]);
 
+    const isActiveTile = useMemo(() => {
+      if (activeParticipant?.user_id === localParticipant?.user_id) return;
+
+      return activeParticipant?.user_id === sessionId;
+    }, [activeParticipant?.user_id, localParticipant?.user_id, sessionId]);
+
     const cx = classNames('tile', videoFit, {
       mirrored,
-      avatar: showAvatar && !videoTrack,
-      screenShare: participant.isScreenShare,
-      active: showActiveSpeaker && participant.isActiveSpeaker,
+      avatar: showAvatar && videoState.isOff,
+      screenShare: isScreen,
+      active: showActiveSpeaker && isActiveTile,
       small: tileWidth < SM_TILE_MAX_WIDTH,
     });
 
@@ -90,18 +157,17 @@ export const Tile = memo(
         <div className="content">
           {showName && (
             <div className="name">
-              {participant.isMicMuted && !participant.isScreenShare && (
-                <IconMicMute />
-              )}
-              {participant.name}
+              {!participant?.audio && !isScreen && <IconMicMute />}
+              {participant?.user_name}
             </div>
           )}
-          {videoTrack ? (
+
+          {!videoState?.isOff ? (
             <Video
-              ref={videoRef}
+              ref={videoEl}
               fit={videoFit}
-              isScreen={participant.isScreenshare}
-              participantId={participant?.id}
+              isScreen={isScreen}
+              sessionId={sessionId}
             />
           ) : (
             showAvatar && (
@@ -200,7 +266,7 @@ export const Tile = memo(
 );
 
 Tile.propTypes = {
-  participant: PropTypes.object.isRequired,
+  sessionId: PropTypes.string.isRequired,
   mirrored: PropTypes.bool,
   showName: PropTypes.bool,
   showAvatar: PropTypes.bool,

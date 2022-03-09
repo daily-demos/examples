@@ -33,21 +33,21 @@ export const AsideHeader = () => {
           background: var(--gray-wash);
           color: var(--gray-dark);
         }
-        
+
         .tab {
           height: 100%;
           width: 50%;
           cursor: pointer;
         }
-        
+
         .tab.active {
-          background: var(--reverse)!important;
-          color: var(--text-default)!important;
+          background: var(--reverse) !important;
+          color: var(--text-default) !important;
           font-weight: 900;
         }
       `}</style>
     </>
-  )
+  );
 };
 
 export default AsideHeader;

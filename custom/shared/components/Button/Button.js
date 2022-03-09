@@ -33,9 +33,9 @@ export const Button = forwardRef(
 
     const content = (
       <>
-        {IconBefore && <IconBefore style={{ marginRight: '.5em'}}/>}
+        {IconBefore && <IconBefore style={{ marginRight: '.5em' }} />}
         {children}
-        {IconAfter && <IconAfter style={{ marginLeft: '.5em'}}/>}
+        {IconAfter && <IconAfter style={{ marginLeft: '.5em' }} />}
       </>
     );
 
@@ -228,7 +228,7 @@ export const Button = forwardRef(
             width: 64px;
             border-radius: 32px;
           }
-          
+
           .button.small-circle {
             padding: 0px;
             height: 42px;
@@ -296,7 +296,7 @@ export const Button = forwardRef(
           .button.dark:disabled {
             opacity: 0.35;
           }
-          
+
           .button.gray {
             background: ${theme.gray.light};
             color: var(--text-default);

@@ -47,7 +47,7 @@ const Room = ({
         </ParticipantsProvider>
       </CallProvider>
     </UIStateProvider>
-  )
+  );
 };
 
 export default Room;
@@ -63,5 +63,5 @@ export async function getStaticPaths() {
   return {
     paths: [],
     fallback: 'blocking',
-  }
+  };
 }

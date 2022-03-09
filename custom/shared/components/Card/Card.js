@@ -6,17 +6,16 @@ export const Card = ({ children, className, variant }) => (
   <div className={classNames('card', className, variant)}>
     {children}
     <style jsx>{`
-
       .card {
         background: var(--reverse);
         box-sizing: border-box;
         border-radius: var(--radius-md);
-        border: 1px solid #C8D1DC;
+        border: 1px solid #c8d1dc;
         padding: var(--spacing-md);
       }
-      
+
       .card.dark {
-        background-color: var(--blue-dark);;
+        background-color: var(--blue-dark);
       }
     `}</style>
   </div>

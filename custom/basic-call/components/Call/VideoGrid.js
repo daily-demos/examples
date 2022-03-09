@@ -18,7 +18,8 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { participants } = useParticipants();
+    const { participantCount, orderedParticipantIds, localParticipant } =
+      useParticipants();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -29,12 +30,13 @@ export const VideoGrid = React.memo(
       let frame;
       const handleResize = () => {
         if (frame) cancelAnimationFrame(frame);
-        frame = requestAnimationFrame(() =>
+        frame = requestAnimationFrame(() => {
+          const dims = containerRef.current?.getBoundingClientRect();
           setDimensions({
-            width: containerRef.current?.clientWidth,
-            height: containerRef.current?.clientHeight,
-          })
-        );
+            width: Math.floor(dims.width),
+            height: Math.floor(dims.height),
+          });
+        });
       };
       handleResize();
       window.addEventListener('resize', handleResize);
@@ -45,65 +47,61 @@ export const VideoGrid = React.memo(
       };
     }, []);
 
-    // Basic brute-force packing algo
-    const layout = useMemo(() => {
-      const aspectRatio = DEFAULT_ASPECT_RATIO;
-      const tileCount = participants.length || 0;
-      const w = dimensions.width;
-      const h = dimensions.height;
-
-      // brute-force search layout where video occupy the largest area of the container
-      let bestLayout = {
-        area: 0,
-        cols: 0,
-        rows: 0,
-        width: 0,
-        height: 0,
-      };
-
-      for (let cols = 0; cols <= tileCount; cols += 1) {
-        const rows = Math.ceil(tileCount / cols);
-        const hScale = w / (cols * aspectRatio);
-        const vScale = h / rows;
-        let width;
-        let height;
-        if (hScale <= vScale) {
-          width = Math.floor(w / cols);
-          height = Math.floor(width / aspectRatio);
+    const [tileWidth, tileHeight] = useMemo(() => {
+      const width = Math.floor(dimensions.width);
+      const height = Math.floor(dimensions.height);
+      const tileCount = participantCount || 0;
+      if (tileCount === 0) return [width, height];
+      const dims = [];
+      /**
+       * We'll calculate the possible tile dimensions for 1 to n columns.
+       */
+      for (let columnCount = 1; columnCount <= tileCount; columnCount++) {
+        // Pixels used for flex gap between tiles
+        const columnGap = columnCount - 1;
+        let maxWidthPerTile = Math.floor((width - columnGap) / columnCount);
+        let maxHeightPerTile = Math.floor(
+          maxWidthPerTile / DEFAULT_ASPECT_RATIO
+        );
+        const rowCount = Math.ceil(tileCount / columnCount);
+        const rowGap = rowCount - 1;
+        if (rowCount * maxHeightPerTile + rowGap > height) {
+          maxHeightPerTile = Math.floor((height - rowGap) / rowCount);
+          maxWidthPerTile = Math.floor(maxHeightPerTile * DEFAULT_ASPECT_RATIO);
+          dims.push([maxWidthPerTile, maxHeightPerTile]);
         } else {
-          height = Math.floor(h / rows);
-          width = Math.floor(height * aspectRatio);
-        }
-        const area = width * height;
-        if (area > bestLayout.area) {
-          bestLayout = {
-            area,
-            width,
-            height,
-            rows,
-            cols,
-          };
+          dims.push([maxWidthPerTile, maxHeightPerTile]);
         }
       }
+      return dims.reduce(
+        ([rw, rh], [w, h]) => {
+          if (w * h < rw * rh) return [rw, rh];
+          return [w, h];
+        },
+        [0, 0]
+      );
+    }, [dimensions.height, dimensions.width, participantCount]);
 
-      return bestLayout;
-    }, [dimensions, participants]);
+    const visibleParticipants = useMemo(
+      () => [localParticipant.session_id, ...orderedParticipantIds],
+      [localParticipant.session_id, orderedParticipantIds]
+    );
 
     // Memoize our tile list to avoid unnecassary re-renders
     const tiles = useDeepCompareMemo(
       () =>
-        participants.map((p) => (
+        visibleParticipants.map((p) => (
           <Tile
-            participant={p}
-            key={p.id}
+            sessionId={p}
+            key={p}
             mirrored
-            style={{ maxWidth: layout.width, maxHeight: layout.height }}
+            style={{ maxWidth: tileWidth, maxHeight: tileHeight }}
           />
         )),
-      [layout, participants]
+      [tileWidth, tileHeight, visibleParticipants]
     );
 
-    if (!participants.length) {
+    if (!visibleParticipants.length) {
       return null;
     }
 

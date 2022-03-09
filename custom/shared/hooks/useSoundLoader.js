@@ -17,8 +17,5 @@ export const useSoundLoader = () => {
     joinSound.load();
   }, [joinSound]);
 
-  return useMemo(
-    () => ({ joinSound, load }),
-    [joinSound, load]
-  );
+  return useMemo(() => ({ joinSound, load }), [joinSound, load]);
 };

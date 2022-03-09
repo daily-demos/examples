@@ -29,7 +29,9 @@ export const InviteOthers = () => {
                     disabled
                   />
                   <Button
-                    onClick={() => navigator.clipboard.writeText(window.location.href)}
+                    onClick={() =>
+                      navigator.clipboard.writeText(window.location.href)
+                    }
                   >
                     Copy link
                   </Button>
@@ -38,7 +40,11 @@ export const InviteOthers = () => {
             </Card>
           </div>
           <div className="preview">
-            <Tile participant={localParticipant} mirrored aspectRatio={DEFAULT_ASPECT_RATIO} />
+            <Tile
+              sessionId={localParticipant.session_id}
+              mirrored
+              aspectRatio={DEFAULT_ASPECT_RATIO}
+            />
           </div>
           <style jsx>{`
             .invite-wrapper {
@@ -46,29 +52,29 @@ export const InviteOthers = () => {
               height: 100%;
               width: 100%;
             }
-            
+
             .invite-others {
               margin: auto;
               text-align: center;
             }
-            
+
             .link {
               display: flex;
               justify-content: center;
               gap: 10px;
             }
-            
+
             .preview {
               position: absolute;
               bottom: 0;
               width: 186px;
             }
-            
+
             :global(.invite-others .card) {
-              border: 0!important;
+              border: 0 !important;
               width: 40vw;
             }
-            
+
             :global(.invite-others .card input) {
               width: 15vw;
             }
@@ -76,7 +82,7 @@ export const InviteOthers = () => {
         </div>
       </VideoContainer>
     </Container>
-  )
-}
+  );
+};
 
 export default InviteOthers;
