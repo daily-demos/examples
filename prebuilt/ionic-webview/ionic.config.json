@@ -1,0 +1,7 @@
+{
+  "name": "ionic-webview",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
