@@ -56,7 +56,7 @@ export const useSharedState = ({ initialValues = {}, broadcast = true }) => {
     [stateRef, callObject]
   );
 
-  // whenever local user joins, we randomly pick a participant from the call and request him for the state.
+  // whenever local user joins, we randomly pick a participant from the call and request state from them.
   const handleJoinedMeeting = useCallback(() => {
     const randomDelay = 1000 + Math.ceil(1000 * Math.random());
 
