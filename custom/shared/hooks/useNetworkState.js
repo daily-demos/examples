@@ -4,10 +4,7 @@ import { useCallState } from '../contexts/CallProvider';
 const STANDARD_HIGH_BITRATE_CAP = 980;
 const STANDARD_LOW_BITRATE_CAP = 300;
 
-export const useNetworkState = (
-  co = null,
-  quality = 'high'
-) => {
+export const useNetworkState = (co = null, quality = 'high') => {
   const [threshold, setThreshold] = useState('good');
   const lastSetKBS = useRef(null);
 

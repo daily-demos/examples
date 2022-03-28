@@ -30,20 +30,19 @@ export const ChatProvider = ({ children }) => {
         ? participants[e.fromId].user_name
         : 'Guest';
 
-      setSharedState(values => ({
+      setSharedState((values) => ({
         ...values,
         chatHistory: [
           ...values.chatHistory,
           // nanoid - we use it to generate unique ID string
           { sender, senderID: e.fromId, message: e.data.message, id: nanoid() },
-        ]
+        ],
       }));
 
       setHasNewMessages(true);
     },
     [callObject, setSharedState]
   );
-
 
   const sendMessage = useCallback(
     (message) => {
@@ -61,13 +60,13 @@ export const ChatProvider = ({ children }) => {
       const senderID = participants.local.user_id;
 
       // Update shared state chat history
-      return setSharedState(values => ({
+      return setSharedState((values) => ({
         ...values,
         chatHistory: [
           ...values.chatHistory,
           // nanoid - we use it to generate unique ID string
-          { sender, senderID, message, id: nanoid() }
-        ]
+          { sender, senderID, message, id: nanoid() },
+        ],
       }));
     },
     [callObject, setSharedState]

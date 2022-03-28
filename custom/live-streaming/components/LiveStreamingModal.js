@@ -5,9 +5,9 @@ import Field from '@custom/shared/components/Field';
 import { TextInput, SelectInput } from '@custom/shared/components/Input';
 import Modal from '@custom/shared/components/Modal';
 import Well from '@custom/shared/components/Well';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { useParticipant } from '@daily-co/daily-react-hooks';
 import { useLiveStreaming } from '../contexts/LiveStreamingProvider';
 
 export const LIVE_STREAMING_MODAL = 'live-streaming';
@@ -18,35 +18,53 @@ const LAYOUTS = [
   { label: 'Active participant', value: 'active-participant' },
 ];
 
+const ParticipantOption = ({ sessionId }) => {
+  const participant = useParticipant(sessionId);
+
+  return (
+    <option value={participant.session_id} key={sessionId}>
+      {participant.user_name}
+    </option>
+  );
+};
+
 export const LiveStreamingModal = () => {
-  const { callObject } = useCallState();
-  const { allParticipants } = useParticipants();
+  const { participantIds } = useParticipants();
   const { currentModals, closeModal } = useUIState();
-  const { isStreaming, streamError } = useLiveStreaming();
+  const { isLiveStreaming, errorMsg, startLiveStreaming, stopLiveStreaming } =
+    useLiveStreaming();
+
   const [pending, setPending] = useState(false);
   const [rtmpUrl, setRtmpUrl] = useState('');
-  const [layout, setLayout] = useState(0);
+  const [layoutType, setLayoutType] = useState('default');
   const [maxCams, setMaxCams] = useState(9);
-  const [participant, setParticipant] = useState(0);
+  const [participantId, setParticipantId] = useState(0);
 
   useEffect(() => {
     // Reset pending state whenever stream state changes
     setPending(false);
-  }, [isStreaming]);
+  }, [isLiveStreaming]);
 
   function startLiveStream() {
     setPending(true);
 
-    const opts =
-      layout === 'single-participant'
-        ? { session_id: participant.id }
-        : { max_cam_streams: maxCams };
-    callObject.startLiveStreaming({ rtmpUrl, preset: layout, ...opts });
+    const config = {
+      rtmpUrl,
+      layout: {
+        preset: layoutType,
+      },
+    };
+
+    if (layoutType === 'single-participant')
+      config.layout.session_id = participantId;
+    else if (layoutType === 'default') config.layout.max_cam_streams = maxCams;
+
+    startLiveStreaming(config);
   }
 
-  function stopLiveStreaming() {
+  function stopLiveStream() {
     setPending(true);
-    callObject.stopLiveStreaming();
+    stopLiveStreaming();
   }
 
   return (
@@ -58,7 +76,7 @@ export const LiveStreamingModal = () => {
         <Button key="close" fullWidth variant="outline">
           Close
         </Button>,
-        !isStreaming ? (
+        !isLiveStreaming ? (
           <Button
             fullWidth
             disabled={!rtmpUrl || pending}
@@ -67,37 +85,32 @@ export const LiveStreamingModal = () => {
             {pending ? 'Starting stream...' : 'Start live streaming'}
           </Button>
         ) : (
-          <Button
-            fullWidth
-            variant="warning"
-            onClick={() => stopLiveStreaming()}
-          >
+          <Button fullWidth variant="warning" onClick={() => stopLiveStream()}>
             Stop live streaming
           </Button>
         ),
       ]}
     >
-      {streamError && (
+      {errorMsg && (
         <Well variant="error">
-          Unable to start stream. Error message: {streamError}
+          Unable to start stream. Error message: {errorMsg}
         </Well>
       )}
       <CardBody>
         <Field label="Layout">
           <SelectInput
-            onChange={(e) => setLayout(Number(e.target.value))}
-            value={layout}
+            onChange={(e) => setLayoutType(e.target.value)}
+            value={layoutType}
           >
-            {LAYOUTS.map((l, i) => (
-              <option value={i} key={l.value}>
+            {LAYOUTS.map((l) => (
+              <option value={l.value} key={l.value}>
                 {l.label}
               </option>
             ))}
           </SelectInput>
         </Field>
 
-        {layout !==
-          LAYOUTS.findIndex((l) => l.value === 'single-participant') && (
+        {layoutType === 'default' && (
           <Field label="Additional cameras">
             <SelectInput
               onChange={(e) => setMaxCams(Number(e.target.value))}
@@ -116,17 +129,17 @@ export const LiveStreamingModal = () => {
           </Field>
         )}
 
-        {layout ===
-          LAYOUTS.findIndex((l) => l.value === 'single-participant') && (
+        {layoutType === 'single-participant' && (
           <Field label="Select participant">
             <SelectInput
-              onChange={(e) => setParticipant(e.target.value)}
-              value={participant}
+              onChange={(e) => setParticipantId(e.target.value)}
+              value={participantId}
             >
-              {allParticipants.map((p) => (
-                <option value={p.id} key={p.id}>
-                  {p.name}
-                </option>
+              <option value={0} disabled>
+                Select
+              </option>
+              {participantIds.map((p) => (
+                <ParticipantOption sessionId={p} key={p} />
               ))}
             </SelectInput>
           </Field>

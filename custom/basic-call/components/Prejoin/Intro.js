@@ -35,10 +35,12 @@ export const Intro = ({
   }, [room]);
 
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      onJoin(roomName, owner, fetchToken);
-    }}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onJoin(roomName, owner, fetchToken);
+      }}
+    >
       <Card>
         <CardHeader>{title}</CardHeader>
         <CardBody>
@@ -69,10 +71,7 @@ export const Intro = ({
           )}
         </CardBody>
         <CardFooter divider>
-          <Button
-            type="submit"
-            disabled={!roomName || fetching}
-          >
+          <Button type="submit" disabled={!roomName || fetching}>
             {fetching ? 'Fetching token...' : 'Join meeting'}
           </Button>
         </CardFooter>

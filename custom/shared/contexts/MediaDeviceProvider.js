@@ -1,83 +1,126 @@
-import React, { createContext, useContext, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { useDaily, useDevices } from '@daily-co/daily-react-hooks';
+import Bowser from 'bowser';
 import PropTypes from 'prop-types';
 
+import { isIOSMobile, isSafari } from '../lib/browserConfig';
 import { useCallState } from './CallProvider';
-import { useParticipants } from './ParticipantsProvider';
-import { useDevices } from './useDevices';
+import { useUIState } from './UIStateProvider';
 
-export const MediaDeviceContext = createContext();
+const noop = () => {};
+
+const REREQUEST_INTERVAL = 2000;
+
+export const MediaDeviceContext = createContext({
+  promptForAccess: noop,
+});
 
 export const MediaDeviceProvider = ({ children }) => {
-  const { callObject } = useCallState();
-  const { localParticipant } = useParticipants();
-
+  const daily = useDaily();
+  const { state } = useCallState();
   const {
-    camError,
-    cams,
-    currentCam,
-    currentMic,
-    currentSpeaker,
-    deviceState,
-    micError,
-    mics,
-    refreshDevices,
-    setCurrentCam,
-    setCurrentMic,
-    setCurrentSpeaker,
-    speakers,
-  } = useDevices(callObject);
+    setShowDeviceInUseModal,
+    setShowDeviceNotFoundModal,
+    setShowUnblockPermissionsModal,
+  } = useUIState();
+  const [browserState, setBrowserState] = useState('');
 
-  const selectCamera = useCallback(
-    async (newCam) => {
-      if (!callObject || newCam.deviceId === currentCam?.deviceId) return;
-      const { camera } = await callObject.setInputDevicesAsync({
-        videoDeviceId: newCam.deviceId,
-      });
-      setCurrentCam(camera);
-    },
-    [callObject, currentCam, setCurrentCam]
-  );
+  const { camState, micState, refreshDevices } = useDevices();
 
-  const selectMic = useCallback(
-    async (newMic) => {
-      if (!callObject || newMic.deviceId === currentMic?.deviceId) return;
-      const { mic } = await callObject.setInputDevicesAsync({
-        audioDeviceId: newMic.deviceId,
-      });
-      setCurrentMic(mic);
-    },
-    [callObject, currentMic, setCurrentMic]
-  );
+  useEffect(() => setBrowserState(Bowser(navigator.userAgent)), []);
 
-  const selectSpeaker = useCallback(
-    (newSpeaker) => {
-      if (!callObject || newSpeaker.deviceId === currentSpeaker?.deviceId) return;
-      callObject.setOutputDevice({
-        outputDeviceId: newSpeaker.deviceId,
-      });
-      setCurrentSpeaker(newSpeaker);
-    },
-    [callObject, currentSpeaker, setCurrentSpeaker]
-  );
+  /**
+   * Clean up modals, when errors are resolved.
+   */
+  useEffect(() => {
+    if (camState !== 'blocked' && micState !== 'blocked') {
+      setShowUnblockPermissionsModal(false);
+    }
+    if (camState !== 'in-use' && micState !== 'in-use') {
+      setShowDeviceInUseModal(false);
+    }
+    if (camState !== 'not-found' && micState !== 'not-found') {
+      setShowDeviceNotFoundModal(false);
+    }
+  }, [
+    camState,
+    micState,
+    setShowDeviceInUseModal,
+    setShowDeviceNotFoundModal,
+    setShowUnblockPermissionsModal,
+  ]);
+
+  /**
+   * Automatically show modal when selected device is in use.
+   */
+  useEffect(() => {
+    if (state !== 'joined' || camState !== 'in-use') return;
+    setShowDeviceInUseModal(true);
+  }, [camState, setShowDeviceInUseModal, state]);
+
+  const promptForAccess = useCallback(() => {
+    if (isSafari() || isIOSMobile()) {
+      if (!isIOSMobile() || isSafari(14)) {
+        let openModal = true;
+        const openTimeout = setTimeout(() => {
+          openModal = false;
+        }, 1500);
+        daily.once('camera-error', () => {
+          if (openModal) {
+            setShowUnblockPermissionsModal(true);
+            clearTimeout(openTimeout);
+          }
+        });
+      }
+      daily.setLocalVideo(true);
+      daily.setLocalAudio(true);
+    } else {
+      setShowUnblockPermissionsModal(true);
+    }
+  }, [daily, setShowUnblockPermissionsModal]);
+
+  const browser = useMemo(() => browserState, [browserState]);
+
+  /**
+   * Automatically re-request cam access.
+   */
+  useEffect(() => {
+    if (!daily) return;
+
+    let interval;
+    switch (camState) {
+      case 'in-use':
+        if (browser?.browser?.name === 'Firefox') return;
+        break;
+      case 'blocked':
+        if (isSafari() || isIOSMobile()) return;
+        interval = setInterval(() => {
+          try {
+            daily.setLocalVideo(true);
+            daily.setLocalAudio(true);
+          } catch {}
+        }, REREQUEST_INTERVAL);
+        break;
+      default:
+        refreshDevices();
+        break;
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [browser, camState, daily, refreshDevices]);
 
   return (
     <MediaDeviceContext.Provider
       value={{
-        camError,
-        cams,
-        currentCam,
-        currentMic,
-        currentSpeaker,
-        deviceState,
-        isCamMuted: localParticipant.isCamMuted,
-        isMicMuted: localParticipant.isMicMuted,
-        micError,
-        mics,
-        refreshDevices,
-        setCurrentCam: selectCamera,
-        setCurrentMic: selectMic,
-        setCurrentSpeaker: selectSpeaker,
-        speakers,
+        promptForAccess,
       }}
     >
       {children}

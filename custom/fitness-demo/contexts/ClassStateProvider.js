@@ -5,7 +5,11 @@ import React, {
   useMemo,
   useEffect,
 } from 'react';
-import { useUIState, VIEW_MODE_SPEAKER, VIEW_MODE_GRID } from '@custom/shared/contexts/UIStateProvider';
+import {
+  useUIState,
+  VIEW_MODE_SPEAKER,
+  VIEW_MODE_GRID,
+} from '@custom/shared/contexts/UIStateProvider';
 import { useSharedState } from '@custom/shared/hooks/useSharedState';
 import PropTypes from 'prop-types';
 
@@ -25,12 +29,15 @@ export const ClassStateProvider = ({ children }) => {
   const classType = useMemo(() => sharedState.type, [sharedState.type]);
 
   const setClassType = useCallback(() => {
-    if (sharedState.type === PRE_CLASS_LOBBY) setSharedState({ type: CLASS_IN_SESSION });
-    if (sharedState.type === CLASS_IN_SESSION) setSharedState({ type: POST_CLASS_LOBBY });
+    if (sharedState.type === PRE_CLASS_LOBBY)
+      setSharedState({ type: CLASS_IN_SESSION });
+    if (sharedState.type === CLASS_IN_SESSION)
+      setSharedState({ type: POST_CLASS_LOBBY });
   }, [sharedState.type, setSharedState]);
 
   useEffect(() => {
-    if (sharedState.type === CLASS_IN_SESSION) setPreferredViewMode(VIEW_MODE_SPEAKER);
+    if (sharedState.type === CLASS_IN_SESSION)
+      setPreferredViewMode(VIEW_MODE_SPEAKER);
     else setPreferredViewMode(VIEW_MODE_GRID);
   }, [setPreferredViewMode, sharedState.type]);
 

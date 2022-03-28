@@ -30,7 +30,10 @@ export const UIStateProvider = ({
   const [activeModals, setActiveModals] = useState({});
   const [customCapsule, setCustomCapsule] = useState();
   const [showAutoplayFailedModal, setShowAutoplayFailedModal] = useState(false);
-
+  const [showDeviceInUseModal, setShowDeviceInUseModal] = useState(false);
+  const [showDeviceNotFoundModal, setShowDeviceNotFoundModal] = useState(false);
+  const [showUnblockPermissionsModal, setShowUnblockPermissionsModal] =
+    useState(false);
 
   /**
    * Decide on view mode based on input conditions.
@@ -105,6 +108,12 @@ export const UIStateProvider = ({
         setCustomCapsule,
         showAutoplayFailedModal,
         setShowAutoplayFailedModal,
+        showDeviceInUseModal,
+        setShowDeviceInUseModal,
+        showDeviceNotFoundModal,
+        setShowDeviceNotFoundModal,
+        showUnblockPermissionsModal,
+        setShowUnblockPermissionsModal,
         isMobile,
         setIsMobile,
       }}

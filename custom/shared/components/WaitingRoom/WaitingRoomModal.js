@@ -9,11 +9,11 @@ export const WaitingRoomModal = ({ onClose }) => {
   const { denyAccess, grantAccess, waitingParticipants } = useWaitingRoom();
 
   const handleAllowAllClick = (close) => {
-    grantAccess('all');
+    grantAccess('*');
     close();
   };
   const handleDenyAllClick = (close) => {
-    denyAccess('all');
+    denyAccess('*');
     close();
   };
 

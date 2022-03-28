@@ -5,6 +5,8 @@ const withTM = require('next-transpile-modules')([
   '@custom/text-chat',
   '@custom/live-streaming',
   '@custom/recording',
+  '@custom/pagination',
+  '@custom/active-speaker',
 ]);
 
 const packageJson = require('./package.json');

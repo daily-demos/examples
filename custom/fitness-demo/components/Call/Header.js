@@ -1,22 +1,26 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import Button from '@custom/shared/components/Button';
 import HeaderCapsule from '@custom/shared/components/HeaderCapsule';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { useCallConfig } from '@custom/shared/hooks/useCallConfig';
 import { ReactComponent as IconLock } from '@custom/shared/icons/lock-md.svg';
 import { ReactComponent as IconPlay } from '@custom/shared/icons/play-sm.svg';
 import { slugify } from '@custom/shared/lib/slugify';
-import { useClassState, PRE_CLASS_LOBBY, CLASS_IN_SESSION } from '../../contexts/ClassStateProvider';
+import {
+  CLASS_IN_SESSION,
+  PRE_CLASS_LOBBY,
+  useClassState,
+} from '../../contexts/ClassStateProvider';
 
 export const Header = () => {
-  const { roomInfo } = useCallState();
-  const { participantCount, localParticipant } = useParticipants();
+  const { roomInfo } = useCallConfig();
+  const { participantCount, isOwner } = useParticipants();
   const { customCapsule } = useUIState();
   const { classType, setClassType } = useClassState();
 
   const capsuleLabel = useCallback(() => {
-    if (!localParticipant.isOwner) return;
+    if (!isOwner) return;
     if (classType === PRE_CLASS_LOBBY)
       return (
         <Button
@@ -27,18 +31,14 @@ export const Header = () => {
         >
           Start Class
         </Button>
-      )
+      );
     if (classType === CLASS_IN_SESSION)
       return (
-        <Button
-          size="tiny"
-          variant="error-light"
-          onClick={setClassType}
-        >
+        <Button size="tiny" variant="error-light" onClick={setClassType}>
           End Class
         </Button>
-      )
-  }, [classType, localParticipant.isOwner, setClassType]);
+      );
+  }, [classType, isOwner, setClassType]);
 
   return useMemo(
     () => (
@@ -52,8 +52,8 @@ export const Header = () => {
         />
 
         <HeaderCapsule>
-          {roomInfo.privacy === 'private' && <IconLock />}
-          {slugify.revert(roomInfo.name)}
+          {roomInfo?.privacy === 'private' && <IconLock />}
+          {slugify.revert(roomInfo?.name)}
         </HeaderCapsule>
         <HeaderCapsule>
           {`${participantCount} ${
@@ -89,7 +89,14 @@ export const Header = () => {
         `}</style>
       </header>
     ),
-    [roomInfo.privacy, roomInfo.name, participantCount, customCapsule, classType, capsuleLabel]
+    [
+      roomInfo?.privacy,
+      roomInfo?.name,
+      participantCount,
+      customCapsule,
+      classType,
+      capsuleLabel,
+    ]
   );
 };
 

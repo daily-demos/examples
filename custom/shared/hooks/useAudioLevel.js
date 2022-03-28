@@ -14,8 +14,8 @@ export const useAudioLevel = (stream) => {
       typeof AudioContext !== 'undefined'
         ? AudioContext
         : typeof webkitAudioContext !== 'undefined'
-          ? webkitAudioContext
-          : null;
+        ? webkitAudioContext
+        : null;
     if (!AudioCtx) return;
     const audioContext = new AudioCtx();
     const mediaStreamSource = audioContext.createMediaStreamSource(stream);

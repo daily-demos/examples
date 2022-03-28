@@ -15,7 +15,7 @@ export const useResponsive = () => {
 
   const getResponsiveConfig = (size) => {
     const responsive = {};
-    Object.keys(responsiveConfig).forEach(config => {
+    Object.keys(responsiveConfig).forEach((config) => {
       responsive[config] = size > responsiveConfig[config];
     });
     return responsive;

@@ -60,7 +60,7 @@ export const ChatAside = () => {
       </div>
       {showEmojis && (
         <div className="emojis">
-          {emojis.map(emoji => (
+          {emojis.map((emoji) => (
             <Button
               key={emoji}
               variant="gray"

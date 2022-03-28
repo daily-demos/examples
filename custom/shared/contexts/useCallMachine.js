@@ -89,7 +89,7 @@ export const useCallMachine = ({
       await callObject.join({ subscribeToTracksAutomatically, token, url });
       setState(CALL_STATE_JOINED);
     },
-    [room, token, subscribeToTracksAutomatically, url]
+    [token, subscribeToTracksAutomatically, url]
   );
 
   /**

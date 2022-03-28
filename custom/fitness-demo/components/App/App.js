@@ -40,7 +40,7 @@ export const App = ({ customComponentForState }) => {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-        
+
                     .loader {
                       margin: 0 auto;
                     }

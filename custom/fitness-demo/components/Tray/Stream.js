@@ -7,13 +7,12 @@ import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { ReactComponent as IconStream } from '@custom/shared/icons/streaming-md.svg';
 
-
 export const Stream = () => {
   const { openModal } = useUIState();
   const { isStreaming } = useLiveStreaming();
-  const { localParticipant } = useParticipants();
+  const { isOwner } = useParticipants();
 
-  if (!localParticipant.isOwner) return null;
+  if (!isOwner) return null;
 
   return (
     <TrayButton
