@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { LiveStreamingProvider } from '@custom/live-streaming/contexts/LiveStreamingProvider';
-import { RecordingProvider } from '@custom/shared/contexts/RecordingProvider';
 import ExpiryTimer from '@custom/shared/components/ExpiryTimer';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
+import { RecordingProvider } from '@custom/shared/contexts/RecordingProvider';
 import { useCallUI } from '@custom/shared/hooks/useCallUI';
 import PropTypes from 'prop-types';
 
