@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 
 import { TrayButton } from '@custom/shared/components/Tray';
-import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { ReactComponent as IconRecord } from '@custom/shared/icons/record-md.svg';
-
 import {
   RECORDING_ERROR,
   RECORDING_RECORDING,
   RECORDING_SAVED,
   RECORDING_UPLOADING,
   useRecording,
-} from '../contexts/RecordingProvider';
+} from '@custom/shared/contexts/RecordingProvider';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { ReactComponent as IconRecord } from '@custom/shared/icons/record-md.svg';
+
 import { RECORDING_MODAL } from './RecordingModal';
 
 export const Tray = () => {

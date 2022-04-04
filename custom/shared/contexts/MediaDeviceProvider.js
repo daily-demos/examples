@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback } from 'react';
+import React, { createContext, useContext, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import { useCallState } from './CallProvider';
@@ -60,6 +60,16 @@ export const MediaDeviceProvider = ({ children }) => {
     [callObject, currentSpeaker, setCurrentSpeaker]
   );
 
+  const isCamMuted = useMemo(() => {
+    const videoState = localParticipant?.tracks?.video?.state;
+    return videoState === 'off' || videoState === 'blocked' || camError;
+  }, [camError, localParticipant?.tracks?.video?.state]);
+
+  const isMicMuted = useMemo(() => {
+    const audioState = localParticipant?.tracks?.audio?.state;
+    return audioState === 'off' || audioState === 'blocked' || micError;
+  }, [micError, localParticipant?.tracks?.audio?.state]);
+
   return (
     <MediaDeviceContext.Provider
       value={{
@@ -69,8 +79,8 @@ export const MediaDeviceProvider = ({ children }) => {
         currentMic,
         currentSpeaker,
         deviceState,
-        isCamMuted: localParticipant.isCamMuted,
-        isMicMuted: localParticipant.isMicMuted,
+        isCamMuted,
+        isMicMuted,
         micError,
         mics,
         refreshDevices,

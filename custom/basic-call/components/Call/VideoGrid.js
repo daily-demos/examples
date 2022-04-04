@@ -18,7 +18,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
 export const VideoGrid = React.memo(
   () => {
     const containerRef = useRef();
-    const { participants } = useParticipants();
+    const { participantIds, participantCount } = useParticipants();
     const [dimensions, setDimensions] = useState({
       width: 1,
       height: 1,
@@ -48,7 +48,7 @@ export const VideoGrid = React.memo(
     // Basic brute-force packing algo
     const layout = useMemo(() => {
       const aspectRatio = DEFAULT_ASPECT_RATIO;
-      const tileCount = participants.length || 0;
+      const tileCount = participantCount || 0;
       const w = dimensions.width;
       const h = dimensions.height;
 
@@ -87,23 +87,23 @@ export const VideoGrid = React.memo(
       }
 
       return bestLayout;
-    }, [dimensions, participants]);
+    }, [dimensions, participantCount]);
 
     // Memoize our tile list to avoid unnecassary re-renders
     const tiles = useDeepCompareMemo(
       () =>
-        participants.map((p) => (
+        participantIds.map((participantId) => (
           <Tile
-            participant={p}
-            key={p.id}
+            sessionId={participantId}
+            key={participantId}
             mirrored
             style={{ maxWidth: layout.width, maxHeight: layout.height }}
           />
         )),
-      [layout, participants]
+      [layout, participantIds]
     );
 
-    if (!participants.length) {
+    if (!participantCount) {
       return null;
     }
 

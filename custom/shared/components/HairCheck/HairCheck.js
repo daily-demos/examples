@@ -21,6 +21,7 @@ import {
 import IconSettings from '@custom/shared/icons/settings-sm.svg';
 
 import { useDeepCompareMemo } from 'use-deep-compare';
+import { useLocalParticipant } from '@daily-co/daily-react-hooks';
 
 /**
  * Hair check
@@ -31,7 +32,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
  */
 export const HairCheck = () => {
   const { callObject } = useCallState();
-  const { localParticipant } = useParticipants();
+  const localParticipant = useLocalParticipant();
   const {
     deviceState,
     camError,
@@ -88,17 +89,17 @@ export const HairCheck = () => {
   };
 
   // Memoize the to prevent unnecassary re-renders
-  const tileMemo = useDeepCompareMemo(
-    () => (
+  const tileMemo = useDeepCompareMemo(() => {
+    if (!localParticipant?.session_id) return;
+    return (
       <Tile
-        participant={localParticipant}
+        sessionId={localParticipant?.session_id}
         mirrored
         showAvatar
         showName={false}
       />
-    ),
-    [localParticipant]
-  );
+    );
+  }, [localParticipant?.session_id]);
 
   const isLoading = useMemo(() => deviceState === DEVICE_STATE_LOADING, [
     deviceState,
