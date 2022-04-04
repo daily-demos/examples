@@ -13,6 +13,7 @@ import React, {
   useState,
 } from 'react';
 import DailyIframe from '@daily-co/daily-js';
+import { DailyProvider } from '@daily-co/daily-react-hooks';
 import Bowser from 'bowser';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -159,7 +160,7 @@ export const CallProvider = ({
         setEnableJoinSound
       }}
     >
-      {children}
+      <DailyProvider callObject={daily}>{children}</DailyProvider>
     </CallContext.Provider>
   );
 };
