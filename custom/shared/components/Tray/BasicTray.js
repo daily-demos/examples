@@ -1,10 +1,9 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { NETWORK_ASIDE } from '@custom/shared/components/Aside/NetworkAside';
 import { PEOPLE_ASIDE } from '@custom/shared/components/Aside/PeopleAside';
 import Button from '@custom/shared/components/Button';
 import { DEVICE_MODAL } from '@custom/shared/components/DeviceSelectModal';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
-import { useMediaDevices } from '@custom/shared/contexts/MediaDeviceProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { useResponsive } from '@custom/shared/hooks/useResponsive';
 import { ReactComponent as IconCameraOff } from '@custom/shared/icons/camera-off-md.svg';
@@ -16,6 +15,7 @@ import { ReactComponent as IconMore } from '@custom/shared/icons/more-md.svg';
 import { ReactComponent as IconNetwork } from '@custom/shared/icons/network-md.svg';
 import { ReactComponent as IconPeople } from '@custom/shared/icons/people-md.svg';
 import { ReactComponent as IconSettings } from '@custom/shared/icons/settings-md.svg';
+import { useLocalParticipant, useDevices } from '@daily-co/daily-react-hooks';
 import { Tray, TrayButton } from './Tray';
 
 export const BasicTray = () => {
@@ -24,7 +24,18 @@ export const BasicTray = () => {
   const [showMore, setShowMore] = useState(false);
   const { callObject, leave } = useCallState();
   const { customTrayComponent, openModal, toggleAside } = useUIState();
-  const { isCamMuted, isMicMuted } = useMediaDevices();
+  const localParticipant = useLocalParticipant();
+  const { hasCamError, hasMicError } = useDevices();
+
+  const isCamMuted = useMemo(() => {
+    const videoState = localParticipant?.tracks?.video?.state;
+    return videoState === 'off' || videoState === 'blocked' || hasCamError;
+  }, [hasCamError, localParticipant?.tracks?.video?.state]);
+
+  const isMicMuted = useMemo(() => {
+    const audioState = localParticipant?.tracks?.audio?.state;
+    return audioState === 'off' || audioState === 'blocked' || hasMicError;
+  }, [hasMicError, localParticipant?.tracks?.audio?.state]);
 
   const toggleCamera = (newState) => {
     if (!callObject) return false;
