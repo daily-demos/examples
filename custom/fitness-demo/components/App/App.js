@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { LiveStreamingProvider } from '@custom/live-streaming/contexts/LiveStreamingProvider';
+import { LiveStreamingProvider } from '@custom/shared/contexts/LiveStreamingProvider';
 import { RecordingProvider } from '@custom/recording/contexts/RecordingProvider';
 import ExpiryTimer from '@custom/shared/components/ExpiryTimer';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
