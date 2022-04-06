@@ -4,7 +4,8 @@
   "private": true,
   "main": "index.js",
   "dependencies": {
-    "@daily-co/daily-js": "0.21.0",
+    "@daily-co/daily-js": "^0.24.0",
+    "@daily-co/daily-react-hooks": "^0.1.0",
     "bowser": "^2.11.0",
     "classnames": "^2.3.1",
     "debounce": "^1.2.1",
@@ -15,6 +16,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-portal": "^4.2.1",
+    "recoil": "^0.7.0",
     "shallow-equal": "^1.2.1",
     "use-deep-compare": "^1.1.0"
   }
