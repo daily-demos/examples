@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { CallProvider } from '@custom/shared/contexts/CallProvider';
 import { MediaDeviceProvider } from '@custom/shared/contexts/MediaDeviceProvider';
 import { ParticipantsProvider } from '@custom/shared/contexts/ParticipantsProvider';
+import { ScreenShareProvider } from '@custom/shared/contexts/ScreenShareProvider';
 import { TracksProvider } from '@custom/shared/contexts/TracksProvider';
 import { UIStateProvider } from '@custom/shared/contexts/UIStateProvider';
 import { WaitingRoomProvider } from '@custom/shared/contexts/WaitingRoomProvider';
@@ -125,7 +126,9 @@ export default function Index({
           <TracksProvider>
             <MediaDeviceProvider>
               <WaitingRoomProvider>
-                {customAppComponent || <App />}
+                <ScreenShareProvider>
+                  {customAppComponent || <App />}
+                </ScreenShareProvider>
               </WaitingRoomProvider>
             </MediaDeviceProvider>
           </TracksProvider>
