@@ -38,9 +38,6 @@ This demo puts to work the following [shared libraries](../shared):
 **[MediaDeviceProvider.js](../shared/contexts/MediaDeviceProvider.js)**
 Convenience context that provides an interface to media devices throughout app
 
-**[useDevices.js](../shared/contexts/useDevices.js)**
-Hook for managing the enumeration and status of client media devices)
-
 **[CallProvider.js](../shared/contexts/CallProvider.js)**
 Primary call context that manages Daily call state, participant state and call object interaction
 
