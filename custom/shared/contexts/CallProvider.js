@@ -13,7 +13,7 @@ import React, {
   useState,
 } from 'react';
 import DailyIframe from '@daily-co/daily-js';
-import { DailyProvider } from '@daily-co/daily-react-hooks';
+import { DailyProvider, useDailyEvent } from '@daily-co/daily-react-hooks';
 import Bowser from 'bowser';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
@@ -124,14 +124,11 @@ export const CallProvider = ({
     setPreJoinNonAuthorized(requiresPermission && !token);
   }, [state, daily, token]);
 
-  useEffect(() => {
-    if (!daily) return;
+  const handleOnJoinCleanUp = useCallback(() => {
+    if (cleanURLOnJoin) router.replace(`/${room}`);
+  }, [cleanURLOnJoin, room, router]);
 
-    if (cleanURLOnJoin)
-      daily.on('joined-meeting', () => router.replace(`/${room}`));
-
-    return () => daily.off('joined-meeting', () => router.replace(`/${room}`));
-  }, [cleanURLOnJoin, daily, room, router]);
+  useDailyEvent('joined-meeting', handleOnJoinCleanUp);
 
   return (
     <CallContext.Provider

@@ -4,7 +4,7 @@ import Button from '@custom/shared/components/Button';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { useTranscription } from '../contexts/TranscriptionProvider';
+import { useTranscription } from '@custom/shared/contexts/TranscriptionProvider';
 
 export const TRANSCRIPTION_ASIDE = 'transcription';
 

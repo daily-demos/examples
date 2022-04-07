@@ -3,7 +3,7 @@ import React from 'react';
 import { TrayButton } from '@custom/shared/components/Tray';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { ReactComponent as IconTranscription } from '@custom/shared/icons/chat-md.svg';
-import { useTranscription } from '../contexts/TranscriptionProvider';
+import { useTranscription } from '@custom/shared/contexts/TranscriptionProvider';
 import { TRANSCRIPTION_ASIDE } from './TranscriptionAside';
 
 export const Tray = () => {
