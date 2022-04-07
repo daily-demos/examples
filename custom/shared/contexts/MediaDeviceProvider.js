@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import { useDevices, useLocalParticipant } from '@daily-co/daily-react-hooks';
+import { useDaily, useDevices } from '@daily-co/daily-react-hooks';
 import PropTypes from 'prop-types';
 
 export const DEVICE_STATE_LOADING = 'loading';
@@ -31,7 +31,8 @@ export const MediaDeviceProvider = ({ children }) => {
     refreshDevices,
   } = useDevices();
 
-  const localParticipant = useLocalParticipant();
+  const daily = useDaily();
+  const localParticipant = daily?.participants().local;
 
   const isCamMuted = useMemo(() => {
     const videoState = localParticipant?.tracks?.video?.state;
