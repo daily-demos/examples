@@ -32,7 +32,7 @@ const SUBSCRIBE_OR_STAGE_ALL_VIDEO_THRESHOLD = 9;
 const TracksContext = createContext(null);
 
 export const TracksProvider = ({ children }) => {
-  const { callObject: daily, optimizeLargeCalls } = useCallState();
+  const { callObject: daily, optimizeLargeCalls, subscribeToTracksAutomatically } = useCallState();
   const { participants } = useParticipants();
   const { viewMode } = useUIState();
   const [state, dispatch] = useReducer(tracksReducer, initialTracksState);
@@ -327,7 +327,8 @@ export const TracksProvider = ({ children }) => {
 
   const joinedSubscriptionQueue = useRef([]);
   useEffect(() => {
-    if (!daily) return;
+    if (!daily || subscribeToTracksAutomatically) return;
+
     const joinBatchInterval = setInterval(async () => {
       if (!joinedSubscriptionQueue.current.length) return;
       const ids = joinedSubscriptionQueue.current.splice(0);
@@ -356,7 +357,7 @@ export const TracksProvider = ({ children }) => {
     return () => {
       clearInterval(joinBatchInterval);
     };
-  }, [daily]);
+  }, [daily, subscribeToTracksAutomatically]);
 
   useEffect(() => {
     if (optimizeLargeCalls) {
