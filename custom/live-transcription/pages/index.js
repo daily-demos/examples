@@ -6,7 +6,11 @@ export async function getStaticProps() {
 
   // Pass through domain as prop
   return {
-    props: defaultProps,
+    props: {
+      ...defaultProps,
+      forceFetchToken: true,
+      forceOwner: true,
+    },
   };
 }
 
