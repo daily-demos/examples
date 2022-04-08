@@ -17,7 +17,7 @@ export const App = ({ customComponentForState }) => {
     ...customComponentForState,
   });
 
-  // Memoize children to avoid unnecassary renders from HOC
+  // Memoize children to avoid unnecessary renders from HOC
   return useMemo(
     () => (
       <>

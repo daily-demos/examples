@@ -10,6 +10,8 @@ import { useUIState } from './UIStateProvider';
 export const LiveStreamingContext = createContext();
 
 export const LiveStreamingProvider = ({ children }) => {
+  // setCustomCapsule allows us to set the recording capsule on the header
+  // to indicate that the recording is going on.
   const { setCustomCapsule } = useUIState();
 
   const handleStreamStarted = useCallback(() => {

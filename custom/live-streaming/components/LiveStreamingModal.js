@@ -57,6 +57,11 @@ export const LiveStreamingModal = () => {
     stopLiveStreaming();
   }
 
+  const handleRMTPURLChange = (e) => setRtmpUrl(e.target.value);
+  const handleSelectLayoutInputChange = (e) => setLayoutType(e.target.value);
+  const handleSelectParticipantInputChange = (e) => setParticipantId(e.target.value);
+  const handleSelectMaxCamsInputChange = (e) => setMaxCams(e.target.valueAsNumber);
+
   return (
     <Modal
       title="Live stream"
@@ -93,7 +98,7 @@ export const LiveStreamingModal = () => {
       <CardBody>
         <Field label="Layout">
           <SelectInput
-            onChange={(e) => setLayoutType(e.target.value)}
+            onChange={handleSelectLayoutInputChange}
             value={layoutType}
           >
             {LAYOUTS.map((l) => (
@@ -107,7 +112,7 @@ export const LiveStreamingModal = () => {
         {layoutType === 'default' && (
           <Field label="Additional cameras">
             <SelectInput
-              onChange={(e) => setMaxCams(Number(e.target.value))}
+              onChange={handleSelectMaxCamsInputChange}
               value={maxCams}
             >
               <option value={9}>9 cameras</option>
@@ -126,7 +131,7 @@ export const LiveStreamingModal = () => {
         {layoutType === 'single-participant' && (
           <Field label="Select participant">
             <SelectInput
-              onChange={(e) => setParticipantId(e.target.value)}
+              onChange={handleSelectParticipantInputChange}
               value={participantId}
             >
               <option value={0} disabled>
@@ -146,8 +151,14 @@ export const LiveStreamingModal = () => {
             type="text"
             placeholder="RTMP URL"
             required
-            onChange={(e) => setRtmpUrl(e.target.value)}
+            onChange={handleRMTPURLChange}
           />
+          <a
+            className="learn-more"
+            href="https://docs.daily.co/guides/paid-features/live-streaming-with-daily"
+          >
+            Want to learn more about RTMP url?
+          </a>
         </Field>
       </CardBody>
     </Modal>
