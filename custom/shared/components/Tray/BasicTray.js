@@ -4,7 +4,6 @@ import { PEOPLE_ASIDE } from '@custom/shared/components/Aside/PeopleAside';
 import Button from '@custom/shared/components/Button';
 import { DEVICE_MODAL } from '@custom/shared/components/DeviceSelectModal';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
-import { useMediaDevices } from '@custom/shared/contexts/MediaDeviceProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { useResponsive } from '@custom/shared/hooks/useResponsive';
 import { ReactComponent as IconCameraOff } from '@custom/shared/icons/camera-off-md.svg';
@@ -16,6 +15,7 @@ import { ReactComponent as IconMore } from '@custom/shared/icons/more-md.svg';
 import { ReactComponent as IconNetwork } from '@custom/shared/icons/network-md.svg';
 import { ReactComponent as IconPeople } from '@custom/shared/icons/people-md.svg';
 import { ReactComponent as IconSettings } from '@custom/shared/icons/settings-md.svg';
+import { useMediaDevices } from '../../contexts/MediaDeviceProvider';
 import { Tray, TrayButton } from './Tray';
 
 export const BasicTray = () => {
@@ -24,7 +24,7 @@ export const BasicTray = () => {
   const [showMore, setShowMore] = useState(false);
   const { callObject, leave } = useCallState();
   const { customTrayComponent, openModal, toggleAside } = useUIState();
-  const { isCamMuted, isMicMuted } = useMediaDevices();
+  const { isMicMuted, isCamMuted } = useMediaDevices();
 
   const toggleCamera = (newState) => {
     if (!callObject) return false;

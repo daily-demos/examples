@@ -1,92 +1,64 @@
-import React, { createContext, useContext, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useMemo } from 'react';
+import { useDaily, useDevices } from '@daily-co/daily-react-hooks';
 import PropTypes from 'prop-types';
 
-import { useCallState } from './CallProvider';
-import { useParticipants } from './ParticipantsProvider';
-import { useDevices } from './useDevices';
+export const DEVICE_STATE_LOADING = 'loading';
+export const DEVICE_STATE_PENDING = 'pending';
+export const DEVICE_STATE_ERROR = 'error';
+export const DEVICE_STATE_GRANTED = 'granted';
+export const DEVICE_STATE_NOT_FOUND = 'not-found';
+export const DEVICE_STATE_NOT_SUPPORTED = 'not-supported';
+export const DEVICE_STATE_BLOCKED = 'blocked';
+export const DEVICE_STATE_IN_USE = 'in-use';
+export const DEVICE_STATE_OFF = 'off';
+export const DEVICE_STATE_PLAYABLE = 'playable';
+export const DEVICE_STATE_SENDABLE = 'sendable';
 
 export const MediaDeviceContext = createContext();
 
 export const MediaDeviceProvider = ({ children }) => {
-  const { callObject } = useCallState();
-  const { localParticipant } = useParticipants();
-
   const {
-    camError,
-    cams,
-    currentCam,
-    currentMic,
-    currentSpeaker,
-    deviceState,
-    micError,
-    mics,
-    refreshDevices,
-    setCurrentCam,
-    setCurrentMic,
-    setCurrentSpeaker,
+    hasCamError,
+    cameras,
+    camState,
+    setCamera,
+    hasMicError,
+    microphones,
+    micState,
+    setMicrophone,
     speakers,
-  } = useDevices(callObject);
+    setSpeaker,
+    refreshDevices,
+  } = useDevices();
 
-  const selectCamera = useCallback(
-    async (newCam) => {
-      if (!callObject || newCam.deviceId === currentCam?.deviceId) return;
-      const { camera } = await callObject.setInputDevicesAsync({
-        videoDeviceId: newCam.deviceId,
-      });
-      setCurrentCam(camera);
-    },
-    [callObject, currentCam, setCurrentCam]
-  );
-
-  const selectMic = useCallback(
-    async (newMic) => {
-      if (!callObject || newMic.deviceId === currentMic?.deviceId) return;
-      const { mic } = await callObject.setInputDevicesAsync({
-        audioDeviceId: newMic.deviceId,
-      });
-      setCurrentMic(mic);
-    },
-    [callObject, currentMic, setCurrentMic]
-  );
-
-  const selectSpeaker = useCallback(
-    (newSpeaker) => {
-      if (!callObject || newSpeaker.deviceId === currentSpeaker?.deviceId) return;
-      callObject.setOutputDevice({
-        outputDeviceId: newSpeaker.deviceId,
-      });
-      setCurrentSpeaker(newSpeaker);
-    },
-    [callObject, currentSpeaker, setCurrentSpeaker]
-  );
+  const daily = useDaily();
+  const localParticipant = daily?.participants().local;
 
   const isCamMuted = useMemo(() => {
     const videoState = localParticipant?.tracks?.video?.state;
-    return videoState === 'off' || videoState === 'blocked' || camError;
-  }, [camError, localParticipant?.tracks?.video?.state]);
+    return videoState === DEVICE_STATE_OFF || videoState === DEVICE_STATE_BLOCKED || hasCamError;
+  }, [hasCamError, localParticipant?.tracks?.video?.state]);
 
   const isMicMuted = useMemo(() => {
     const audioState = localParticipant?.tracks?.audio?.state;
-    return audioState === 'off' || audioState === 'blocked' || micError;
-  }, [micError, localParticipant?.tracks?.audio?.state]);
+    return audioState === DEVICE_STATE_OFF || audioState === DEVICE_STATE_BLOCKED || hasMicError;
+  }, [hasMicError, localParticipant?.tracks?.audio?.state]);
 
   return (
     <MediaDeviceContext.Provider
       value={{
-        camError,
-        cams,
-        currentCam,
-        currentMic,
-        currentSpeaker,
-        deviceState,
         isCamMuted,
         isMicMuted,
-        micError,
-        mics,
+        camError: hasCamError,
+        cams: cameras,
+        camState,
+        micError: hasMicError,
+        mics: microphones,
+        micState,
         refreshDevices,
-        setCurrentCam: selectCamera,
-        setCurrentMic: selectMic,
-        setCurrentSpeaker: selectSpeaker,
+        setCurrentCam: setCamera,
+        setCurrentMic: setMicrophone,
+        setCurrentSpeaker: setSpeaker,
         speakers,
       }}
     >

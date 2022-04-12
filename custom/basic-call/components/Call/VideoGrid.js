@@ -89,7 +89,7 @@ export const VideoGrid = React.memo(
       return bestLayout;
     }, [dimensions, participantCount]);
 
-    // Memoize our tile list to avoid unnecassary re-renders
+    // Memoize our tile list to avoid unnecessary re-renders
     const tiles = useDeepCompareMemo(
       () =>
         participantIds.map((participantId) => (

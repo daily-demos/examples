@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { LIVE_STREAMING_MODAL } from '@custom/live-streaming/components/LiveStreamingModal';
-import { useLiveStreaming } from '@custom/live-streaming/contexts/LiveStreamingProvider';
 import { TrayButton } from '@custom/shared/components/Tray';
+import { useLiveStreaming } from '@custom/shared/contexts/LiveStreamingProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import { ReactComponent as IconStream } from '@custom/shared/icons/streaming-md.svg';
