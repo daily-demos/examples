@@ -7,17 +7,15 @@ import MuteButton from '@custom/shared/components/MuteButton';
 import Tile from '@custom/shared/components/Tile';
 import { ACCESS_STATE_LOBBY } from '@custom/shared/constants';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
-import { useMediaDevices } from '@custom/shared/contexts/MediaDeviceProvider';
-import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
-import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import {
   DEVICE_STATE_BLOCKED,
   DEVICE_STATE_NOT_FOUND,
   DEVICE_STATE_IN_USE,
   DEVICE_STATE_PENDING,
-  DEVICE_STATE_LOADING,
-  DEVICE_STATE_GRANTED,
-} from '@custom/shared/contexts/useDevices';
+  useMediaDevices,
+} from '@custom/shared/contexts/MediaDeviceProvider';
+import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import IconSettings from '@custom/shared/icons/settings-sm.svg';
 
 import { useDeepCompareMemo } from 'use-deep-compare';
@@ -33,7 +31,8 @@ export const HairCheck = () => {
   const { callObject } = useCallState();
   const { localParticipant } = useParticipants();
   const {
-    deviceState,
+    camState,
+    micState,
     camError,
     micError,
     isCamMuted,
@@ -87,7 +86,7 @@ export const HairCheck = () => {
     }
   };
 
-  // Memoize the to prevent unnecassary re-renders
+  // Memoize the to prevent unnecessary re-renders
   const tileMemo = useDeepCompareMemo(
     () => (
       <Tile
@@ -100,21 +99,14 @@ export const HairCheck = () => {
     [localParticipant]
   );
 
-  const isLoading = useMemo(() => deviceState === DEVICE_STATE_LOADING, [
-    deviceState,
+  const isLoading = useMemo(() => camState === DEVICE_STATE_PENDING || micState === DEVICE_STATE_PENDING, [
+    camState, micState,
   ]);
 
-  const hasError = useMemo(() => {
-    return !(!deviceState ||
-      [
-        DEVICE_STATE_LOADING,
-        DEVICE_STATE_PENDING,
-        DEVICE_STATE_GRANTED,
-      ].includes(deviceState));
-  }, [deviceState]);
+  const hasError = useMemo(() => camError || micError, [camError, micError]);
 
   const camErrorVerbose = useMemo(() => {
-    switch (camError) {
+    switch (camState) {
       case DEVICE_STATE_BLOCKED:
         return 'Camera blocked by user';
       case DEVICE_STATE_NOT_FOUND:
@@ -124,7 +116,20 @@ export const HairCheck = () => {
       default:
         return 'unknown';
     }
-  }, [camError]);
+  }, [camState]);
+
+  const micErrorVerbose = useMemo(() => {
+    switch (micState) {
+      case DEVICE_STATE_BLOCKED:
+        return 'Microphone blocked by user';
+      case DEVICE_STATE_NOT_FOUND:
+        return 'Microphone not found';
+      case DEVICE_STATE_IN_USE:
+        return 'Microphone in use';
+      default:
+        return 'unknown';
+    }
+  }, [micState]);
 
   const showWaitingMessage = useMemo(() => {
     return (
@@ -206,14 +211,14 @@ export const HairCheck = () => {
                     <div className="overlay-message">{camErrorVerbose}</div>
                   )}
                   {micError && (
-                    <div className="overlay-message">{micError}</div>
+                    <div className="overlay-message">{micErrorVerbose}</div>
                   )}
                 </>
               )}
             </div>
             <div className="mute-buttons">
-              <MuteButton isMuted={isCamMuted} disabled={!!camError} />
-              <MuteButton mic isMuted={isMicMuted} disabled={!!micError} />
+              <MuteButton isMuted={isCamMuted} disabled={camError} />
+              <MuteButton mic isMuted={isMicMuted} disabled={micError} />
             </div>
             {tileMemo}
           </div>

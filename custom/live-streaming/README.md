@@ -18,7 +18,13 @@
 
 Please note: this demo is not currently mobile optimised
 
-### Getting started
+## Pre-requisites
+
+To use this demo, you will need to create a [Daily account](https://dashboard.daily.co/signup) and a [Daily room](https://dashboard.daily.co/rooms/create).
+
+You will also need to enter an RTMP URL in the demo UI to start a live stream. To learn more about where to find this value, please read Daily's [live streaming guide](https://docs.daily.co/guides/paid-features/live-streaming-with-daily). You may also find the [live streaming with AWS's IVS tutorial](https://www.daily.co/blog/live-stream-daily-calls-with-only-3-second-latency/) helpful.
+
+## Getting started
 
 ```
 # set both DAILY_API_KEY and DAILY_DOMAIN

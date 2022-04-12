@@ -5,10 +5,9 @@ import Field from '@custom/shared/components/Field';
 import { TextInput, SelectInput } from '@custom/shared/components/Input';
 import Modal from '@custom/shared/components/Modal';
 import Well from '@custom/shared/components/Well';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
+import { useLiveStreaming } from '@custom/shared/contexts/LiveStreamingProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { useLiveStreaming } from '../contexts/LiveStreamingProvider';
 
 export const LIVE_STREAMING_MODAL = 'live-streaming';
 
@@ -19,15 +18,19 @@ const LAYOUTS = [
 ];
 
 export const LiveStreamingModal = () => {
-  const { callObject } = useCallState();
-  const { allParticipants } = useParticipants();
+  const { participants } = useParticipants();
   const { currentModals, closeModal } = useUIState();
-  const { isStreaming, streamError } = useLiveStreaming();
+  const {
+    isStreaming,
+    streamError,
+    startLiveStreaming,
+    stopLiveStreaming,
+  } = useLiveStreaming();
   const [pending, setPending] = useState(false);
   const [rtmpUrl, setRtmpUrl] = useState('');
-  const [layout, setLayout] = useState(0);
+  const [layoutType, setLayoutType] = useState('default');
   const [maxCams, setMaxCams] = useState(9);
-  const [participant, setParticipant] = useState(0);
+  const [participantId, setParticipantId] = useState(0);
 
   useEffect(() => {
     // Reset pending state whenever stream state changes
@@ -35,19 +38,29 @@ export const LiveStreamingModal = () => {
   }, [isStreaming]);
 
   function startLiveStream() {
-    setPending(true);
+    const config = {
+      rtmpUrl,
+      layout: {
+        preset: layoutType,
+      },
+    };
 
-    const opts =
-      layout === 'single-participant'
-        ? { session_id: participant.id }
-        : { max_cam_streams: maxCams };
-    callObject.startLiveStreaming({ rtmpUrl, preset: layout, ...opts });
+    if (layoutType === 'single-participant')
+      config.layout.session_id = participantId;
+    else if (layoutType === 'default') config.layout.max_cam_streams = maxCams;
+
+    startLiveStreaming(config);
   }
 
-  function stopLiveStreaming() {
+  function stopLiveStream() {
     setPending(true);
-    callObject.stopLiveStreaming();
+    stopLiveStreaming();
   }
+
+  const handleRMTPURLChange = (e) => setRtmpUrl(e.target.value);
+  const handleSelectLayoutInputChange = (e) => setLayoutType(e.target.value);
+  const handleSelectParticipantInputChange = (e) => setParticipantId(e.target.value);
+  const handleSelectMaxCamsInputChange = (e) => setMaxCams(e.target.valueAsNumber);
 
   return (
     <Modal
@@ -62,7 +75,7 @@ export const LiveStreamingModal = () => {
           <Button
             fullWidth
             disabled={!rtmpUrl || pending}
-            onClick={() => startLiveStream()}
+            onClick={startLiveStream}
           >
             {pending ? 'Starting stream...' : 'Start live streaming'}
           </Button>
@@ -70,7 +83,7 @@ export const LiveStreamingModal = () => {
           <Button
             fullWidth
             variant="warning"
-            onClick={() => stopLiveStreaming()}
+            onClick={stopLiveStream}
           >
             Stop live streaming
           </Button>
@@ -85,22 +98,21 @@ export const LiveStreamingModal = () => {
       <CardBody>
         <Field label="Layout">
           <SelectInput
-            onChange={(e) => setLayout(Number(e.target.value))}
-            value={layout}
+            onChange={handleSelectLayoutInputChange}
+            value={layoutType}
           >
-            {LAYOUTS.map((l, i) => (
-              <option value={i} key={l.value}>
+            {LAYOUTS.map((l) => (
+              <option value={l.value} key={l.value}>
                 {l.label}
               </option>
             ))}
           </SelectInput>
         </Field>
 
-        {layout !==
-          LAYOUTS.findIndex((l) => l.value === 'single-participant') && (
+        {layoutType === 'default' && (
           <Field label="Additional cameras">
             <SelectInput
-              onChange={(e) => setMaxCams(Number(e.target.value))}
+              onChange={handleSelectMaxCamsInputChange}
               value={maxCams}
             >
               <option value={9}>9 cameras</option>
@@ -116,15 +128,17 @@ export const LiveStreamingModal = () => {
           </Field>
         )}
 
-        {layout ===
-          LAYOUTS.findIndex((l) => l.value === 'single-participant') && (
+        {layoutType === 'single-participant' && (
           <Field label="Select participant">
             <SelectInput
-              onChange={(e) => setParticipant(e.target.value)}
-              value={participant}
+              onChange={handleSelectParticipantInputChange}
+              value={participantId}
             >
-              {allParticipants.map((p) => (
-                <option value={p.id} key={p.id}>
+              <option value={0} disabled>
+                Select
+              </option>
+              {participants.map((p) => (
+                <option value={p.sessionId} key={p.sessionId}>
                   {p.name}
                 </option>
               ))}
@@ -137,8 +151,14 @@ export const LiveStreamingModal = () => {
             type="text"
             placeholder="RTMP URL"
             required
-            onChange={(e) => setRtmpUrl(e.target.value)}
+            onChange={handleRMTPURLChange}
           />
+          <a
+            className="learn-more"
+            href="https://docs.daily.co/guides/paid-features/live-streaming-with-daily"
+          >
+            Want to learn more about RTMP url?
+          </a>
         </Field>
       </CardBody>
     </Modal>
