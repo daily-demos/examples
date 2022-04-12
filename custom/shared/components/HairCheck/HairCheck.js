@@ -86,7 +86,7 @@ export const HairCheck = () => {
     }
   };
 
-  // Memoize the to prevent unnecassary re-renders
+  // Memoize the to prevent unnecessary re-renders
   const tileMemo = useDeepCompareMemo(
     () => (
       <Tile
