@@ -127,8 +127,9 @@ export const CallProvider = ({
   useEffect(() => {
     if (!daily) return;
 
-    if (cleanURLOnJoin)
+    if (cleanURLOnJoin) {
       daily.on('joined-meeting', () => router.replace(`/${room}`));
+    }
 
     return () => daily.off('joined-meeting', () => router.replace(`/${room}`));
   }, [cleanURLOnJoin, daily, room, router]);

@@ -2,24 +2,23 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
 } from 'react';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
+import { useDaily, useDailyEvent } from '@daily-co/daily-react-hooks';
 import { nanoid } from 'nanoid';
 import PropTypes from 'prop-types';
 
 export const TranscriptionContext = createContext();
 
 export const TranscriptionProvider = ({ children }) => {
-  const { callObject } = useCallState();
+  const daily = useDaily();
   const [transcriptionHistory, setTranscriptionHistory] = useState([]);
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   const handleNewMessage = useCallback(
     (e) => {
-      const participants = callObject.participants();
+      const participants = daily.participants();
       // Collect only transcription messages, and gather enough
       // words to be able to post messages at sentence intervals
       if (e.fromId === 'transcription' && e.data?.is_final) {
@@ -37,7 +36,7 @@ export const TranscriptionProvider = ({ children }) => {
 
       setHasNewMessages(true);
     },
-    [callObject]
+    [daily]
   );
 
   const handleTranscriptionStarted = useCallback(() => {
@@ -55,21 +54,10 @@ export const TranscriptionProvider = ({ children }) => {
     setIsTranscribing(false);
   }, []);
 
-  useEffect(() => {
-    if (!callObject) {
-      return false;
-    }
-
-    console.log(`💬 Transcription provider listening for app messages`);
-
-    callObject.on('app-message', handleNewMessage);
-
-    callObject.on('transcription-started', handleTranscriptionStarted);
-    callObject.on('transcription-stopped', handleTranscriptionStopped);
-    callObject.on('transcription-error', handleTranscriptionError);
-
-    return () => callObject.off('app-message', handleNewMessage);
-  }, [callObject, handleNewMessage, handleTranscriptionStarted, handleTranscriptionStopped, handleTranscriptionError]);
+  useDailyEvent('app-message', handleNewMessage);
+  useDailyEvent('transcription-started', handleTranscriptionStarted);
+  useDailyEvent('transcription-stopped', handleTranscriptionStopped);
+  useDailyEvent('transcription-error', handleTranscriptionError);
 
   return (
     <TranscriptionContext.Provider

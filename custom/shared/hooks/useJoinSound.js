@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { useCallState } from '../contexts/CallProvider';
+import { useDaily, useDailyEvent } from '@daily-co/daily-react-hooks';
 import { useSoundLoader } from './useSoundLoader';
 
 /**
  * Convenience hook to play `join.mp3` when first other participants joins.
  */
 export const useJoinSound = () => {
-  const { callObject: daily } = useCallState();
+  const daily = useDaily();
   const { joinSound } = useSoundLoader();
   const [playJoinSound, setPlayJoinSound] = useState(false);
 
@@ -25,18 +25,12 @@ export const useJoinSound = () => {
     }, 2000);
   }, [daily]);
 
-  useEffect(() => {
-    if (!daily) return;
-    const handleParticipantJoined = () => {
-      // first other participant joined --> play sound
-      if (!playJoinSound || Object.keys(daily.participants()).length !== 2)
-        return;
-      joinSound.play();
-    };
-
-    daily.on('participant-joined', handleParticipantJoined);
-    return () => {
-      daily.off('participant-joined', handleParticipantJoined);
-    };
+  const handleParticipantJoined = useCallback(() => {
+    // first other participant joined --> play sound
+    if (!playJoinSound || Object.keys(daily.participants()).length !== 2)
+      return;
+    joinSound.play();
   }, [daily, joinSound, playJoinSound]);
+
+  useDailyEvent('participant-joined', handleParticipantJoined);
 };
