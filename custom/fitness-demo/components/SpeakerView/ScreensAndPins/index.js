@@ -1,1 +1,0 @@
-export { ScreensAndPins } from './ScreensAndPins';

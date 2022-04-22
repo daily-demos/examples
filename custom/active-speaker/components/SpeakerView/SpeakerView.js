@@ -3,67 +3,41 @@ import { Container } from '@custom/basic-call/components/Call/Container';
 import Header from '@custom/basic-call/components/Call/Header';
 import ParticipantBar from '@custom/shared/components/ParticipantBar/ParticipantBar';
 import VideoContainer from '@custom/shared/components/VideoContainer/VideoContainer';
-import { useCallState } from '@custom/shared/contexts/CallProvider';
 import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
 import { useTracks } from '@custom/shared/contexts/TracksProvider';
-import { useUIState } from '@custom/shared/contexts/UIStateProvider';
-import { isScreenId } from '@custom/shared/contexts/participantsState';
+import { Screens } from './Screens';
 import { SpeakerTile } from './SpeakerTile';
 
 const SIDEBAR_WIDTH = 186;
 
 export const SpeakerView = () => {
-  const { currentSpeaker, localParticipant, participants, screens } =
+  const { currentSpeakerId, localParticipant, screens, orderedParticipantIds } =
     useParticipants();
   const { updateCamSubscriptions } = useTracks();
-  const { showLocalVideo } = useCallState();
-  const { pinnedId } = useUIState();
   const activeRef = useRef();
-
-  const screensAndPinned = useMemo(
-    () => [...screens, ...participants.filter(({ id }) => id === pinnedId)],
-    [participants, pinnedId, screens]
-  );
-
-  const otherParticipants = useMemo(
-    () => participants.filter(({ isLocal }) => !isLocal),
-    [participants]
-  );
-
-  const showSidebar = useMemo(() => {
-    const hasScreenshares = screens.length > 0;
-
-    if (isScreenId(pinnedId)) {
-      return false;
-    }
-
-    return participants.length > 1 || hasScreenshares;
-  }, [participants, pinnedId, screens]);
-
-  /* const screenShareTiles = useMemo(
-    () => <ScreensAndPins items={screensAndPinned} />,
-    [screensAndPinned]
-  ); */
 
   const hasScreenshares = useMemo(() => screens.length > 0, [screens]);
 
+  const showSidebar = useMemo(
+    () => orderedParticipantIds.length > 0 || hasScreenshares,
+    [hasScreenshares, orderedParticipantIds]
+  );
+
   const fixedItems = useMemo(() => {
     const items = [];
-    if (showLocalVideo) {
-      items.push(localParticipant);
-    }
-    if (hasScreenshares && otherParticipants.length > 0) {
-      items.push(otherParticipants[0]);
+    items.push(localParticipant?.session_id);
+    if (hasScreenshares && orderedParticipantIds.length > 0) {
+      items.push(orderedParticipantIds[0]);
     }
     return items;
-  }, [hasScreenshares, localParticipant, otherParticipants, showLocalVideo]);
+  }, [hasScreenshares, localParticipant, orderedParticipantIds]);
 
   const otherItems = useMemo(() => {
-    if (otherParticipants.length > 1) {
-      return otherParticipants.slice(hasScreenshares ? 1 : 0);
+    if (orderedParticipantIds.length > 1) {
+      return orderedParticipantIds.slice(hasScreenshares ? 1 : 0);
     }
     return [];
-  }, [hasScreenshares, otherParticipants]);
+  }, [hasScreenshares, orderedParticipantIds]);
 
   /**
    * Update cam subscriptions, in case ParticipantBar is not shown.
@@ -72,10 +46,10 @@ export const SpeakerView = () => {
     // Sidebar takes care of cam subscriptions for all displayed participants.
     if (showSidebar) return;
     updateCamSubscriptions([
-      currentSpeaker?.id,
-      ...screensAndPinned.map((p) => p.id),
+      currentSpeakerId,
+      ...screens.map((s) => s.session_id),
     ]);
-  }, [currentSpeaker, screensAndPinned, showSidebar, updateCamSubscriptions]);
+  }, [currentSpeakerId, screens, showSidebar, updateCamSubscriptions]);
 
   return (
     <div className="speaker-view">
@@ -83,7 +57,11 @@ export const SpeakerView = () => {
         <Header />
         <VideoContainer>
           <div ref={activeRef} className="active">
-            <SpeakerTile participant={currentSpeaker} screenRef={activeRef} />
+            {screens.length > 0 ? (
+              <Screens />
+            ) : (
+              <SpeakerTile screenRef={activeRef} sessionId={currentSpeakerId} />
+            )}
           </div>
         </VideoContainer>
       </Container>

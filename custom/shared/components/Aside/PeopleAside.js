@@ -4,6 +4,7 @@ import { ReactComponent as IconCamOff } from '@custom/shared/icons/camera-off-sm
 import { ReactComponent as IconCamOn } from '@custom/shared/icons/camera-on-sm.svg';
 import { ReactComponent as IconMicOff } from '@custom/shared/icons/mic-off-sm.svg';
 import { ReactComponent as IconMicOn } from '@custom/shared/icons/mic-on-sm.svg';
+import { useMediaTrack, useParticipant } from '@daily-co/daily-react-hooks';
 import PropTypes from 'prop-types';
 import { useCallState } from '../../contexts/CallProvider';
 import { useParticipants } from '../../contexts/ParticipantsProvider';
@@ -12,45 +13,51 @@ import Button from '../Button';
 
 export const PEOPLE_ASIDE = 'people';
 
-const PersonRow = ({ participant, isOwner = false }) => (
-  <div className="person-row">
-    <div className="name">
-      {participant.name} {participant.isLocal && '(You)'}
-    </div>
-    <div className="actions">
-      {!isOwner ? (
-        <>
+const PersonRow = ({ sessionId, isOwner = false }) => {
+  const participant = useParticipant(sessionId);
+
+  const videoState = useMediaTrack(sessionId, 'video');
+
+  if (!participant) return null;
+  return (
+    <div className="person-row">
+      <div className="name">
+        {participant.user_name} {participant.local && '(You)'}
+      </div>
+      <div className="actions">
+        {!isOwner ? (
+          <>
           <span
-            className={participant.isCamMuted ? 'state error' : 'state success'}
+            className={!videoState?.isOff && videoState?.persistentTrack ? 'state success' : 'state error'}
           >
-            {participant.isCamMuted ? <IconCamOff /> : <IconCamOn />}
+            {!videoState?.isOff && videoState?.persistentTrack ? <IconCamOn /> : <IconCamOff />}
           </span>
-          <span
-            className={participant.isMicMuted ? 'state error' : 'state success'}
-          >
-            {participant.isMicMuted ? <IconMicOff /> : <IconMicOn />}
+            <span
+              className={participant.audio ? 'state success' : 'state error'}
+            >
+            {participant.audio ? <IconMicOn /> : <IconMicOff />}
           </span>
-        </>
-      ) : (
-        <>
-          <Button
-            size="tiny-square"
-            disabled={participant.isCamMuted}
-            variant={participant.isCamMuted ? 'error-light' : 'success-light'}
-          >
-            {participant.isCamMuted ? <IconCamOff /> : <IconCamOn />}
-          </Button>
-          <Button
-            size="tiny-square"
-            disabled={participant.isMicMuted}
-            variant={participant.isMicMuted ? 'error-light' : 'success-light'}
-          >
-            {participant.isMicMuted ? <IconMicOff /> : <IconMicOn />}
-          </Button>
-        </>
-      )}
-    </div>
-    <style jsx>{`
+          </>
+        ) : (
+          <>
+            <Button
+              size="tiny-square"
+              disabled={!participant.video}
+              variant={!videoState?.isOff && videoState?.persistentTrack ? 'success-light' : 'error-light'}
+            >
+              {!videoState?.isOff && videoState?.persistentTrack ? <IconCamOn /> : <IconCamOff />}
+            </Button>
+            <Button
+              size="tiny-square"
+              disabled={!participant.audio}
+              variant={participant.audio ? 'success-light' : 'error-light'}
+            >
+              {participant.audio ? <IconMicOn /> : <IconMicOff />}
+            </Button>
+          </>
+        )}
+      </div>
+      <style jsx>{`
       .person-row {
         display: flex;
         border-bottom: 1px solid var(--gray-light);
@@ -87,8 +94,9 @@ const PersonRow = ({ participant, isOwner = false }) => (
         color: var(--green-default);
       }
     `}</style>
-  </div>
-);
+    </div>
+  );
+}
 PersonRow.propTypes = {
   participant: PropTypes.object,
   isOwner: PropTypes.bool,
@@ -97,7 +105,7 @@ PersonRow.propTypes = {
 export const PeopleAside = () => {
   const { callObject } = useCallState();
   const { showAside, setShowAside } = useUIState();
-  const { participants, isOwner } = useParticipants();
+  const { participantIds, isOwner } = useParticipants();
 
   if (!showAside || showAside !== PEOPLE_ASIDE) {
     return null;
@@ -131,8 +139,8 @@ export const PeopleAside = () => {
           </div>
         )}
         <div className="rows">
-          {participants.map((p) => (
-            <PersonRow participant={p} key={p.id} isOwner={isOwner} />
+          {participantIds.map((participantId) => (
+            <PersonRow sessionId={participantId} key={participantId} isOwner={isOwner} />
           ))}
         </div>
         <style jsx>

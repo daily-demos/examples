@@ -1,3 +1,3 @@
-export { Audio } from './Audio';
+export { AudioTracks as Audio } from './AudioTracks';
 export { AudioTrack } from './AudioTrack';
-export { CombinedAudioTrack } from './CombinedAudioTrack';
+export { WebAudioTracks } from './WebAudioTracks';

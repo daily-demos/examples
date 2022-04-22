@@ -4,7 +4,6 @@ import { CardBody } from '@custom/shared/components/Card';
 import Modal from '@custom/shared/components/Modal';
 import Well from '@custom/shared/components/Well';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
-import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import {
   RECORDING_COUNTDOWN_1,
   RECORDING_COUNTDOWN_2,
@@ -13,11 +12,11 @@ import {
   RECORDING_RECORDING,
   RECORDING_SAVED,
   RECORDING_TYPE_CLOUD,
-  RECORDING_TYPE_CLOUD_BETA,
   RECORDING_TYPE_RTP_TRACKS,
   RECORDING_UPLOADING,
   useRecording,
-} from '../contexts/RecordingProvider';
+} from '@custom/shared/contexts/RecordingProvider';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 
 export const RECORDING_MODAL = 'recording';
 
@@ -107,7 +106,7 @@ export const RecordingModal = () => {
           <p>Recording started: {recordingStartedDate.toString()}</p>
         )}
 
-        {[RECORDING_TYPE_CLOUD, RECORDING_TYPE_CLOUD_BETA].includes(
+        {[RECORDING_TYPE_CLOUD].includes(
           enableRecording
         ) && (
           <>

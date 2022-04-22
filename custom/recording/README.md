@@ -27,7 +27,7 @@ yarn workspace @custom/recording dev
 
 ### How does this demo work?
 
-This example introduces a new [RecordingProvider](./contexts/RecordingProvider.js) context that listens for the various [recording events](https://docs.daily.co/reference#recording-started), counts down to begin a recording and stops a currently active recording. We also introduce a new recording modal and tray button.
+This example introduces a new [RecordingProvider](../shared/contexts/RecordingProvider.js) context that listens for the various [recording events](https://docs.daily.co/reference#recording-started), counts down to begin a recording and stops a currently active recording. We also introduce a new recording modal and tray button.
 
 Remember to follow the best practises detailed in [the documentation](https://docs.daily.co/reference#recordings) to avoid lengthy or stuck recordings.
 

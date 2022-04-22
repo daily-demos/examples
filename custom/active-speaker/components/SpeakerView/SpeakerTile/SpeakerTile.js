@@ -1,28 +1,28 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Tile from '@custom/shared/components/Tile';
 import { DEFAULT_ASPECT_RATIO } from '@custom/shared/constants';
 import { useResize } from '@custom/shared/hooks/useResize';
+import defaultTheme from '@custom/shared/styles/defaultTheme';
 import PropTypes from 'prop-types';
 
 const MAX_RATIO = DEFAULT_ASPECT_RATIO;
 const MIN_RATIO = 4 / 3;
 
-export const SpeakerTile = ({ participant, screenRef }) => {
+export const SpeakerTile = ({ sessionId, screenRef }) => {
   const [ratio, setRatio] = useState(MAX_RATIO);
   const [nativeAspectRatio, setNativeAspectRatio] = useState(null);
   const [screenHeight, setScreenHeight] = useState(1);
 
   const updateRatio = useCallback(() => {
-    const rect = screenRef.current?.getBoundingClientRect();
-    setRatio(rect.width / rect.height);
-    setScreenHeight(rect.height);
+    if (!screenRef.current) return;
+    const { height, width } = screenRef.current.getBoundingClientRect();
+    setRatio(width / height);
+    setScreenHeight(height);
   }, [screenRef]);
 
   useResize(() => {
     updateRatio();
   }, [updateRatio]);
-
-  useEffect(() => updateRatio(), [updateRatio]);
 
   /**
    * Only use the video's native aspect ratio if it's in portrait mode
@@ -49,13 +49,14 @@ export const SpeakerTile = ({ participant, screenRef }) => {
   const style = {
     height,
     maxWidth: screenHeight * finalRatio,
+    outline: `1px solid ${defaultTheme.background}`,
     overflow: 'hidden',
   };
 
   return (
     <Tile
       aspectRatio={finalRatio}
-      participant={participant}
+      sessionId={sessionId}
       style={style}
       videoFit={videoFit}
       showActiveSpeaker={false}

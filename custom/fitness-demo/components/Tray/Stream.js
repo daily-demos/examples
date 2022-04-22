@@ -13,7 +13,7 @@ export const Stream = () => {
   const { isStreaming } = useLiveStreaming();
   const { localParticipant } = useParticipants();
 
-  if (!localParticipant.isOwner) return null;
+  if (!localParticipant.owner) return null;
 
   return (
     <TrayButton

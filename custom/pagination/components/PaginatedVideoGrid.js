@@ -1,6 +1,5 @@
 import React, {
   useRef,
-  useCallback,
   useMemo,
   useEffect,
   useState,
@@ -12,14 +11,13 @@ import {
   MEETING_STATE_JOINED,
 } from '@custom/shared/constants';
 import { useCallState } from '@custom/shared/contexts/CallProvider';
-import { useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
-import { isLocalId } from '@custom/shared/contexts/participantsState';
+import { useParticipantMetaData, useParticipants } from '@custom/shared/contexts/ParticipantsProvider';
+import { useTracks } from '@custom/shared/contexts/TracksProvider';
 import { useActiveSpeaker } from '@custom/shared/hooks/useActiveSpeaker';
 import { useCamSubscriptions } from '@custom/shared/hooks/useCamSubscriptions';
 import { ReactComponent as IconArrow } from '@custom/shared/icons/raquo-md.svg';
-import sortByKey from '@custom/shared/lib/sortByKey';
 import PropTypes from 'prop-types';
-import { useDeepCompareMemo } from 'use-deep-compare';
+import { useDeepCompareMemo, useDeepCompareEffect } from 'use-deep-compare';
 
 // --- Constants
 
@@ -31,11 +29,14 @@ export const PaginatedVideoGrid = ({
 }) => {
   const { callObject } = useCallState();
   const {
-    activeParticipant,
     participantCount,
-    participants,
+    participantIds,
+    localParticipant,
     swapParticipantPosition,
+    orderedParticipantIds,
   } = useParticipants();
+  const { maxCamSubscriptions } = useTracks();
+  const participantMetaData = useParticipantMetaData();
   const activeSpeakerId = useActiveSpeaker();
 
   // Memoized participant count (does not include screen shares)
@@ -132,12 +133,12 @@ export const PaginatedVideoGrid = ({
   // -- Track subscriptions
 
   // Memoized array of participants on the current page (those we can see)
-  const visibleParticipants = useMemo(
+  const visibleParticipantIds = useMemo(
     () =>
-      participants.length - page * pageSize > 0
-        ? participants.slice((page - 1) * pageSize, page * pageSize)
-        : participants.slice(-pageSize),
-    [page, pageSize, participants]
+      participantIds.length - page * pageSize > 0
+        ? participantIds.slice((page - 1) * pageSize, page * pageSize)
+        : participantIds.slice(-pageSize),
+    [page, pageSize, participantIds]
   );
 
   /**
@@ -145,54 +146,69 @@ export const PaginatedVideoGrid = ({
    * Note: we pause adjacent page tracks and unsubscribe from everything else
    */
   const camSubscriptions = useMemo(() => {
-    const maxSubs = 3 * pageSize;
+    const maxSubs = maxCamSubscriptions
+      ? // avoid subscribing to only a portion of a page
+      Math.max(maxCamSubscriptions, pageSize)
+      : // if no maximum is set, subscribe to adjacent pages
+      3 * pageSize;
 
-    // Determine participant ids to subscribe to or stage, based on page
-    let renderedOrBufferedIds = [];
+    // Determine participant ids to subscribe to or stage, based on page.
+    let renderedOrBufferedIds;
     switch (page) {
       // First page
       case 1:
-        renderedOrBufferedIds = participants
-          .slice(0, Math.min(maxSubs, 2 * pageSize))
-          .map((p) => p.id);
+        renderedOrBufferedIds = orderedParticipantIds.slice(
+          0,
+          Math.min(maxSubs, 2 * pageSize - 1)
+        );
         break;
       // Last page
-      case Math.ceil(participants.length / pageSize):
-        renderedOrBufferedIds = participants
-          .slice(-Math.min(maxSubs, 2 * pageSize))
-          .map((p) => p.id);
+      case Math.ceil(orderedParticipantIds.length / pageSize):
+        renderedOrBufferedIds = orderedParticipantIds.slice(
+          -Math.min(maxSubs, 2 * pageSize)
+        );
         break;
       // Any other page
       default:
-        {
-          const buffer = (maxSubs - pageSize) / 2;
-          const min = (page - 1) * pageSize - buffer;
-          const max = page * pageSize + buffer;
-          renderedOrBufferedIds = participants.slice(min, max).map((p) => p.id);
-        }
+      {
+        const buffer = Math.floor((maxSubs - pageSize) / 2);
+        const min = Math.max(0, (page - 1) * pageSize - buffer);
+        const max = Math.min(
+          orderedParticipantIds.length,
+          page * pageSize + buffer
+        );
+        renderedOrBufferedIds = orderedParticipantIds.slice(min, max);
+      }
         break;
     }
 
     const subscribedIds = [];
     const stagedIds = [];
 
-    // Decide whether to subscribe to or stage participants'
-    // track based on visibility
-    renderedOrBufferedIds.forEach((id) => {
-      if (id !== isLocalId()) {
-        if (visibleParticipants.some((vp) => vp.id === id)) {
+    // Decide whether to subscribe to or stage participants' track based on
+    // visibility
+    for (const id of renderedOrBufferedIds) {
+      if (id !== localParticipant?.session_id) {
+        if (visibleParticipantIds.some((visId) => visId === id)) {
           subscribedIds.push(id);
         } else {
           stagedIds.push(id);
         }
       }
-    });
+    }
 
     return {
       subscribedIds,
       stagedIds,
     };
-  }, [page, pageSize, participants, visibleParticipants]);
+  }, [
+    localParticipant?.session_id,
+    maxCamSubscriptions,
+    orderedParticipantIds,
+    page,
+    pageSize,
+    visibleParticipantIds,
+  ]);
 
   useCamSubscriptions(
     camSubscriptions?.subscribedIds,
@@ -205,7 +221,7 @@ export const PaginatedVideoGrid = ({
   useEffect(() => {
     if (!(callObject && callObject.meetingState() === MEETING_STATE_JOINED))
       return;
-    const count = visibleParticipants.length;
+    const count = visibleParticipantIds.length;
 
     let layer;
     if (count < 5) {
@@ -215,79 +231,86 @@ export const PaginatedVideoGrid = ({
       // mid quality layer
       layer = 1;
     } else {
-      // low qualtiy layer
+      // low quality layer
       layer = 0;
     }
 
-    const receiveSettings = visibleParticipants.reduce(
-      (settings, participant) => {
-        if (isLocalId(participant.id)) return settings;
-        return { ...settings, [participant.id]: { video: { layer } } };
+    const receiveSettings = visibleParticipantIds.reduce(
+      (settings, participantId) => {
+        if (localParticipant.session_id === participantId) return settings;
+        return { ...settings, [participantId]: { video: { layer } } };
       },
       {}
     );
     callObject.updateReceiveSettings(receiveSettings);
-  }, [visibleParticipants, callObject]);
+  }, [visibleParticipantIds, callObject, localParticipant.session_id]);
 
   // -- Active speaker
 
   /**
    * Handle position updates based on active speaker events
    */
-  const handleActiveSpeakerChange = useCallback(
-    (peerId) => {
-      if (!peerId) return;
-      // active participant is already visible
-      if (visibleParticipants.some(({ id }) => id === peerId)) return;
-      // ignore repositioning when viewing page > 1
-      if (page > 1) return;
-
-      /**
-       * We can now assume that
-       * a) the user is looking at page 1
-       * b) the most recent active participant is not visible on page 1
-       * c) we'll have to promote the most recent participant's position to page 1
-       *
-       * To achieve that, we'll have to
-       * - find the least recent active participant on page 1
-       * - swap least & most recent active participant's position via setParticipantPosition
-       */
-      const sortedVisibleRemoteParticipants = visibleParticipants
-        .filter(({ isLocal }) => !isLocal)
-        .sort((a, b) => sortByKey(a, b, 'lastActiveDate'));
-
-      if (!sortedVisibleRemoteParticipants.length) return;
-
-      swapParticipantPosition(sortedVisibleRemoteParticipants[0].id, peerId);
-    },
-    [page, swapParticipantPosition, visibleParticipants]
+  const sortedVisibleRemoteParticipantIds = useDeepCompareMemo(
+    () =>
+      visibleParticipantIds.slice(1).sort((a, b) => {
+        const lastActiveA =
+          participantMetaData[a]?.last_active_date ?? new Date('1970-01-01');
+        const lastActiveB =
+          participantMetaData[b]?.last_active_date ?? new Date('1970-01-01');
+        if (lastActiveA > lastActiveB) return 1;
+        if (lastActiveA < lastActiveB) return -1;
+        return 0;
+      }),
+    [participantMetaData, visibleParticipantIds]
   );
 
-  useEffect(() => {
-    if (page > 1 || !activeSpeakerId) return;
-    handleActiveSpeakerChange(activeSpeakerId);
-  }, [activeSpeakerId, handleActiveSpeakerChange, page]);
+  useDeepCompareEffect(() => {
+    if (!activeSpeakerId) return;
+
+    // active participant is already visible
+    if (visibleParticipantIds.some((id) => id === activeSpeakerId)) return;
+    // ignore repositioning when viewing page > 1
+    if (page > 1) return;
+
+    /**
+     * We can now assume that
+     * a) the user is looking at page 1
+     * b) the most recent active participant is not visible on page 1
+     * c) we'll have to promote the most recent participant's position to page 1
+     *
+     * To achieve that, we'll have to
+     * - find the least recent active participant on page 1
+     * - swap least & most recent active participant's position via setParticipantPosition
+     */
+
+    if (!sortedVisibleRemoteParticipantIds.length) return;
+
+    swapParticipantPosition(
+      sortedVisibleRemoteParticipantIds[0],
+      activeSpeakerId
+    );
+  }, [
+    activeSpeakerId,
+    page,
+    sortedVisibleRemoteParticipantIds,
+    swapParticipantPosition,
+    visibleParticipantIds,
+  ]);
 
   const tiles = useDeepCompareMemo(
     () =>
-      visibleParticipants.map((p) => (
+      visibleParticipantIds.map((p) => (
         <Tile
-          participant={p}
+          sessionId={p}
           mirrored
-          key={p.id}
+          key={p}
           style={{
             maxHeight: tileHeight,
             maxWidth: tileWidth,
           }}
         />
       )),
-    [
-      activeParticipant,
-      participantCount,
-      tileWidth,
-      tileHeight,
-      visibleParticipants,
-    ]
+    [participantCount, tileWidth, tileHeight, visibleParticipantIds]
   );
 
   const handlePrevClick = () => setPage((p) => p - 1);
