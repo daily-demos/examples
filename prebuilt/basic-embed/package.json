@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@daily-co/daily-js": "^0.41.0",
     "clipboard-polyfill": "^3.0.3",
     "next": "11.1.2",
     "next-compose-plugins": "^2.2.1",
