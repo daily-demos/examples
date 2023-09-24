@@ -4,26 +4,44 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { useUIState } from '@custom/shared/contexts/UIStateProvider';
+import { useDaily, useMediaTrack } from '@daily-co/daily-react-hooks';
 import Bowser from 'bowser';
 import classNames from 'classnames';
 
-import { useCallState } from '../../contexts/CallProvider';
-import { useUIState } from '../../contexts/UIStateProvider';
-import { useVideoTrack } from '../../hooks/useVideoTrack';
+import { useDeepCompareMemo } from 'use-deep-compare';
 
 export const Video = forwardRef(
   (
-    { fit = 'contain', isScreen = false, participantId, ...props },
+    { fit = 'contain', isScreen = false, sessionId, ...props },
     videoEl
   ) => {
-    const { callObject: daily } = useCallState();
+    const daily = useDaily();
     const { isMobile } = useUIState();
     const isLocalCam = useMemo(() => {
       const localParticipant = daily.participants()?.local;
-      return participantId === localParticipant.session_id && !isScreen;
-    }, [daily, isScreen, participantId]);
+      return sessionId === localParticipant.session_id && !isScreen;
+    }, [daily, isScreen, sessionId]);
     const [isMirrored, setIsMirrored] = useState(isLocalCam);
-    const videoTrack = useVideoTrack(participantId);
+    const videoState = useMediaTrack(
+      sessionId,
+      isScreen ? 'screenVideo' : 'video'
+    );
+    const videoTrack = useMemo(
+      () => videoState.persistentTrack,
+      [videoState.persistentTrack]
+    );
+
+    /**
+     * Considered as playable video:
+     * - local cam feed
+     * - any screen share
+     * - remote cam feed that is subscribed and reported as playable
+     */
+    const isPlayable = useDeepCompareMemo(
+      () => isLocalCam || isScreen || !videoState.isOff,
+      [isLocalCam, isScreen, videoState.isOff]
+    );
 
     const isChrome92 = useMemo(() => {
       const { browser, platform, os } = Bowser.parse(navigator.userAgent);
@@ -93,7 +111,7 @@ export const Video = forwardRef(
         video.srcObject = null;
         if (isChrome92) video.load();
       };
-    }, [isChrome92, participantId, videoEl, videoTrack, videoTrack?.id]);
+    }, [isChrome92, sessionId, videoEl, videoTrack, videoTrack?.id]);
 
     return (
       <>
@@ -101,7 +119,7 @@ export const Video = forwardRef(
           className={classNames(fit, {
             isMirrored,
             isMobile,
-            playable: videoTrack?.enabled,
+            playable: isPlayable && videoTrack?.enabled,
           })}
           autoPlay
           muted

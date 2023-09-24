@@ -19,6 +19,7 @@ import { useUIState } from '@custom/shared/contexts/UIStateProvider';
 import IconSettings from '@custom/shared/icons/settings-sm.svg';
 
 import { useDeepCompareMemo } from 'use-deep-compare';
+import { useLocalParticipant } from '@daily-co/daily-react-hooks';
 
 /**
  * Hair check
@@ -29,7 +30,7 @@ import { useDeepCompareMemo } from 'use-deep-compare';
  */
 export const HairCheck = () => {
   const { callObject } = useCallState();
-  const { localParticipant } = useParticipants();
+  const localParticipant = useLocalParticipant();
   const {
     camState,
     micState,
@@ -86,18 +87,18 @@ export const HairCheck = () => {
     }
   };
 
-  // Memoize the to prevent unnecessary re-renders
-  const tileMemo = useDeepCompareMemo(
-    () => (
+  // Memoize the to prevent unnecassary re-renders
+  const tileMemo = useDeepCompareMemo(() => {
+    if (!localParticipant?.session_id) return;
+    return (
       <Tile
-        participant={localParticipant}
+        sessionId={localParticipant?.session_id}
         mirrored
         showAvatar
         showName={false}
       />
-    ),
-    [localParticipant]
-  );
+    );
+  }, [localParticipant?.session_id]);
 
   const isLoading = useMemo(() => camState === DEVICE_STATE_PENDING || micState === DEVICE_STATE_PENDING, [
     camState, micState,

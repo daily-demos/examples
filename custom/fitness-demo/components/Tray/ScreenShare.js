@@ -20,7 +20,7 @@ export const ScreenShareTray = () => {
     isSharingScreen ? stopScreenShare() : startScreenShare();
 
   if (!enableScreenShare) return null;
-  if (!localParticipant.isOwner) return null;
+  if (!localParticipant.owner) return null;
 
   return (
     <TrayButton

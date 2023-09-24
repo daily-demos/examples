@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Button from '@custom/shared/components/Button';
 import { Card, CardBody, CardHeader } from '@custom/shared/components/Card';
 import { TextInput } from '@custom/shared/components/Input';
@@ -12,7 +12,7 @@ import Header from './Header';
 export const InviteOthers = () => {
   const { localParticipant } = useParticipants();
 
-  return (
+  return useMemo(() => (
     <Container>
       <Header />
       <VideoContainer>
@@ -38,7 +38,7 @@ export const InviteOthers = () => {
             </Card>
           </div>
           <div className="preview">
-            <Tile participant={localParticipant} mirrored aspectRatio={DEFAULT_ASPECT_RATIO} />
+            <Tile sessionId={localParticipant?.session_id} mirrored aspectRatio={DEFAULT_ASPECT_RATIO} />
           </div>
           <style jsx>{`
             .invite-wrapper {
@@ -76,7 +76,7 @@ export const InviteOthers = () => {
         </div>
       </VideoContainer>
     </Container>
-  )
+  ), [localParticipant?.session_id])
 }
 
 export default InviteOthers;
